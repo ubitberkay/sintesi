@@ -360,9 +360,30 @@
         }
 
         .contact-form {
+            grid-column: 1 / -1;
             display: flex;
             flex-direction: column;
             gap: 1.5rem;
+            margin-top: 3rem;
+            max-width: 800px;
+            width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .contact-map {
+            width: 100%;
+            height: 100%;
+            border-radius: 5px;
+            overflow: hidden;
+            border: 2px solid var(--color-accent);
+        }
+
+        .contact-map iframe {
+            width: 100%;
+            height: 100%;
+            min-height: 350px;
+            display: block;
         }
 
         .form-group input,
@@ -657,6 +678,10 @@
                 </div>
             </div>
 
+            <div class="contact-map">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3011.3926517557584!2d29.1214538765984!3d40.99477827135261!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14cac78f933a427d%3A0x95cfd6dca5c1aea5!2sSintesi!5e0!3m2!1str!2str!4v1777971006340!5m2!1str!2str" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+
             <form class="contact-form" id="contactForm">
                 <div id="form-message"
                     style="display: none; margin-bottom: 15px; padding: 15px; border-radius: 5px; text-align: center; width: 100%; grid-column: 1 / -1;">
@@ -713,13 +738,38 @@
             navLinks.classList.toggle('active');
         });
 
-        // Menü linklerine tıklandığında mobil menüyü kapatma
+        // Menü linklerine tıklandığında mobil menüyü kapatma ve URL hash temizleme
         const links = document.querySelectorAll('.nav-link');
         links.forEach(link => {
-            link.addEventListener('click', () => {
+            link.addEventListener('click', function (e) {
                 mobileMenu.classList.remove('active');
                 navLinks.classList.remove('active');
+
+                const href = this.getAttribute('href');
+                
+                // Eğer link aynı sayfadaki bir # id'ye gidiyorsa
+                if (href.startsWith('#')) {
+                    e.preventDefault(); // URL'ye # eklenmesini engeller
+                    const targetElement = document.querySelector(href);
+                    if (targetElement) {
+                        // Oraya yumuşak bir şekilde kaydır
+                        const offsetTop = targetElement.offsetTop;
+                        window.scrollTo({
+                            top: offsetTop - 80, // header yüksekliği kadar pay bırak (opsiyonel)
+                            behavior: 'smooth'
+                        });
+                    }
+                }
             });
+        });
+
+        // Eğer kullanıcı başka sayfadan "index.html#iletisim" gibi gelirse URL'yi temizle
+        window.addEventListener('load', () => {
+            if (window.location.hash) {
+                setTimeout(() => {
+                    history.replaceState(null, null, window.location.pathname + window.location.search);
+                }, 100);
+            }
         });
 
         // Scroll spy (Aktif menü linkini belirleme)
