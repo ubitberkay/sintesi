@@ -42,7 +42,12 @@ try {
 
     // Alıcı ve Gönderici Ayarları
     $mail->setFrom('info@sintesi.com.tr', 'Sintesi İletişim Formu');
-    $mail->addAddress('info@sintesi.com.tr', 'Sintesi İletişim');     // Gidecek adres
+    // Gidecek adresler (Birden fazla alıcı)
+    $mail->addAddress('bugra@sintesi.com.tr');
+    $mail->addAddress('cagla@sintesi.com.tr');
+    $mail->addAddress('ersinavsar@sintesi.com.tr');
+    $mail->addAddress('iletisim@sintesi.com.tr');
+    $mail->addAddress('info@sintesi.com.tr');
     $mail->addReplyTo($eposta, $ad);                            // Yanıtla butonu için gönderenin e-postası
 
     // İçerik
