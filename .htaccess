@@ -1,0 +1,14 @@
+RewriteEngine On
+
+# 1. "index.html" isteklerini ana dizine (/) yönlendir
+RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ /index\.html\ HTTP/
+RewriteRule ^index\.html$ / [R=301,L]
+
+# 2. Diğer sayfalardaki ".html" uzantılarını kaldır (Örn: hakkimizda.html -> hakkimizda)
+RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ /([^.]+)\.html\ HTTP
+RewriteRule ^(.*)\.html$ /$1 [R=301,L]
+
+# 3. Ziyaretçi uzantısız (hakkimizda) girdiğinde arka planda .html dosyasını çalıştır
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}.html -f
+RewriteRule ^(.*?)/?$ $1.html [L]
