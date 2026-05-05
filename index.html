@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sintesi</title>
+    <link rel="icon" type="image/webp" href="sintesi.webp">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Montserrat:wght@300;400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --color-bg: #0c0c0c;
+            --color-surface: #151515;
+            --color-text: #f5f5f5;
+            --color-text-muted: #a0a0a0;
+            --color-accent: #9D432C;
+            /* Elegant gold */
+            --color-accent-hover: #e8c682;
+
+            --font-heading: 'Cormorant Garamond', serif;
+            --font-body: 'Montserrat', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* Typography */
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: var(--font-heading);
+            font-weight: 400;
+        }
+
+        h2 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--color-accent);
+        }
+
+        .section-subtitle {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--color-text-muted);
+            margin-bottom: 2rem;
+            display: block;
+        }
+
+        p {
+            font-size: 1rem;
+            font-weight: 300;
+            color: var(--color-text-muted);
+            margin-bottom: 1.5rem;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+            transition: color 0.3s ease;
+        }
+
+        /* Button */
+        .btn {
+            display: inline-block;
+            padding: 12px 32px;
+            border: 1px solid var(--color-accent);
+            color: var(--color-accent);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: var(--color-accent);
+            color: var(--color-bg);
+        }
+
+        /* Header & Navbar */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 2rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            transition: background-color 0.4s ease, padding 0.4s ease;
+        }
+
+        header.scrolled {
+            background-color: rgba(12, 12, 12, 0.95);
+            padding: 1rem 5%;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .logo {
+            font-family: var(--font-heading);
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--color-text);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo img {
+            height: 1.2em;
+            width: auto;
+            object-fit: contain;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 3rem;
+        }
+
+        nav ul li a {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+        }
+
+        nav ul li a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background-color: var(--color-accent);
+            transition: width 0.3s ease;
+        }
+
+        nav ul li a:hover::after,
+        nav ul li a.active::after {
+            width: 100%;
+        }
+
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .menu-toggle span {
+            width: 30px;
+            height: 1px;
+            background-color: var(--color-text);
+            transition: 0.3s;
+        }
+
+        /* Hero Section */
+        #anasayfa {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            text-align: center;
+            max-width: 100%;
+            padding: 0;
+        }
+
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* Kullanıcının sonradan değiştirebileceği placeholder bir görsel */
+            background-image: url('./assets/optimized/hero.webp');
+            background-size: cover;
+            background-position: center;
+            z-index: -2;
+            filter: brightness(0.6);
+        }
+
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(12, 12, 12, 0.3), var(--color-bg));
+            z-index: -1;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            padding: 0 20px;
+            animation: fadeInUp 1.5s ease;
+        }
+
+        .hero-title {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Sections General */
+        section {
+            padding: 8rem 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Hakkımızda Section */
+        #hakkimizda {
+            display: flex;
+            align-items: center;
+            gap: 5rem;
+        }
+
+        .about-text {
+            flex: 1;
+        }
+
+        .about-image {
+            flex: 1;
+            position: relative;
+        }
+
+        .about-image::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: -20px;
+            width: 100%;
+            height: 100%;
+            border: 1px solid var(--color-accent);
+            z-index: -1;
+        }
+
+        .about-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: cover;
+            aspect-ratio: 3/4;
+        }
+
+        /* Galeri Section */
+        #galeri {
+            text-align: center;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            aspect-ratio: 1/1;
+            cursor: pointer;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.7s ease;
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .gallery-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .gallery-item:hover .gallery-overlay {
+            opacity: 1;
+        }
+
+        /* İletişim Section */
+        #iletisim {
+            background-color: var(--color-surface);
+            max-width: 100%;
+            padding: 8rem 5%;
+        }
+
+        .contact-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5rem;
+        }
+
+        .contact-info h3 {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            color: var(--color-accent);
+        }
+
+        .info-block {
+            margin-bottom: 2rem;
+        }
+
+        .info-block h4 {
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+            color: var(--color-text);
+        }
+
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 15px;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--color-text);
+            font-family: var(--font-body);
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-bottom-color: var(--color-accent);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.8rem;
+            color: var(--color-text-muted);
+            letter-spacing: 1px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .hero-title {
+                font-size: 3.5rem;
+            }
+
+            #hakkimizda {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .about-image {
+                margin-top: 2rem;
+                width: 80%;
+                margin: 2rem auto 0;
+            }
+
+            .contact-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Lightbox */
+        .lightbox {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            padding-top: 50px;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(5px);
+        }
+
+        .lightbox-content {
+            margin: auto;
+            display: block;
+            max-width: 90%;
+            max-height: 85vh;
+            object-fit: contain;
+            animation: zoomIn 0.3s ease;
+        }
+
+        @keyframes zoomIn {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 30px;
+            right: 40px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            z-index: 2001;
+        }
+
+        .close-btn:hover,
+        .close-btn:focus {
+            color: var(--color-accent);
+            text-decoration: none;
+        }
+
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            font-size: 30px;
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: background 0.3s;
+            z-index: 2001;
+        }
+
+        .nav-btn:hover {
+            background: var(--color-accent);
+        }
+
+        .prev-btn {
+            left: 20px;
+        }
+
+        .next-btn {
+            right: 20px;
+        }
+
+        @media (max-width: 768px) {
+            nav ul {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 70%;
+                height: 100vh;
+                background-color: var(--color-surface);
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                transition: right 0.4s ease;
+            }
+
+            nav ul.active {
+                right: 0;
+            }
+
+            .menu-toggle {
+                display: flex;
+                z-index: 1001;
+            }
+
+            .menu-toggle.active span:nth-child(1) {
+                transform: translateY(7px) rotate(45deg);
+            }
+
+            .menu-toggle.active span:nth-child(2) {
+                opacity: 0;
+            }
+
+            .menu-toggle.active span:nth-child(3) {
+                transform: translateY(-7px) rotate(-45deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header / Navbar -->
+    <header id="header">
+        <a href="#anasayfa" class="logo">
+            <img src="sintesi.webp" alt="Sintesi Logo">
+            Sintesi
+        </a>
+        <nav>
+            <ul id="nav-links">
+                <li><a href="#anasayfa" class="nav-link active">Anasayfa</a></li>
+                <li><a href="#hakkimizda" class="nav-link">Hakkımızda</a></li>
+                <li><a href="#galeri" class="nav-link">Galeri</a></li>
+                <li><a href="./assets/menu.pdf" target="_blank" class="nav-link">Menü</a></li>
+                <li><a href="#iletisim" class="nav-link">İletişim</a></li>
+            </ul>
+        </nav>
+        <div class="menu-toggle" id="mobile-menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </header>
+
+    <!-- Anasayfa (Hero) -->
+    <section id="anasayfa">
+        <!-- Fotoğraflar ekleneceği için varsayılan bir görsel bırakılmıştır, 'src' kısmından değiştirebilirsiniz -->
+        <div class="hero-bg"></div>
+        <div class="hero-overlay"></div>
+
+        <div class="hero-content">
+            <span class="section-subtitle">Gastronominin Sentezi</span>
+            <h1 class="hero-title">Sintesi</h1>
+            <p>Lezzetin, sanatın ve tutkunun bir araya geldiği unutulmaz bir deneyim. Geleneksel tatların modern
+                dokunuşlarla yeniden hayat bulduğu yer.</p>
+            <a href="#iletisim" class="btn">Rezervasyon Yap</a>
+        </div>
+    </section>
+
+    <!-- Hakkımızda -->
+    <section id="hakkimizda">
+        <div class="about-text">
+            <span class="section-subtitle">Hikayemiz</span>
+            <h2>Tutkuyla Harmanlanmış Lezzetler</h2>
+            <p>Sintesi, kelime anlamı olarak "sentez" anlamına gelir. Bizim için mutfak, farklı kültürlerin, yerel
+                malzemelerin ve yenilikçi tekniklerin kusursuz bir sentezidir.</p>
+            <p>Her bir tabağımız, en taze malzemelerin özenle seçilmesiyle başlar ve şeflerimizin sanatıyla masanıza
+                ulaşır. Amacımız, sadece yemek yemek değil, aynı zamanda duygulara hitap eden bir gastronomi yolculuğu
+                sunmaktır.</p>
+            <a href="hakkimizda.html" class="btn" style="margin-top: 1rem;">Mekanımızı Keşfedin</a>
+        </div>
+        <div class="about-image">
+            <!-- Hakkımızda Fotoğraf Alanı -->
+            <img src="./assets/optimized/ersin.webp" loading="lazy" alt="Sintesi Mutfak">
+        </div>
+    </section>
+
+    <!-- Galeri -->
+    <section id="galeri">
+        <span class="section-subtitle">Atmosfer & Sunum</span>
+        <h2>Görsel Bir Şölen</h2>
+
+        <div class="gallery-grid">
+            <!-- Galeri Fotoğraf Alanları -->
+            <div class="gallery-item">
+                <img src="./assets/optimized/galeri.webp" loading="lazy" alt="Galeri 1">
+                <div class="gallery-overlay"></div>
+            </div>
+            <div class="gallery-item">
+                <img src="./assets/optimized/galeri2.webp" loading="lazy" alt="Galeri 2">
+                <div class="gallery-overlay"></div>
+            </div>
+            <div class="gallery-item">
+                <img src="./assets/optimized/galeri3.webp" loading="lazy" alt="Galeri 3">
+                <div class="gallery-overlay"></div>
+            </div>
+            <div class="gallery-item">
+                <img src="./assets/optimized/galeri4.webp" loading="lazy" alt="Galeri 4">
+                <div class="gallery-overlay"></div>
+            </div>
+            <div class="gallery-item">
+                <img src="./assets/optimized/galeri5.webp" loading="lazy" alt="Galeri 5">
+                <div class="gallery-overlay"></div>
+            </div>
+            <div class="gallery-item">
+                <img src="./assets/optimized/galeri6.webp" loading="lazy" alt="Galeri 6">
+                <div class="gallery-overlay"></div>
+            </div>
+        </div>
+        <div style="text-align: center; margin-top: 3rem;">
+            <a href="galeri.html" class="btn">Tüm Galeriyi Gör</a>
+        </div>
+    </section>
+
+    <!-- İletişim -->
+    <section id="iletisim">
+        <div class="contact-container">
+            <div class="contact-info">
+                <span class="section-subtitle">Bize Ulaşın</span>
+                <h3>Sizi Ağırlamaktan Mutluluk Duyarız</h3>
+
+                <div class="info-block">
+                    <h4>Adres</h4>
+                    <p>Atatürk Mahallesi Ertuğrul Gazi Sokak Metropol İstanbul Alışveriş Merkezi B2 Katı<br>Ataşehir,
+                        İstanbul</p>
+                </div>
+
+                <div class="info-block">
+                    <h4>Rezervasyon</h4>
+                    <p>+90 (216) XXX XX XX<br>info@sintesi.com.tr</p>
+                </div>
+
+                <div class="info-block">
+                    <h4>Çalışma Saatleri</h4>
+                    <p>Salı - Pazar: 10:00 - 00:00<br>Pazartesi: Kapalı</p>
+                </div>
+            </div>
+
+            <form class="contact-form" id="contactForm">
+                <div id="form-message"
+                    style="display: none; margin-bottom: 15px; padding: 15px; border-radius: 5px; text-align: center; width: 100%; grid-column: 1 / -1;">
+                </div>
+                <div class="form-group">
+                    <input type="text" name="ad" id="ad" placeholder="Adınız Soyadınız" required>
+                </div>
+                <div class="form-group">
+                    <input type="email" name="eposta" id="eposta" placeholder="E-posta Adresiniz" required>
+                </div>
+                <div class="form-group">
+                    <input type="tel" name="telefon" id="telefon" placeholder="Telefon Numaranız"
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '');" maxlength="15">
+                </div>
+                <div class="form-group">
+                    <textarea name="mesaj" id="mesaj" placeholder="Mesajınız veya Özel İstekleriniz..."
+                        required></textarea>
+                </div>
+                <button type="submit" class="btn" id="submitBtn" style="align-self: flex-start;">Gönder</button>
+            </form>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; Sintesi Restaurant. Tüm Hakları Saklıdır.</p>
+    </footer>
+
+    <!-- Lightbox Modal -->
+    <div id="lightbox" class="lightbox">
+        <span class="close-btn">&times;</span>
+        <button class="nav-btn prev-btn">&#10094;</button>
+        <img class="lightbox-content" id="lightbox-img">
+        <button class="nav-btn next-btn">&#10095;</button>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Header scroll efekti
+        window.addEventListener('scroll', () => {
+            const header = document.getElementById('header');
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // Mobil menü toggle
+        const mobileMenu = document.getElementById('mobile-menu');
+        const navLinks = document.getElementById('nav-links');
+
+        mobileMenu.addEventListener('click', () => {
+            mobileMenu.classList.toggle('active');
+            navLinks.classList.toggle('active');
+        });
+
+        // Menü linklerine tıklandığında mobil menüyü kapatma
+        const links = document.querySelectorAll('.nav-link');
+        links.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.remove('active');
+                navLinks.classList.remove('active');
+            });
+        });
+
+        // Scroll spy (Aktif menü linkini belirleme)
+        const sections = document.querySelectorAll('section');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (pageYOffset >= (sectionTop - 200)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            links.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').includes(current)) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Lightbox functionality
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+        const closeBtn = document.querySelector('.close-btn');
+        const prevBtn = document.querySelector('.prev-btn');
+        const nextBtn = document.querySelector('.next-btn');
+
+        const galleryImages = Array.from(document.querySelectorAll('.gallery-item img'));
+        let currentIndex = 0;
+
+        function openLightbox(index) {
+            currentIndex = index;
+            lightboxImg.src = galleryImages[currentIndex].src;
+            lightbox.style.display = 'block';
+        }
+
+        function closeLightbox() {
+            lightbox.style.display = 'none';
+        }
+
+        function showNext() {
+            currentIndex = (currentIndex + 1) % galleryImages.length;
+            lightboxImg.src = galleryImages[currentIndex].src;
+        }
+
+        function showPrev() {
+            currentIndex = (currentIndex - 1 + galleryImages.length) % galleryImages.length;
+            lightboxImg.src = galleryImages[currentIndex].src;
+        }
+
+        galleryImages.forEach((img, index) => {
+            img.parentElement.addEventListener('click', () => {
+                openLightbox(index);
+            });
+        });
+
+        closeBtn.addEventListener('click', closeLightbox);
+        nextBtn.addEventListener('click', showNext);
+        prevBtn.addEventListener('click', showPrev);
+
+        lightbox.addEventListener('click', (e) => {
+            if (e.target === lightbox) {
+                closeLightbox();
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (lightbox.style.display === 'block') {
+                if (e.key === 'Escape') closeLightbox();
+                if (e.key === 'ArrowRight') showNext();
+                if (e.key === 'ArrowLeft') showPrev();
+            }
+        });
+
+        // İletişim Formu AJAX İşlemi
+        const contactForm = document.getElementById('contactForm');
+        const formMessage = document.getElementById('form-message');
+        const submitBtn = document.getElementById('submitBtn');
+
+        if (contactForm) {
+            contactForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                // E-posta format kontrolü
+                const emailInput = document.getElementById('eposta').value;
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(emailInput)) {
+                    formMessage.style.display = 'block';
+                    formMessage.style.backgroundColor = 'rgba(244, 67, 54, 0.2)';
+                    formMessage.style.color = '#F44336';
+                    formMessage.innerText = 'Lütfen geçerli bir e-posta adresi giriniz.';
+                    return;
+                }
+
+                // Butonu deaktive et
+                submitBtn.disabled = true;
+                submitBtn.innerText = 'Gönderiliyor...';
+                submitBtn.style.opacity = '0.7';
+
+                const formData = new FormData(this);
+
+                fetch('gonder.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        formMessage.style.display = 'block';
+                        formMessage.innerText = data.message;
+
+                        if (data.success) {
+                            formMessage.style.backgroundColor = 'rgba(76, 175, 80, 0.2)';
+                            formMessage.style.color = '#4CAF50';
+                            contactForm.reset();
+                        } else {
+                            formMessage.style.backgroundColor = 'rgba(244, 67, 54, 0.2)';
+                            formMessage.style.color = '#F44336';
+                        }
+                    })
+                    .catch(error => {
+                        formMessage.style.display = 'block';
+                        formMessage.style.backgroundColor = 'rgba(244, 67, 54, 0.2)';
+                        formMessage.style.color = '#F44336';
+                        formMessage.innerText = 'Bir hata oluştu. Lütfen daha sonra tekrar deneyin.';
+                    })
+                    .finally(() => {
+                        submitBtn.disabled = false;
+                        submitBtn.innerText = 'Gönder';
+                        submitBtn.style.opacity = '1';
+                    });
+            });
+        }
+    </script>
+</body>
+
+</html>
