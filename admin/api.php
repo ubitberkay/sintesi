@@ -170,7 +170,7 @@ function gonderOnayMaili($rez) {
     require_once __DIR__ . '/../phpmailer/SMTP.php';
     
     try {
-        $mail = new PHPMailer(true);
+        $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
         $mail->isSMTP();
         $mail->Host       = 'mail.sintesi.com.tr';
         $mail->SMTPAuth   = true;
@@ -359,8 +359,8 @@ function manuelEkle($pdo) {
     ");
     $stmt->execute([$ad_soyad, $telefon, $email, $tarih, $saat, $kisi, $ozel, $iptal_kodu]);
     
-    // Onay maili gönder (Eğer e-posta adresi varsa ve localde değilsek)
-    if (!empty($email) && !local_mi()) {
+    // Onay maili gönder (Eğer e-posta adresi varsa)
+    if (!empty($email)) {
         gonderOnayMaili([
             'ad_soyad' => $ad_soyad,
             'email' => $email,
