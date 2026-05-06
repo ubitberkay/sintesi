@@ -187,23 +187,34 @@ function gonderBildirimMaili($ad, $email, $telefon, $tarih, $saat, $kisi, $ozel)
         $mail->isHTML(true);
         $mail->Subject = "🍽️ Yeni Rezervasyon Talebi - {$ad} ({$tarih_format})";
         $mail->Body = "
-            <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'>
-                <div style='background: #9D432C; color: white; padding: 20px; text-align: center; border-radius: 10px 10px 0 0;'>
-                    <h2 style='margin: 0;'>🍽️ Yeni Rezervasyon Talebi</h2>
+            <div style=\"font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; border-radius: 15px; overflow: hidden; background: #000 url('https://sintesi.com.tr/background.png') no-repeat center center; background-size: cover; color: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.5);\">
+                <div style='padding: 40px 20px; text-align: center;'>
+                    <img src='https://sintesi.com.tr/sintesi.webp' alt='Sintesi' style='max-width: 180px; margin-bottom: 20px;'>
+                    <h1 style='margin: 0; font-size: 26px; font-family: Georgia, serif; color: #fff;'>Yeni Rezervasyon Talebi</h1>
+                    <div style='width: 50px; height: 2px; background: #9D432C; margin: 20px auto;'></div>
                 </div>
-                <div style='background: #1a1a1a; color: #f5f5f5; padding: 25px; border-radius: 0 0 10px 10px;'>
-                    <table style='width: 100%; border-collapse: collapse;'>
-                        <tr><td style='padding: 10px; color: #9D432C; font-weight: bold;'>Ad Soyad:</td><td style='padding: 10px;'>{$ad}</td></tr>
-                        <tr><td style='padding: 10px; color: #9D432C; font-weight: bold;'>Telefon:</td><td style='padding: 10px;'>{$telefon}</td></tr>
-                        <tr><td style='padding: 10px; color: #9D432C; font-weight: bold;'>E-posta:</td><td style='padding: 10px;'>" . ($email ?: 'Belirtilmedi') . "</td></tr>
-                        <tr><td style='padding: 10px; color: #9D432C; font-weight: bold;'>Tarih:</td><td style='padding: 10px;'>{$tarih_format}</td></tr>
-                        <tr><td style='padding: 10px; color: #9D432C; font-weight: bold;'>Saat:</td><td style='padding: 10px;'>{$saat}</td></tr>
-                        <tr><td style='padding: 10px; color: #9D432C; font-weight: bold;'>Kişi Sayısı:</td><td style='padding: 10px;'>{$kisi} kişi</td></tr>
-                        <tr><td style='padding: 10px; color: #9D432C; font-weight: bold;'>Özel İstekler:</td><td style='padding: 10px;'>" . ($ozel ?: 'Yok') . "</td></tr>
-                    </table>
-                    <p style='margin-top: 20px; padding-top: 15px; border-top: 1px solid #333; font-size: 13px; color: #888;'>
-                        Bu rezervasyonu onaylamak veya iptal etmek için <a href='https://www.sintesi.com.tr/admin' style='color: #9D432C;'>Admin Paneli</a>'ne giriş yapın.
-                    </p>
+                <div style='padding: 0 40px 40px 40px;'>
+                    <p style='font-size: 16px; line-height: 1.6; color: #e0e0e0;'>Web sitesi üzerinden yeni bir rezervasyon talebi alındı:</p>
+                    
+                    <div style='background: rgba(255,255,255,0.05); padding: 25px; border-radius: 12px; margin: 30px 0; border: 1px solid rgba(255,255,255,0.1);'>
+                        <table style='width: 100%; border-collapse: collapse;'>
+                            <tr><td style='padding: 8px 0; color: #888; font-size: 14px;'>Müşteri</td><td style='padding: 8px 0; color: #fff; font-size: 16px; text-align: right;'><strong>{$ad}</strong></td></tr>
+                            <tr><td style='padding: 8px 0; color: #888; font-size: 14px;'>Telefon</td><td style='padding: 8px 0; color: #fff; font-size: 16px; text-align: right;'><strong>{$telefon}</strong></td></tr>
+                            <tr><td style='padding: 8px 0; color: #888; font-size: 14px;'>E-posta</td><td style='padding: 8px 0; color: #fff; font-size: 16px; text-align: right;'><strong>" . ($email ?: 'Belirtilmedi') . "</strong></td></tr>
+                            <tr><td style='padding: 8px 0; color: #888; font-size: 14px;'>Tarih</td><td style='padding: 8px 0; color: #fff; font-size: 16px; text-align: right;'><strong>{$tarih_format}</strong></td></tr>
+                            <tr><td style='padding: 8px 0; color: #888; font-size: 14px;'>Saat</td><td style='padding: 8px 0; color: #fff; font-size: 16px; text-align: right;'><strong>{$saat}</strong></td></tr>
+                            <tr><td style='padding: 8px 0; color: #888; font-size: 14px;'>Kişi</td><td style='padding: 8px 0; color: #fff; font-size: 16px; text-align: right;'><strong>{$kisi} Kişi</strong></td></tr>
+                        </table>
+                        " . ($ozel ? "
+                        <div style='margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.05);'>
+                            <p style='margin: 0; color: #888; font-size: 14px;'>Özel İstek:</p>
+                            <p style='margin: 5px 0 0 0; color: #fff; font-size: 14px; line-height: 1.5;'>{$ozel}</p>
+                        </div>" : "") . "
+                    </div>
+                    
+                    <div style='text-align: center; margin-top: 30px;'>
+                        <a href='https://www.sintesi.com.tr/admin' style='background: #333; color: #fff; padding: 12px 25px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 14px; display: inline-block; border: 1px solid rgba(255,255,255,0.1);'>Admin Paneline Git</a>
+                    </div>
                 </div>
             </div>
         ";

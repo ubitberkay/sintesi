@@ -204,26 +204,42 @@ function gonderOnayMaili($rez) {
         $mail->isHTML(true);
         $mail->Subject = "✅ Rezervasyonunuz Onaylandı - Sintesi";
         $mail->Body = "
-            <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; border-radius: 10px; overflow: hidden;'>
-                <div style='background: #9D432C; color: white; padding: 30px; text-align: center;'>
-                    <h1 style='margin: 0; font-size: 24px;'>Rezervasyonunuz Onaylandı!</h1>
+            <div style=\"font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; border-radius: 15px; overflow: hidden; background: #000 url('https://sintesi.com.tr/background.png') no-repeat center center; background-size: cover; color: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.5);\">
+                <div style='padding: 40px 20px; text-align: center;'>
+                    <img src='https://sintesi.com.tr/sintesi.webp' alt='Sintesi' style='max-width: 180px; margin-bottom: 20px;'>
+                    <h1 style='margin: 0; font-size: 26px; font-family: Georgia, serif; color: #fff;'>Rezervasyonunuz Onaylandı</h1>
+                    <div style='width: 50px; height: 2px; background: #9D432C; margin: 20px auto;'></div>
                 </div>
-                <div style='padding: 30px; background: #fff; color: #333;'>
-                    <p>Sayın <strong>{$rez['ad_soyad']}</strong>,</p>
-                    <p>Sintesi'de yapmış olduğunuz rezervasyon talebiniz başarıyla onaylanmıştır. Sizi ağırlamaktan mutluluk duyacağız.</p>
+                <div style='padding: 0 40px 40px 40px;'>
+                    <p style='font-size: 16px; line-height: 1.6; color: #e0e0e0;'>Sayın <strong>{$rez['ad_soyad']}</strong>,</p>
+                    <p style='font-size: 16px; line-height: 1.6; color: #e0e0e0;'>Rezervasyon talebiniz onaylanmıştır. Sizi Sintesi atmosferinde ağırlamak için sabırsızlanıyoruz.</p>
                     
-                    <div style='background: #f9f9f9; padding: 20px; border-radius: 5px; margin: 20px 0;'>
-                        <p style='margin: 5px 0;'><strong>Tarih:</strong> {$tarih_format}</p>
-                        <p style='margin: 5px 0;'><strong>Saat:</strong> {$rez['saat']}</p>
-                        <p style='margin: 5px 0;'><strong>Kişi Sayısı:</strong> {$rez['kisi_sayisi']} Kişi</p>
+                    <div style='background: rgba(255,255,255,0.05); padding: 25px; border-radius: 12px; margin: 30px 0; border: 1px solid rgba(255,255,255,0.1);'>
+                        <table style='width: 100%; border-collapse: collapse;'>
+                            <tr>
+                                <td style='padding: 8px 0; color: #888; font-size: 14px;'>Tarih</td>
+                                <td style='padding: 8px 0; color: #fff; font-size: 16px; text-align: right;'><strong>{$tarih_format}</strong></td>
+                            </tr>
+                            <tr>
+                                <td style='padding: 8px 0; color: #888; font-size: 14px;'>Saat</td>
+                                <td style='padding: 8px 0; color: #fff; font-size: 16px; text-align: right;'><strong>{$rez['saat']}</strong></td>
+                            </tr>
+                            <tr>
+                                <td style='padding: 8px 0; color: #888; font-size: 14px;'>Kişi Sayısı</td>
+                                <td style='padding: 8px 0; color: #fff; font-size: 16px; text-align: right;'><strong>{$rez['kisi_sayisi']} Kişi</strong></td>
+                            </tr>
+                        </table>
                     </div>
                     
-                    <p>Herhangi bir değişiklik durumunda bize <strong>+90 (216) XXX XX XX</strong> numaralı telefondan ulaşabilirsiniz.</p>
-                    <p style='margin-top: 30px;'>Görüşmek üzere,<br><strong>Sintesi Ekibi</strong></p>
+                    <div style='text-align: center; margin: 40px 0;'>
+                        <a href='https://sintesi.com.tr/iptal.php?kod={$rez['iptal_kodu']}' style='background: #9D432C; color: #fff; padding: 15px 35px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 14px; display: inline-block;'>Rezervasyonu İptal Et</a>
+                    </div>
+                    
+                    <p style='font-size: 13px; color: #666; text-align: center;'>Not: Rezervasyon saatinden 15 dakika sonra gelinmediği takdirde rezervasyon otomatik olarak iptal edilebilir.</p>
                 </div>
-                <div style='background: #f4f4f4; padding: 20px; text-align: center; color: #888; font-size: 12px;'>
-                    {$iptal_butonu}
-                    Metropol İstanbul AVM, B2 Katı, Ataşehir/İstanbul
+                <div style='background: rgba(0,0,0,0.4); padding: 30px; text-align: center; border-top: 1px solid rgba(255,255,255,0.05);'>
+                    <p style='margin: 0; color: #888; font-size: 13px;'>Metropol İstanbul AVM, B2 Katı, Ataşehir/İstanbul</p>
+                    <p style='margin: 10px 0 0 0; color: #888; font-size: 13px;'>+90 (216) XXX XX XX</p>
                 </div>
             </div>
         ";
@@ -261,25 +277,20 @@ function gonderIptalMaili($rez) {
         $mail->isHTML(true);
         $mail->Subject = "❌ Rezervasyonunuz İptal Edildi - Sintesi";
         $mail->Body = "
-            <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; border-radius: 10px; overflow: hidden;'>
-                <div style='background: #ef4444; color: white; padding: 30px; text-align: center;'>
-                    <h1 style='margin: 0; font-size: 24px;'>Rezervasyonunuz İptal Edildi</h1>
+            <div style=\"font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; border-radius: 15px; overflow: hidden; background: #000 url('https://sintesi.com.tr/background.png') no-repeat center center; background-size: cover; color: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.5);\">
+                <div style='padding: 40px 20px; text-align: center;'>
+                    <img src='https://sintesi.com.tr/sintesi.webp' alt='Sintesi' style='max-width: 180px; margin-bottom: 20px;'>
+                    <h1 style='margin: 0; font-size: 26px; font-family: Georgia, serif; color: #fff;'>Rezervasyon İptali</h1>
+                    <div style='width: 50px; height: 2px; background: #9D432C; margin: 20px auto;'></div>
                 </div>
-                <div style='padding: 30px; background: #fff; color: #333;'>
-                    <p>Sayın <strong>{$rez['ad_soyad']}</strong>,</p>
-                    <p>Üzülerek bildiririz ki, Sintesi'de yapmış olduğunuz rezervasyon talebiniz iptal edilmiştir. İptal sebebi genellikle yoğunluk, kapasite doluluğu veya özel bir durum olabilmektedir.</p>
-                    
-                    <div style='background: #f9f9f9; padding: 20px; border-radius: 5px; margin: 20px 0;'>
-                        <p style='margin: 5px 0;'><strong>Tarih:</strong> {$tarih_format}</p>
-                        <p style='margin: 5px 0;'><strong>Saat:</strong> {$rez['saat']}</p>
-                        <p style='margin: 5px 0;'><strong>Kişi Sayısı:</strong> {$rez['kisi_sayisi']} Kişi</p>
-                    </div>
-                    
-                    <p>Yeni bir tarih planlamak veya detaylı bilgi almak isterseniz bize <strong>+90 (216) XXX XX XX</strong> numaralı telefondan ulaşabilirsiniz.</p>
-                    <p style='margin-top: 30px;'>Anlayışınız için teşekkür ederiz,<br><strong>Sintesi Ekibi</strong></p>
+                <div style='padding: 0 40px 40px 40px;'>
+                    <p style='font-size: 16px; line-height: 1.6; color: #e0e0e0;'>Sayın <strong>{$rez['ad_soyad']}</strong>,</p>
+                    <p style='font-size: 16px; line-height: 1.6; color: #e0e0e0;'>{$tarih_format} saat {$rez['saat']} için olan rezervasyonunuz iptal edilmiştir.</p>
+                    <p style='font-size: 16px; line-height: 1.6; color: #e0e0e0;'>Sizi başka bir zaman aramızda görmeyi umuyoruz.</p>
+                    <p style='margin-top: 40px; font-size: 14px; color: #aaa; text-align: center;'>Anlayışınız için teşekkür ederiz,<br><strong>Sintesi Ekibi</strong></p>
                 </div>
-                <div style='background: #f4f4f4; padding: 20px; text-align: center; color: #888; font-size: 12px;'>
-                    Metropol İstanbul AVM, B2 Katı, Ataşehir/İstanbul
+                <div style='background: rgba(0,0,0,0.4); padding: 30px; text-align: center; border-top: 1px solid rgba(255,255,255,0.05);'>
+                    <p style='margin: 0; color: #888; font-size: 13px;'>Metropol İstanbul AVM, B2 Katı, Ataşehir/İstanbul</p>
                 </div>
             </div>
         ";

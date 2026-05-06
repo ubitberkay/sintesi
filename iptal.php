@@ -84,22 +84,46 @@ function gonderIptalBildirimi($rez) {
         $mail->isHTML(true);
         $mail->Subject = "❌ Rezervasyon İptal Edildi - {$rez['ad_soyad']} ({$tarih_format})";
         $mail->Body = "
-            <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; border-radius: 10px; overflow: hidden;'>
-                <div style='background: #ef4444; color: white; padding: 20px; text-align: center;'>
-                    <h2 style='margin: 0;'>❌ Rezervasyon İptal Edildi</h2>
+            <div style=\"font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; border-radius: 15px; overflow: hidden; background: #000 url('https://sintesi.com.tr/background.png') no-repeat center center; background-size: cover; color: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.5);\">
+                <div style='padding: 40px 20px; text-align: center;'>
+                    <img src='https://sintesi.com.tr/sintesi.webp' alt='Sintesi' style='max-width: 180px; margin-bottom: 20px;'>
+                    <h1 style='margin: 0; font-size: 26px; font-family: Georgia, serif; color: #fff;'>Rezervasyon İptal Edildi</h1>
+                    <div style='width: 50px; height: 2px; background: #9D432C; margin: 20px auto;'></div>
                 </div>
-                <div style='padding: 25px; background: #fff; color: #333;'>
-                    <p>Aşağıdaki rezervasyon müşteri tarafından <strong>iptal edilmiştir</strong>:</p>
-                    <table style='width: 100%; border-collapse: collapse; margin-top: 15px;'>
-                        <tr><td style='padding: 8px; font-weight: bold; width: 120px;'>Müşteri:</td><td style='padding: 8px;'>{$rez['ad_soyad']}</td></tr>
-                        <tr><td style='padding: 8px; font-weight: bold;'>Telefon:</td><td style='padding: 8px;'>{$rez['telefon']}</td></tr>
-                        <tr><td style='padding: 8px; font-weight: bold;'>E-posta:</td><td style='padding: 8px;'>" . ($rez['email'] ?: 'Belirtilmedi') . "</td></tr>
-                        <tr><td style='padding: 8px; font-weight: bold;'>Tarih:</td><td style='padding: 8px;'>{$tarih_format}</td></tr>
-                        <tr><td style='padding: 8px; font-weight: bold;'>Saat:</td><td style='padding: 8px;'>{$rez['saat']}</td></tr>
-                    </table>
-                    <p style='margin-top: 25px; font-size: 13px; color: #666; border-top: 1px solid #eee; padding-top: 15px;'>
+                <div style='padding: 0 40px 40px 40px;'>
+                    <p style='font-size: 16px; line-height: 1.6; color: #e0e0e0;'>Aşağıdaki rezervasyon müşteri tarafından <strong>iptal edilmiştir</strong>:</p>
+                    
+                    <div style='background: rgba(255,255,255,0.05); padding: 25px; border-radius: 12px; margin: 30px 0; border: 1px solid rgba(255,255,255,0.1);'>
+                        <table style='width: 100%; border-collapse: collapse;'>
+                            <tr>
+                                <td style='padding: 8px 0; color: #888; font-size: 14px;'>Müşteri</td>
+                                <td style='padding: 8px 0; color: #fff; font-size: 16px; text-align: right;'><strong>{$rez['ad_soyad']}</strong></td>
+                            </tr>
+                            <tr>
+                                <td style='padding: 8px 0; color: #888; font-size: 14px;'>Telefon</td>
+                                <td style='padding: 8px 0; color: #fff; font-size: 16px; text-align: right;'><strong>{$rez['telefon']}</strong></td>
+                            </tr>
+                            <tr>
+                                <td style='padding: 8px 0; color: #888; font-size: 14px;'>E-posta</td>
+                                <td style='padding: 8px 0; color: #fff; font-size: 16px; text-align: right;'><strong>" . ($rez['email'] ?: 'Belirtilmedi') . "</strong></td>
+                            </tr>
+                            <tr>
+                                <td style='padding: 8px 0; color: #888; font-size: 14px;'>Tarih</td>
+                                <td style='padding: 8px 0; color: #fff; font-size: 16px; text-align: right;'><strong>{$tarih_format}</strong></td>
+                            </tr>
+                            <tr>
+                                <td style='padding: 8px 0; color: #888; font-size: 14px;'>Saat</td>
+                                <td style='padding: 8px 0; color: #fff; font-size: 16px; text-align: right;'><strong>{$rez['saat']}</strong></td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <p style='font-size: 13px; color: #666; text-align: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px;'>
                         Bu işlem müşteri tarafından e-posta yoluyla yapılmıştır.
                     </p>
+                </div>
+                <div style='background: rgba(0,0,0,0.4); padding: 30px; text-align: center;'>
+                    <p style='margin: 0; color: #888; font-size: 13px;'>Sintesi Yönetim Paneli Bildirim Sistemi</p>
                 </div>
             </div>
         ";
