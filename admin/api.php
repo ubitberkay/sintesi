@@ -250,13 +250,13 @@ function istatistikler($pdo) {
     $hafta_bas = date('Y-m-d', strtotime('monday this week'));
     $hafta_son = date('Y-m-d', strtotime('sunday this week'));
     
-    // Bugünkü rezervasyonlar
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM rezervasyonlar WHERE tarih = ?");
+    // Bugünkü rezervasyonlar (İptaller hariç)
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM rezervasyonlar WHERE tarih = ? AND durum != 'iptal'");
     $stmt->execute([$bugun]);
     $bugunki = $stmt->fetchColumn();
     
-    // Bu haftaki
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM rezervasyonlar WHERE tarih >= ? AND tarih <= ?");
+    // Bu haftaki (İptaller hariç)
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM rezervasyonlar WHERE tarih >= ? AND tarih <= ? AND durum != 'iptal'");
     $stmt->execute([$hafta_bas, $hafta_son]);
     $haftalik = $stmt->fetchColumn();
     
@@ -265,8 +265,8 @@ function istatistikler($pdo) {
     $stmt->execute();
     $bekleyen = $stmt->fetchColumn();
     
-    // Toplam
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM rezervasyonlar");
+    // Toplam (İptaller hariç)
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM rezervasyonlar WHERE durum != 'iptal'");
     $stmt->execute();
     $toplam = $stmt->fetchColumn();
     
