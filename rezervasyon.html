@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sintesi | Rezervasyon</title>
+    <link rel="icon" type="image/webp" href="sintesi.webp">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Montserrat:wght@300;400;500&display=swap"
+        rel="stylesheet">
+    <!-- Flatpickr (Modern Tarih Seçici) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/tr.js"></script>
+    <style>
+        :root {
+            --color-bg: #0c0c0c;
+            --color-surface: #151515;
+            --color-text: #f5f5f5;
+            --color-text-muted: #a0a0a0;
+            --color-accent: #9D432C;
+            --color-accent-hover: #e8c682;
+            --font-heading: 'Cormorant Garamond', serif;
+            --font-body: 'Montserrat', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: var(--font-heading);
+            font-weight: 400;
+        }
+
+        h2 {
+            font-size: 3rem;
+            letter-spacing: 2px;
+            margin-bottom: 1rem;
+        }
+
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1.2rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            transition: all 0.4s ease;
+            background: rgba(12, 12, 12, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .logo {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            color: var(--color-accent);
+            text-decoration: none;
+            letter-spacing: 3px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo img {
+            height: 40px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            color: var(--color-text-muted);
+            text-decoration: none;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 1px;
+            bottom: -5px;
+            left: 0;
+            background-color: var(--color-accent);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--color-accent);
+        }
+
+        .nav-link:hover::after,
+        .nav-link.active::after {
+            width: 100%;
+        }
+
+        /* Section styling */
+        .section-subtitle {
+            font-family: var(--font-body);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: var(--color-accent);
+            display: block;
+            margin-bottom: 1rem;
+        }
+
+        section {
+            padding: 8rem 5% 5rem;
+            text-align: center;
+        }
+
+        /* Btn */
+        .btn {
+            display: inline-block;
+            padding: 14px 40px;
+            border: 1px solid var(--color-accent);
+            color: var(--color-accent);
+            text-decoration: none;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-family: var(--font-body);
+            background: transparent;
+        }
+
+        .btn:hover {
+            background: var(--color-accent);
+            color: var(--color-text);
+        }
+
+        /* Form styles */
+        .form-group {
+            position: relative;
+            margin-bottom: 5px;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 15px 0;
+            background: transparent !important;
+            border: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--color-text);
+            font-family: var(--font-body);
+            font-size: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 0;
+        }
+
+        /* Autocomplete Beyaz Arka Plan Engelleme */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus,
+        input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 1000px var(--color-bg) inset !important;
+            -webkit-text-fill-color: var(--color-text) !important;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-bottom-color: var(--color-accent);
+            padding-left: 10px;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* Rezervasyon Layout */
+        .rez-layout-container {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 4rem;
+            max-width: 1200px;
+            margin: 4rem auto 0;
+            text-align: left;
+        }
+
+        .contact-details-side {
+            display: flex;
+            flex-direction: column;
+            gap: 2.5rem;
+        }
+
+        .info-block {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .info-label {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            color: var(--color-accent);
+            letter-spacing: 1px;
+        }
+
+        .info-block p {
+            color: var(--color-text-muted);
+            font-size: 0.95rem;
+            line-height: 1.8;
+        }
+
+        /* Form Side */
+        .rez-form-container-v2 {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 3rem;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group select {
+            -webkit-appearance: none;
+            appearance: none;
+            cursor: pointer;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239D432C'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right center;
+            background-size: 1.2rem;
+            padding-right: 2rem;
+        }
+
+        .form-group select option {
+            background: #151515;
+            color: #f5f5f5;
+            padding: 10px;
+        }
+
+        .rez-full {
+            grid-column: 1 / -1;
+        }
+
+        @media (max-width: 992px) {
+            .rez-layout-container {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+            }
+
+            .rez-form-container-v2 {
+                padding: 2rem;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+        }
+
+        /* Flatpickr Özel Tema */
+        .flatpickr-calendar {
+            background: #151515 !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+        }
+
+        .flatpickr-day.selected,
+        .flatpickr-day.startRange,
+        .flatpickr-day.endRange,
+        .flatpickr-day.selected.hover,
+        .flatpickr-day.nextMonthDay.selected,
+        .flatpickr-day.prevMonthDay.selected,
+        .flatpickr-day.selected:focus,
+        .flatpickr-day.selected:hover {
+            background: var(--color-accent) !important;
+            border-color: var(--color-accent) !important;
+        }
+
+        .flatpickr-months .flatpickr-month,
+        .flatpickr-current-month .flatpickr-monthDropdown-months {
+            background: transparent !important;
+            color: #fff !important;
+            fill: #fff !important;
+        }
+
+        .flatpickr-weekday {
+            color: var(--color-accent) !important;
+        }
+
+        .flatpickr-day {
+            color: #ccc !important;
+        }
+
+        .flatpickr-day.today {
+            border-color: var(--color-accent) !important;
+        }
+
+        .flatpickr-day.flatpickr-disabled,
+        .flatpickr-day.flatpickr-disabled:hover {
+            color: #444 !important;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.8rem;
+            color: var(--color-text-muted);
+            letter-spacing: 1px;
+        }
+
+        /* Mobile Menu */
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        .menu-toggle span {
+            width: 25px;
+            height: 2px;
+            background: var(--color-text);
+            transition: all 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            nav ul {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 70%;
+                height: 100vh;
+                background: rgba(12, 12, 12, 0.98);
+                flex-direction: column;
+                padding: 6rem 2rem;
+                transition: right 0.4s ease;
+                border-left: 1px solid rgba(255, 255, 255, 0.05);
+            }
+
+            nav ul.active {
+                right: 0;
+            }
+
+            .menu-toggle {
+                display: flex;
+            }
+
+            .menu-toggle.active span:nth-child(1) {
+                transform: translateY(7px) rotate(45deg);
+            }
+
+            .menu-toggle.active span:nth-child(2) {
+                opacity: 0;
+            }
+
+            .menu-toggle.active span:nth-child(3) {
+                transform: translateY(-7px) rotate(-45deg);
+            }
+
+            .rez-form-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header / Navbar -->
+    <header id="header">
+        <a href="index.html" class="logo">
+            <img src="sintesi.webp" alt="Sintesi Logo">
+            Sintesi
+        </a>
+        <nav>
+            <ul id="nav-links">
+                <li><a href="index.html" class="nav-link">Anasayfa</a></li>
+                <li><a href="hakkimizda.html" class="nav-link">Hakkımızda</a></li>
+                <li><a href="galeri.html" class="nav-link">Galeri</a></li>
+                <li><a href="./menu.pdf" target="_blank" class="nav-link">Menü</a></li>
+                <li><a href="rezervasyon.html" class="nav-link active">Rezervasyon</a></li>
+                <li><a href="index.html#iletisim" class="nav-link">İletişim</a></li>
+            </ul>
+        </nav>
+        <div class="menu-toggle" id="mobile-menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </header>
+
+    <!-- Rezervasyon Section -->
+    <section id="rezervasyon">
+        <span class="section-subtitle">Planlamanızı Yapın</span>
+        <h2>Masanızı Ayırın</h2>
+        <p style="color: var(--color-text-muted); font-size: 0.9rem; margin-top: -0.5rem; margin-bottom: 2rem;">
+            * Her saat dilimi için maksimum 16 kişilik kapasitemiz bulunmaktadır.
+        </p>
+
+        <div class="rez-layout-container">
+            <!-- Sol Taraf: İletişim Bilgileri -->
+            <div class="contact-details-side">
+                <div class="info-block">
+                    <span class="info-label">Adres</span>
+                    <p>Atatürk Mahallesi Ertuğrul Gazi Sokak Metropol İstanbul Alışveriş Merkezi B2 Katı<br>Ataşehir,
+                        İstanbul</p>
+                </div>
+
+                <div class="info-block">
+                    <span class="info-label">İletişim & Rezervasyon</span>
+                    <p>+90 (216) XXX XX XX<br>info@sintesi.com.tr</p>
+                </div>
+
+                <div class="info-block">
+                    <span class="info-label">Çalışma Saatleri</span>
+                    <p>Salı - Pazar: 10:00 - 00:00<br><strong>Pazartesi: Kapalı</strong></p>
+                </div>
+            </div>
+
+            <!-- Sağ Taraf: Form -->
+            <div class="form-side">
+                <form class="rez-form-container-v2" id="rezervasyonForm">
+                    <div id="rez-form-message" class="rez-full"
+                        style="display: none; padding: 15px; border-radius: 5px; text-align: center; margin-bottom: 20px;">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <input type="text" name="ad_soyad" id="rez-ad" placeholder="Adınız Soyadınız" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="tel" name="telefon" id="rez-telefon" placeholder="Telefon Numaranız"
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '');" maxlength="15" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <input type="email" name="email" id="rez-email" placeholder="E-posta Adresiniz (Opsiyonel)">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" name="tarih" id="rez-tarih" placeholder="Tarih Seçin" required readonly>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <select name="saat" id="rez-saat" required>
+                                <option value="" disabled selected>Saat Seçin</option>
+                                <option value="10:00">10:00</option>
+                                <option value="10:30">10:30</option>
+                                <option value="11:00">11:00</option>
+                                <option value="11:30">11:30</option>
+                                <option value="12:00">12:00</option>
+                                <option value="12:30">12:30</option>
+                                <option value="13:00">13:00</option>
+                                <option value="13:30">13:30</option>
+                                <option value="14:00">14:00</option>
+                                <option value="14:30">14:30</option>
+                                <option value="15:00">15:00</option>
+                                <option value="15:30">15:30</option>
+                                <option value="16:00">16:00</option>
+                                <option value="16:30">16:30</option>
+                                <option value="17:00">17:00</option>
+                                <option value="17:30">17:30</option>
+                                <option value="18:00">18:00</option>
+                                <option value="18:30">18:30</option>
+                                <option value="19:00">19:00</option>
+                                <option value="19:30">19:30</option>
+                                <option value="20:00">20:00</option>
+                                <option value="20:30">20:30</option>
+                                <option value="21:00">21:00</option>
+                                <option value="21:30">21:30</option>
+                                <option value="22:00">22:00</option>
+                                <option value="22:30">22:30</option>
+                                <option value="23:00">23:00</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <select name="kisi_sayisi" id="rez-kisi" required>
+                                <option value="" disabled selected>Kişi Sayısı</option>
+                                <option value="1">1 Kişi</option>
+                                <option value="2" selected>2 Kişi</option>
+                                <option value="3">3 Kişi</option>
+                                <option value="4">4 Kişi</option>
+                                <option value="5">5 Kişi</option>
+                                <option value="6">6 Kişi</option>
+                                <option value="7">7 Kişi</option>
+                                <option value="8">8 Kişi</option>
+                                <option value="9">9 Kişi</option>
+                                <option value="10">10 Kişi</option>
+                                <option value="12">12 Kişi</option>
+                                <option value="15">15 Kişi</option>
+                                <option value="20">20 Kişi</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group rez-full">
+                        <textarea name="ozel_istekler" id="rez-ozel"
+                            placeholder="Özel istekleriniz (Doğum günü, alerjiler, tercihler...)"></textarea>
+                    </div>
+
+                    <div class="rez-full" style="text-align: left; margin-top: 1rem;">
+                        <button type="submit" class="btn" id="rezSubmitBtn">Rezervasyon Talebi Gönder</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div style="margin-bottom: 1rem;">
+            <a href="https://www.instagram.com/sintesirestaurant/" target="_blank" rel="noopener noreferrer" style="color: var(--color-text-muted); transition: color 0.3s ease;" onmouseover="this.style.color='var(--color-accent)'" onmouseout="this.style.color='var(--color-text-muted)'" title="Instagram">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                </svg>
+            </a>
+        </div>
+        <p>&copy; Sintesi Restaurant. Tüm Hakları Saklıdır.</p>
+    </footer>
+
+    <script>
+        // Mobil menü toggle
+        const mobileMenu = document.getElementById('mobile-menu');
+        const navLinks = document.getElementById('nav-links');
+        mobileMenu.addEventListener('click', () => {
+            mobileMenu.classList.toggle('active');
+            navLinks.classList.toggle('active');
+        });
+
+        // Rezervasyon Formu ve Flatpickr Başlatma
+        const rezForm = document.getElementById('rezervasyonForm');
+        const rezMessage = document.getElementById('rez-form-message');
+        const rezSubmitBtn = document.getElementById('rezSubmitBtn');
+        const rezTarihInput = document.getElementById('rez-tarih');
+
+        const fp = flatpickr("#rez-tarih", {
+            locale: "tr",
+            dateFormat: "Y-m-d",
+            altInput: true,
+            altFormat: "d F Y, l",
+            minDate: "today",
+            disable: [
+                function (date) {
+                    return (date.getDay() === 1);
+                }
+            ],
+            onChange: function (selectedDates, dateStr, instance) {
+                if (dateStr) {
+                    rezMessage.style.display = 'none';
+                    rezSubmitBtn.disabled = false;
+                    rezSubmitBtn.style.opacity = '1';
+
+                    if (ozelGunMu(dateStr)) {
+                        rezMessage.style.display = 'block';
+                        rezMessage.style.backgroundColor = 'rgba(234, 179, 8, 0.2)';
+                        rezMessage.style.color = '#eab308';
+                        rezMessage.innerHTML = '<strong>Özel Gün Uyarısı:</strong> 14 Şubat, 8 Mart ve Anneler Günü gibi özel günlerde rezervasyonlar yoğunluk nedeniyle sadece <strong>telefon ile</strong> alınmaktadır. <br><br> Lütfen bize ulaşın: <strong>+90 (216) XXX XX XX</strong>';
+                        rezSubmitBtn.disabled = true;
+                        rezSubmitBtn.style.opacity = '0.5';
+                    } else {
+                        saatleriGuncelle(dateStr);
+                    }
+                }
+            }
+        });
+
+        function ozelGunMu(tarihStr) {
+            const date = new Date(tarihStr);
+            const ay = date.getMonth() + 1;
+            const gun = date.getDate();
+            const yil = date.getFullYear();
+
+            // 14 Şubat
+            if (ay === 2 && gun === 14) return true;
+            // 8 Mart
+            if (ay === 3 && gun === 8) return true;
+
+            // Anneler Günü (Mayıs'ın 2. Pazarı)
+            if (ay === 5) {
+                const ilkGun = new Date(yil, 4, 1);
+                const ilkPazar = (7 - ilkGun.getDay()) % 7 + 1;
+                const ikinciPazar = ilkPazar + 7;
+                if (gun === ikinciPazar) return true;
+            }
+
+            return false;
+        }
+
+        function saatleriGuncelle(secilenTarih) {
+            const saatSelect = document.getElementById('rez-saat');
+            const options = saatSelect.options;
+            const suan = new Date();
+            const bugun = suan.toISOString().split('T')[0];
+            const suanSaat = suan.getHours();
+            const suanDakika = suan.getMinutes();
+
+            for (let i = 1; i < options.length; i++) {
+                const optValue = options[i].value;
+                const [optSaat, optDakika] = optValue.split(':').map(Number);
+
+                if (secilenTarih === bugun) {
+                    if (optSaat < suanSaat || (optSaat === suanSaat && optDakika <= suanDakika)) {
+                        options[i].disabled = true;
+                        options[i].style.display = 'none';
+                    } else {
+                        options[i].disabled = false;
+                        options[i].style.display = 'block';
+                    }
+                } else {
+                    options[i].disabled = false;
+                    options[i].style.display = 'block';
+                }
+            }
+
+            // Eğer seçili olan saat artık devre dışıysa seçimi sıfırla
+            if (saatSelect.selectedIndex > 0 && options[saatSelect.selectedIndex].disabled) {
+                saatSelect.selectedIndex = 0;
+            }
+        }
+
+        if (rezForm) {
+            rezForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const tarihVal = rezTarihInput.value;
+                if (!tarihVal) {
+                    rezMessage.style.display = 'block';
+                    rezMessage.style.backgroundColor = 'rgba(244, 67, 54, 0.2)';
+                    rezMessage.style.color = '#F44336';
+                    rezMessage.innerText = 'Lütfen bir tarih seçin.';
+                    return;
+                }
+
+                rezSubmitBtn.disabled = true;
+                rezSubmitBtn.innerText = 'Gönderiliyor...';
+                rezSubmitBtn.style.opacity = '0.7';
+
+                const formData = new FormData(this);
+
+                fetch('rezervasyon_gonder.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        rezMessage.style.display = 'block';
+                        rezMessage.innerText = data.message;
+
+                        if (data.success) {
+                            rezMessage.style.backgroundColor = 'rgba(76, 175, 80, 0.2)';
+                            rezMessage.style.color = '#4CAF50';
+                            rezForm.reset();
+                        } else {
+                            rezMessage.style.backgroundColor = 'rgba(244, 67, 54, 0.2)';
+                            rezMessage.style.color = '#F44336';
+                        }
+                    })
+                    .catch(error => {
+                        rezMessage.style.display = 'block';
+                        rezMessage.style.backgroundColor = 'rgba(244, 67, 54, 0.2)';
+                        rezMessage.style.color = '#F44336';
+                        rezMessage.innerText = 'Bir hata oluştu. Lütfen daha sonra tekrar deneyin.';
+                    })
+                    .finally(() => {
+                        rezSubmitBtn.disabled = false;
+                        rezSubmitBtn.innerText = 'Rezervasyon Talebi Gönder';
+                        rezSubmitBtn.style.opacity = '1';
+                    });
+            });
+        }
+    </script>
+</body>
+
+</html>

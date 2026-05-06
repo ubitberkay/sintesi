@@ -385,25 +385,37 @@
         .form-group input,
         .form-group textarea {
             width: 100%;
-            padding: 15px;
-            background: transparent;
+            padding: 15px 0;
+            background: transparent !important;
             border: none;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             color: var(--color-text);
             font-family: var(--font-body);
             font-size: 1rem;
-            transition: border-color 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 0;
+        }
+
+        /* Autocomplete Beyaz Arka Plan Engelleme */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus,
+        input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 1000px var(--color-bg) inset !important;
+            -webkit-text-fill-color: var(--color-text) !important;
+            transition: background-color 5000s ease-in-out 0s;
         }
 
         .form-group input:focus,
         .form-group textarea:focus {
             outline: none;
             border-bottom-color: var(--color-accent);
+            padding-left: 10px;
         }
 
         .form-group textarea {
             resize: vertical;
-            min-height: 120px;
+            min-height: 100px;
         }
 
         /* Footer */
@@ -594,6 +606,20 @@
             .menu-toggle.active span:nth-child(3) {
                 transform: translateY(-7px) rotate(-45deg);
             }
+
+            .info-accent-link {
+                color: var(--color-accent) !important;
+                text-decoration: none;
+                font-size: 0.9rem;
+                font-weight: 500;
+                margin-top: 0.5rem;
+                display: inline-block;
+                transition: opacity 0.3s ease;
+            }
+
+            .info-accent-link:hover {
+                opacity: 0.8;
+            }
         }
     </style>
 </head>
@@ -612,6 +638,7 @@
                 <li><a href="#hakkimizda" class="nav-link">Hakkımızda</a></li>
                 <li><a href="#galeri" class="nav-link">Galeri</a></li>
                 <li><a href="./menu.pdf" target="_blank" class="nav-link">Menü</a></li>
+                <li><a href="rezervasyon.html" class="nav-link">Rezervasyon</a></li>
                 <li><a href="#iletisim" class="nav-link">İletişim</a></li>
             </ul>
         </nav>
@@ -633,7 +660,7 @@
             <h1 class="hero-title">Sintesi</h1>
             <p>Lezzetin, sanatın ve tutkunun bir araya geldiği unutulmaz bir deneyim. Geleneksel tatların modern
                 dokunuşlarla yeniden hayat bulduğu yer.</p>
-            <a href="#iletisim" class="btn">Rezervasyon Yap</a>
+            <a href="/rezervasyon.html" class="btn">Rezervasyon Yap</a>
         </div>
     </section>
 
@@ -707,7 +734,11 @@
 
                 <div class="info-block">
                     <h4>Rezervasyon</h4>
+                    <a href="rezervasyon.html" class="info-accent-link" style="color: #9D432C !important;">Online
+                        Rezervasyon
+                        Formu</a>
                     <p>+90 (216) XXX XX XX<br>info@sintesi.com.tr</p>
+
                 </div>
 
                 <div class="info-block">
@@ -748,6 +779,15 @@
     </section>
 
     <footer>
+        <div style="margin-bottom: 1rem;">
+            <a href="https://www.instagram.com/sintesirestaurant/" target="_blank" rel="noopener noreferrer" style="color: var(--color-text-muted); transition: color 0.3s ease;" onmouseover="this.style.color='var(--color-accent)'" onmouseout="this.style.color='var(--color-text-muted)'" title="Instagram">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                </svg>
+            </a>
+        </div>
         <p>&copy; Sintesi Restaurant. Tüm Hakları Saklıdır.</p>
     </footer>
 
