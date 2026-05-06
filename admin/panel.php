@@ -39,6 +39,10 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             --danger: #ef4444;
         }
         
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+        }
         body {
             font-family: 'Montserrat', sans-serif;
             background: var(--bg);
@@ -102,6 +106,7 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             max-width: 1200px;
             margin: 0 auto;
             padding: 2rem;
+            overflow-x: hidden;
         }
         
         /* ===== STAT CARDS ===== */
@@ -437,6 +442,7 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             font-size: 0.85rem;
             outline: none;
             width: 250px;
+            box-sizing: border-box;
         }
 
         .pagination {
@@ -444,6 +450,7 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             justify-content: center;
             gap: 5px;
             margin-top: 20px;
+            flex-wrap: wrap;
         }
         .page-btn {
             padding: 8px 12px;
@@ -461,6 +468,7 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
         .top-actions {
             display: flex;
             gap: 10px;
+            flex-wrap: wrap;
         }
         .btn-primary {
             background: var(--accent);
@@ -473,6 +481,7 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             font-family: inherit;
             font-size: 0.9rem;
             transition: 0.3s;
+            white-space: nowrap;
         }
         .btn-primary:hover { background: var(--accent-hover); }
         
@@ -495,6 +504,7 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             border-radius: 6px;
             color: var(--text);
             font-family: inherit;
+            box-sizing: border-box;
         }
 
         /* Flatpickr Dark Theme Customization */
@@ -506,6 +516,8 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             background: var(--accent) !important;
             border-color: var(--accent) !important;
         }
+
+
         
         /* Responsive */
         @media (max-width: 1024px) {
@@ -526,13 +538,59 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             .filter-group { width: 100%; }
             .filter-group input, 
             .filter-group select,
+            .search-bar,
             .flatpickr-input,
             .flatpickr-mobile {
                 width: 100% !important;
+                box-sizing: border-box !important;
             }
             .btn-filtrele { width: 100%; margin-top: 0.5rem; }
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
             .rez-card { grid-template-columns: 1fr 1fr; }
+            
+            /* Table Header Mobile */
+            .table-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+            }
+            .table-header h2 {
+                font-size: 1.4rem;
+            }
+            .top-actions {
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr;
+                gap: 8px;
+                width: 100%;
+            }
+            .top-actions .btn-primary,
+            .top-actions .btn-refresh {
+                width: 100%;
+                text-align: center;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 5px;
+                font-size: 0.8rem;
+                padding: 10px 5px;
+                box-sizing: border-box;
+                white-space: nowrap;
+            }
+
+            /* Modal Mobile */
+            .modal-content {
+                padding: 1.5rem;
+                width: 95%;
+            }
+            .modal-content div[style*="grid-template-columns"] {
+                grid-template-columns: 1fr !important;
+            }
+            .modal-actions {
+                flex-direction: column;
+            }
+            .modal-actions .btn-modal {
+                width: 100%;
+            }
             
             /* Navbar Sadeleştirme */
             .logo-text, .btn-text, .admin-user-name { display: none; }
@@ -550,6 +608,14 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
         @media (max-width: 480px) {
             .stats-grid { grid-template-columns: 1fr; }
             .rez-card { grid-template-columns: 1fr; }
+            .top-actions {
+                grid-template-columns: 1fr 1fr 1fr;
+            }
+            .btn-text { display: none; }
+            .top-actions .btn-primary, .top-actions .btn-refresh {
+                font-size: 1.2rem;
+                padding: 12px;
+            }
         }
     </style>
 </head>
@@ -617,17 +683,18 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             </div>
             <button class="btn-filtrele" onclick="yukleRezervasyonlar()">Filtrele</button>
         </div>
-
         <!-- Rezervasyonlar Tablosu -->
+        <h2>🍽️ Rezervasyonlar</h2>
         <div class="table-container">
+             
             <div class="table-header">
-                <h2>🍽️ Rezervasyonlar</h2>
+             
                 <div class="top-actions">
-                    <button class="btn-primary" onclick="acModal('manuelEkleModal')">+ Yeni Ekle</button>
-                    <button class="btn-primary" onclick="ayarlariAc()" style="background:var(--surface-2);border:1px solid rgba(255,255,255,0.1);">⚙️ Ayarlar</button>
+                    <button class="btn-primary" onclick="acModal('manuelEkleModal')"><span>+</span> <span class="btn-text">Yeni Ekle</span></button>
+                    <button class="btn-primary" onclick="ayarlariAc()" style="background:var(--surface-2);border:1px solid rgba(255,255,255,0.1);"><span>⚙️</span> <span class="btn-text">Ayarlar</span></button>
                     <button class="btn-refresh" onclick="yukleHerSeyi(this)">
                         <span class="icon">🔄</span>
-                        <span>Yenile</span>
+                        <span class="btn-text">Yenile</span>
                     </button>
                 </div>
             </div>
