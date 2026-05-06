@@ -6,9 +6,10 @@
 
 require_once __DIR__ . '/config.php';
 
-$kod = $_GET['kod'] ?? '';
+$kod = $_GET['kod'] ?? $_POST['kod'] ?? '';
 $mesaj = '';
 $hata = false;
+$onay_gerekli = false;
 
 if (empty($kod)) {
     $hata = true;
@@ -29,16 +30,23 @@ if (empty($kod)) {
             $hata = true;
             $mesaj = 'Rezervasyonunuz zaten iptal edilmiş.';
         } else {
-            // İptal işlemini yap
-            $stmt = $pdo->prepare("UPDATE rezervasyonlar SET durum = 'iptal' WHERE id = ?");
-            $stmt->execute([$rezervasyon['id']]);
-            
-            // Yöneticilere bildirim gönder
-            if (!local_mi()) {
-                gonderIptalBildirimi($rezervasyon);
+            // Eğer POST isteği gelmişse iptal et (Botların/Antivirüslerin otomatik tıklamasını engellemek için)
+            if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['onay'])) {
+                // İptal işlemini yap
+                $stmt = $pdo->prepare("UPDATE rezervasyonlar SET durum = 'iptal' WHERE id = ?");
+                $stmt->execute([$rezervasyon['id']]);
+                
+                // Yöneticilere bildirim gönder
+                if (!local_mi()) {
+                    gonderIptalBildirimi($rezervasyon);
+                }
+                
+                $mesaj = "Sayın {$rezervasyon['ad_soyad']}, " . date('d.m.Y', strtotime($rezervasyon['tarih'])) . " saat {$rezervasyon['saat']} için yaptığınız rezervasyonunuz başarıyla iptal edilmiştir.";
+            } else {
+                // Henüz iptal edilmedi, onay formu göster
+                $onay_gerekli = true;
+                $mesaj = "Sayın <strong>{$rezervasyon['ad_soyad']}</strong>, <br>" . date('d.m.Y', strtotime($rezervasyon['tarih'])) . " saat <strong>{$rezervasyon['saat']}</strong> için olan rezervasyonunuzu iptal etmek istediğinizden emin misiniz?";
             }
-            
-            $mesaj = "Sayın {$rezervasyon['ad_soyad']}, " . date('d.m.Y', strtotime($rezervasyon['tarih'])) . " saat {$rezervasyon['saat']} için yaptığınız rezervasyonunuz başarıyla iptal edilmiştir.";
         }
     } catch (Exception $e) {
         $hata = true;
@@ -169,10 +177,17 @@ function gonderIptalBildirimi($rez) {
         
         <?php if ($hata): ?>
             <div class="icon">⚠️</div>
-            <p class="message error-text"><?= htmlspecialchars($mesaj) ?></p>
+            <p class="message error-text"><?= $mesaj ?></p>
+        <?php elseif ($onay_gerekli): ?>
+            <div class="icon">❓</div>
+            <p class="message"><?= $mesaj ?></p>
+            <form method="POST" style="margin-bottom: 2rem;">
+                <input type="hidden" name="kod" value="<?= htmlspecialchars($kod) ?>">
+                <button type="submit" name="onay" class="btn" style="background: #ef4444;">Rezervasyonu İptal Et</button>
+            </form>
         <?php else: ?>
             <div class="icon">✅</div>
-            <p class="message success-text"><?= htmlspecialchars($mesaj) ?></p>
+            <p class="message success-text"><?= $mesaj ?></p>
         <?php endif; ?>
         
         <a href="index.html" class="btn">Ana Sayfaya Dön</a>
