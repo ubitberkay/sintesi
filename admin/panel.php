@@ -216,7 +216,7 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             margin-bottom: 1rem;
             padding: 1.2rem;
             display: grid;
-            grid-template-columns: 0.5fr 2fr 1.5fr 1.5fr 1fr 1fr 1.5fr;
+            grid-template-columns: 2fr 1.5fr 1.5fr 1fr 1fr 1.5fr;
             align-items: center;
             gap: 1rem;
             transition: all 0.3s ease;
@@ -228,7 +228,6 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             transform: translateX(5px);
         }
         
-        .rez-id { color: var(--muted); font-size: 0.75rem; }
         .rez-name { font-weight: 600; font-size: 1rem; }
         .rez-info { display: flex; flex-direction: column; gap: 2px; }
         .rez-label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
@@ -655,7 +654,6 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                         
                         html += `
                         <div class="rez-card">
-                            <div class="rez-id">#${r.id}</div>
                             <div class="rez-info">
                                 <span class="rez-name">${r.ad_soyad}</span>
                                 <span style="color:var(--muted);font-size:0.8rem;">${r.email || 'E-posta yok'}</span>
