@@ -426,6 +426,76 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             color: #fff;
         }
         .btn-modal:hover { opacity: 0.9; }
+        
+        .search-bar {
+            padding: 10px 14px;
+            background: var(--surface-2);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 6px;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 0.85rem;
+            outline: none;
+            width: 250px;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin-top: 20px;
+        }
+        .page-btn {
+            padding: 8px 12px;
+            background: var(--surface-2);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .page-btn:hover { background: var(--accent); border-color: var(--accent); }
+        .page-btn.active { background: var(--accent); border-color: var(--accent); font-weight: bold; }
+        .page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        .top-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.9rem;
+            transition: 0.3s;
+        }
+        .btn-primary:hover { background: var(--accent-hover); }
+        
+        /* Modal Form Styles */
+        .modal-form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        .modal-form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+        .modal-form-group input, .modal-form-group select, .modal-form-group textarea {
+            width: 100%;
+            padding: 10px;
+            background: var(--surface-2);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 6px;
+            color: var(--text);
+            font-family: inherit;
+        }
 
         /* Flatpickr Dark Theme Customization */
         .flatpickr-calendar {
@@ -525,6 +595,10 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
         <!-- Filtreler -->
         <div class="filters">
             <div class="filter-group">
+                <label>Arama</label>
+                <input type="text" id="filtre-arama" class="search-bar" placeholder="Ad Soyad veya Tel...">
+            </div>
+            <div class="filter-group">
                 <label>Durum</label>
                 <select id="filtre-durum">
                     <option value="">Tümü</option>
@@ -548,14 +622,19 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
         <div class="table-container">
             <div class="table-header">
                 <h2>🍽️ Rezervasyonlar</h2>
-                <button class="btn-refresh" onclick="yukleHerSeyi(this)">
-                    <span class="icon">🔄</span>
-                    <span>Yenile</span>
-                </button>
+                <div class="top-actions">
+                    <button class="btn-primary" onclick="acModal('manuelEkleModal')">+ Yeni Ekle</button>
+                    <button class="btn-primary" onclick="ayarlariAc()" style="background:var(--surface-2);border:1px solid rgba(255,255,255,0.1);">⚙️ Ayarlar</button>
+                    <button class="btn-refresh" onclick="yukleHerSeyi(this)">
+                        <span class="icon">🔄</span>
+                        <span>Yenile</span>
+                    </button>
+                </div>
             </div>
             <div id="tablo-icerik">
                 <div class="loading">Yükleniyor...</div>
             </div>
+            <div id="sayfalama" class="pagination"></div>
         </div>
     </main>
 
@@ -568,13 +647,72 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             <h3 class="modal-title">Emin misiniz?</h3>
             <p class="modal-text">Bu rezervasyon kaydı kalıcı olarak silinecektir. Bu işlemi geri alamazsınız.</p>
             <div class="modal-actions">
-                <button class="btn-modal btn-cancel" onclick="modalKapat()">Vazgeç</button>
+                <button class="btn-modal btn-cancel" onclick="kapatModal('deleteModal')">Vazgeç</button>
                 <button class="btn-modal btn-confirm-delete" id="confirmDeleteBtn">Evet, Sil</button>
             </div>
         </div>
     </div>
 
+    <!-- Manuel Ekle Modal -->
+    <div id="manuelEkleModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 500px;">
+            <h3 class="modal-title">Yeni Rezervasyon Ekle</h3>
+            <form id="manuelEkleForm" onsubmit="manuelEkleKaydet(event)">
+                <div class="modal-form-group">
+                    <label>Ad Soyad</label>
+                    <input type="text" id="m-ad" required>
+                </div>
+                <div class="modal-form-group">
+                    <label>Telefon</label>
+                    <input type="text" id="m-tel" required>
+                </div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <div class="modal-form-group">
+                        <label>Tarih</label>
+                        <input type="text" id="m-tarih" placeholder="Tarih Seçin" required readonly>
+                    </div>
+                    <div class="modal-form-group">
+                        <label>Saat</label>
+                        <input type="time" id="m-saat" required>
+                    </div>
+                </div>
+                <div class="modal-form-group">
+                    <label>Kişi Sayısı</label>
+                    <input type="number" id="m-kisi" value="2" min="1" max="50" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-modal btn-cancel" onclick="kapatModal('manuelEkleModal')">Vazgeç</button>
+                    <button type="submit" class="btn-modal btn-primary">Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Ayarlar Modal -->
+    <div id="ayarlarModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 500px;">
+            <h3 class="modal-title">Sistem Ayarları</h3>
+            <form id="ayarlarForm" onsubmit="ayarlariKaydetSubmit(event)">
+                <div class="modal-form-group">
+                    <label>Saatlik Maksimum Kapasite</label>
+                    <input type="number" id="ayar-kapasite" min="1" required>
+                </div>
+                <div class="modal-form-group">
+                    <label>Kapalı / Özel Günler</label>
+                    <input type="text" id="ayar-kapali-gunler" placeholder="Tarihleri seçin" readonly>
+                    <small style="color:var(--muted); font-size:0.75rem;">Bu tarihlerde rezervasyon alınamaz.</small>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-modal btn-cancel" onclick="kapatModal('ayarlarModal')">İptal</button>
+                    <button type="submit" class="btn-modal btn-primary">Ayarları Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
+        const csrfToken = "<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>";
+
         // Sayfa yüklendiğinde verileri çek
         document.addEventListener('DOMContentLoaded', () => {
             yukleIstatistikler();
@@ -582,9 +720,10 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             initFlatpickr();
         });
 
+        let currentPage = 1;
         let currentDeleteId = null;
 
-        let fpBas, fpSon;
+        let fpBas, fpSon, fpAyarlar;
 
         function initFlatpickr() {
             const config = {
@@ -595,7 +734,33 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             };
             fpBas = flatpickr("#filtre-tarih-bas", config);
             fpSon = flatpickr("#filtre-tarih-son", config);
+            
+            fpAyarlar = flatpickr("#ayar-kapali-gunler", {
+                locale: "tr",
+                mode: "multiple",
+                dateFormat: "Y-m-d",
+                altInput: true,
+                altFormat: "d F Y"
+            });
+            
+            flatpickr("#m-tarih", {
+                locale: "tr",
+                dateFormat: "Y-m-d",
+                altInput: true,
+                altFormat: "d F Y"
+            });
+            
+            // Arama inputu listener'ı
+            document.getElementById('filtre-arama').addEventListener('input', (e) => {
+                currentPage = 1; // Yeni aramada ilk sayfaya dön
+                clearTimeout(window.searchTimeout);
+                window.searchTimeout = setTimeout(yukleRezervasyonlar, 500);
+            });
         }
+
+        // Modal Kontrolleri
+        function acModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function kapatModal(id) { document.getElementById(id).style.display = 'none'; }
 
         /**
          * Hızlı Filtre (Stat kartlarına tıklanınca)
@@ -668,18 +833,23 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
         /**
          * Rezervasyonları yükle
          */
-        async function yukleRezervasyonlar() {
+        async function yukleRezervasyonlar(page = currentPage) {
+            currentPage = page;
             const durum = document.getElementById('filtre-durum').value;
             const tarihBas = document.getElementById('filtre-tarih-bas').value;
             const tarihSon = document.getElementById('filtre-tarih-son').value;
+            const arama = document.getElementById('filtre-arama').value;
 
-            let url = 'api.php?action=list';
+            let url = `api.php?action=list&page=${page}`;
             if (durum) url += '&durum=' + durum;
             if (tarihBas) url += '&tarih_bas=' + tarihBas;
             if (tarihSon) url += '&tarih_son=' + tarihSon;
+            if (arama) url += '&search=' + encodeURIComponent(arama);
 
             const container = document.getElementById('tablo-icerik');
+            const paginationContainer = document.getElementById('sayfalama');
             container.innerHTML = '<div class="loading">Yükleniyor...</div>';
+            paginationContainer.innerHTML = '';
 
             try {
                 const res = await fetch(url);
@@ -730,6 +900,26 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                     });
 
                     container.innerHTML = html;
+
+                    // Sayfalama oluştur
+                    if (json.pagination && json.pagination.total_pages > 1) {
+                        let pageHtml = '';
+                        const tp = json.pagination.total_pages;
+                        const cp = json.pagination.current_page;
+                        
+                        pageHtml += `<button class="page-btn" ${cp === 1 ? 'disabled' : `onclick="yukleRezervasyonlar(${cp - 1})"`}>Önceki</button>`;
+                        
+                        for (let i = 1; i <= tp; i++) {
+                            if (i === 1 || i === tp || (i >= cp - 2 && i <= cp + 2)) {
+                                pageHtml += `<button class="page-btn ${i === cp ? 'active' : ''}" onclick="yukleRezervasyonlar(${i})">${i}</button>`;
+                            } else if (i === cp - 3 || i === cp + 3) {
+                                pageHtml += `<span style="color:var(--muted); margin:0 5px;">...</span>`;
+                            }
+                        }
+                        
+                        pageHtml += `<button class="page-btn" ${cp === tp ? 'disabled' : `onclick="yukleRezervasyonlar(${cp + 1})"`}>Sonraki</button>`;
+                        paginationContainer.innerHTML = pageHtml;
+                    }
                 } else {
                     container.innerHTML = `
                         <div class="empty-state">
@@ -751,6 +941,7 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                 const formData = new FormData();
                 formData.append('action', action);
                 formData.append('id', id);
+                formData.append('csrf_token', csrfToken);
 
                 const res = await fetch('api.php?action=' + action, {
                     method: 'POST',
@@ -806,13 +997,103 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
          * Tarih formatla
          */
         function formatTarih(tarihStr) {
-            const tarih = new Date(tarihStr);
-            const gunler = ['Paz', 'Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt'];
-            const gun = gunler[tarih.getDay()];
-            const g = tarih.getDate().toString().padStart(2, '0');
-            const a = (tarih.getMonth() + 1).toString().padStart(2, '0');
-            const y = tarih.getFullYear();
-            return `${gun}, ${g}.${a}.${y}`;
+            const date = new Date(tarihStr);
+            return date.toLocaleDateString('tr-TR', { day: '2-digit', month: 'long', year: 'numeric' });
+        }
+
+        /**
+         * Manuel Rezervasyon Ekleme
+         */
+        async function manuelEkleKaydet(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.textContent = "Kaydediliyor...";
+            
+            try {
+                const formData = new FormData();
+                formData.append('action', 'create');
+                formData.append('ad_soyad', document.getElementById('m-ad').value);
+                formData.append('telefon', document.getElementById('m-tel').value);
+                formData.append('tarih', document.getElementById('m-tarih').value);
+                formData.append('saat', document.getElementById('m-saat').value);
+                formData.append('kisi_sayisi', document.getElementById('m-kisi').value);
+                formData.append('csrf_token', csrfToken);
+                
+                const res = await fetch('api.php', { method: 'POST', body: formData });
+                const json = await res.json();
+                
+                if (json.success) {
+                    toastGoster(json.message, 'success');
+                    kapatModal('manuelEkleModal');
+                    e.target.reset();
+                    yukleHerSeyi();
+                } else {
+                    toastGoster(json.message, 'error');
+                }
+            } catch(err) {
+                toastGoster('Bağlantı hatası.', 'error');
+            }
+            btn.disabled = false;
+            btn.textContent = "Kaydet";
+        }
+
+        /**
+         * Ayarlar Modalını Aç ve Verileri Çek
+         */
+        async function ayarlariAc() {
+            acModal('ayarlarModal');
+            document.getElementById('ayar-kapasite').value = '';
+            fpAyarlar.clear();
+            
+            try {
+                const res = await fetch('api.php?action=settings_get');
+                const json = await res.json();
+                if (json.success) {
+                    document.getElementById('ayar-kapasite').value = json.data.kapasite;
+                    fpAyarlar.setDate(json.data.kapali_gunler);
+                }
+            } catch(err) {
+                toastGoster('Ayarlar yüklenemedi', 'error');
+            }
+        }
+
+        /**
+         * Ayarları Kaydet
+         */
+        async function ayarlariKaydetSubmit(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.textContent = "Kaydediliyor...";
+            
+            try {
+                const formData = new FormData();
+                formData.append('action', 'settings_save');
+                formData.append('kapasite', document.getElementById('ayar-kapasite').value);
+                
+                const seciliGunler = fpAyarlar.selectedDates.map(date => {
+                    return date.getFullYear() + "-" + 
+                           String(date.getMonth() + 1).padStart(2, '0') + "-" + 
+                           String(date.getDate()).padStart(2, '0');
+                });
+                formData.append('kapali_gunler', JSON.stringify(seciliGunler));
+                formData.append('csrf_token', csrfToken);
+                
+                const res = await fetch('api.php', { method: 'POST', body: formData });
+                const json = await res.json();
+                
+                if (json.success) {
+                    toastGoster(json.message, 'success');
+                    kapatModal('ayarlarModal');
+                } else {
+                    toastGoster(json.message, 'error');
+                }
+            } catch(err) {
+                toastGoster('Bağlantı hatası.', 'error');
+            }
+            btn.disabled = false;
+            btn.textContent = "Ayarları Kaydet";
         }
 
         /**

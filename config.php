@@ -71,4 +71,13 @@ function local_mi() {
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+
+// CSRF Token oluştur (varsa yeniden oluşturma)
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
+function verify_csrf_token($token) {
+    return hash_equals($_SESSION['csrf_token'], $token);
+}
 ?>

@@ -96,11 +96,24 @@ if ($kisi < 1 || $kisi > 20) {
 try {
     $pdo = veritabani_baglantisi();
     
-    // Saatlik kapasite kontrolü (16 kişi sınırı)
+    // Ayarları çek
+    $stmt_ayarlar = $pdo->prepare("SELECT ayar_anahtari, ayar_degeri FROM ayarlar");
+    $stmt_ayarlar->execute();
+    $ayarlar = $stmt_ayarlar->fetchAll(PDO::FETCH_KEY_PAIR);
+    
+    $maksimum_kapasite = isset($ayarlar['kapasite']) ? (int)$ayarlar['kapasite'] : 16;
+    $kapali_gunler = isset($ayarlar['kapali_gunler']) ? json_decode($ayarlar['kapali_gunler'], true) : [];
+    
+    // Kapalı gün kontrolü
+    if (is_array($kapali_gunler) && in_array($tarih, $kapali_gunler)) {
+        echo json_encode(['success' => false, 'message' => 'Seçtiğiniz tarih restoranımız kapalıdır. Lütfen başka bir tarih seçin.']);
+        exit;
+    }
+
+    // Saatlik kapasite kontrolü
     $stmt = $pdo->prepare("SELECT SUM(kisi_sayisi) FROM rezervasyonlar WHERE tarih = ? AND saat = ? AND durum != 'iptal'");
     $stmt->execute([$tarih, $saat]);
     $mevcut_kisi = (int)$stmt->fetchColumn();
-    $maksimum_kapasite = 16;
     
     if (($mevcut_kisi + $kisi) > $maksimum_kapasite) {
         $kalan_yer = $maksimum_kapasite - $mevcut_kisi;
@@ -112,12 +125,14 @@ try {
         exit;
     }
     
+    $iptal_kodu = bin2hex(random_bytes(16));
+
     // Veritabanına kaydet
     $stmt = $pdo->prepare("
-        INSERT INTO rezervasyonlar (ad_soyad, email, telefon, tarih, saat, kisi_sayisi, ozel_istekler, durum)
-        VALUES (?, ?, ?, ?, ?, ?, ?, 'beklemede')
+        INSERT INTO rezervasyonlar (ad_soyad, email, telefon, tarih, saat, kisi_sayisi, ozel_istekler, durum, iptal_kodu)
+        VALUES (?, ?, ?, ?, ?, ?, ?, 'beklemede', ?)
     ");
-    $stmt->execute([$ad_soyad, $email, $telefon, $tarih, $saat, $kisi, $ozel]);
+    $stmt->execute([$ad_soyad, $email, $telefon, $tarih, $saat, $kisi, $ozel, $iptal_kodu]);
     
     // E-posta bildirimi gönder (sadece sunucuda, local'de atla)
     if (!local_mi()) {

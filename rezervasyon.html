@@ -434,7 +434,7 @@
     <section id="rezervasyon">
         <span class="section-subtitle">Planlamanızı Yapın</span>
         <h2>Masanızı Ayırın</h2>
-        <p style="color: var(--color-text-muted); font-size: 0.9rem; margin-top: -0.5rem; margin-bottom: 2rem;">
+        <p id="kapasite-notu" style="color: var(--color-text-muted); font-size: 0.9rem; margin-top: -0.5rem; margin-bottom: 2rem;">
             * Her saat dilimi için maksimum 16 kişilik kapasitemiz bulunmaktadır.
         </p>
 
@@ -572,24 +572,51 @@
             navLinks.classList.toggle('active');
         });
 
-        // Rezervasyon Formu ve Flatpickr Başlatma
         const rezForm = document.getElementById('rezervasyonForm');
         const rezMessage = document.getElementById('rez-form-message');
         const rezSubmitBtn = document.getElementById('rezSubmitBtn');
         const rezTarihInput = document.getElementById('rez-tarih');
 
-        const fp = flatpickr("#rez-tarih", {
-            locale: "tr",
-            dateFormat: "Y-m-d",
-            altInput: true,
-            altFormat: "d F Y, l",
-            minDate: "today",
-            disable: [
-                function (date) {
-                    return (date.getDay() === 1);
+        let maxKapasite = 16;
+        let kapaliGunlerStr = [];
+        let fp = null;
+
+        // Ayarları çek ve takvimi başlat
+        fetch('public_api.php')
+            .then(res => res.json())
+            .then(json => {
+                if (json.success) {
+                    maxKapasite = json.data.kapasite;
+                    kapaliGunlerStr = json.data.kapali_gunler || [];
+                    document.getElementById('kapasite-notu').textContent = `* Her saat dilimi için maksimum ${maxKapasite} kişilik kapasitemiz bulunmaktadır.`;
                 }
-            ],
-            onChange: function (selectedDates, dateStr, instance) {
+                initTakvim();
+            })
+            .catch(err => {
+                console.error("Ayarlar yüklenemedi", err);
+                initTakvim(); // Hata olursa varsayılanlarla başlat
+            });
+
+        function initTakvim() {
+            fp = flatpickr("#rez-tarih", {
+                locale: "tr",
+                dateFormat: "Y-m-d",
+                altInput: true,
+                altFormat: "d F Y, l",
+                minDate: "today",
+                disable: [
+                    function (date) {
+                        return (date.getDay() === 1); // Pazartesi kapalı
+                    },
+                    function (date) {
+                        // Özel/Kapalı gün kontrolü
+                        const dateString = date.getFullYear() + "-" + 
+                            String(date.getMonth() + 1).padStart(2, '0') + "-" + 
+                            String(date.getDate()).padStart(2, '0');
+                        return kapaliGunlerStr.includes(dateString);
+                    }
+                ],
+                onChange: function (selectedDates, dateStr, instance) {
                 if (dateStr) {
                     rezMessage.style.display = 'none';
                     rezSubmitBtn.disabled = false;
@@ -608,6 +635,7 @@
                 }
             }
         });
+        }
 
         function ozelGunMu(tarihStr) {
             const date = new Date(tarihStr);
