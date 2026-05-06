@@ -20,7 +20,7 @@ $local_ortam = in_array($sunucu_adi, ['localhost', '127.0.0.1', '::1']);
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'sintesic_rezervasyon');    // cPanel'de oluşturduğunuz veritabanı adı
 define('DB_USER', 'sintesic_admin');          // cPanel'de oluşturduğunuz veritabanı kullanıcısı
-define('DB_PASS', 'BURAYA_SIFRE_YAZIN');     // Veritabanı kullanıcı şifresi
+define('DB_PASS', 'qwe12ASD?');     // Veritabanı kullanıcı şifresi
 
 // ============================================================
 // VERİTABANI BAĞLANTISI
