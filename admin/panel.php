@@ -516,6 +516,22 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             background: var(--accent) !important;
             border-color: var(--accent) !important;
         }
+        .flatpickr-time {
+            background: #151515 !important;
+            border-top: 1px solid rgba(157,67,44,0.2) !important;
+        }
+        .flatpickr-time .numInputWrapper:hover {
+            background: rgba(255,255,255,0.05) !important;
+        }
+        .flatpickr-time input {
+            color: var(--text) !important;
+        }
+        .flatpickr-time .flatpickr-am-pm {
+            color: var(--text) !important;
+        }
+        .flatpickr-time .flatpickr-time-separator {
+            color: var(--muted) !important;
+        }
 
 
         
@@ -740,7 +756,7 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                     </div>
                     <div class="modal-form-group">
                         <label>Saat</label>
-                        <input type="time" id="m-saat" required>
+                        <input type="text" id="m-saat" placeholder="Saat Seçin" required readonly>
                     </div>
                 </div>
                 <div class="modal-form-group">
@@ -815,6 +831,17 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                 dateFormat: "Y-m-d",
                 altInput: true,
                 altFormat: "d F Y"
+            });
+
+            flatpickr("#m-saat", {
+                locale: "tr",
+                enableTime: true,
+                noCalendar: true,
+                dateFormat: "H:i",
+                time_24hr: true,
+                altInput: true,
+                altFormat: "H:i",
+                placeholder: "Saat Seçin"
             });
             
             // Arama inputu listener'ı
