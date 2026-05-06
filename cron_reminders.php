@@ -58,6 +58,33 @@ try {
     
     echo "İşlem tamamlandı. Toplam " . $gonderilen_sayisi . " hatırlatma gönderildi.\n";
 
+    // --- OTOMATİK GELMEDİ İŞARETLEME ---
+    // Rezervasyon saati üzerinden 1 saat geçmiş ve hala 'onaylandi' olanları 'gelmedi' yap
+    $bir_saat_once = $suan - 3600;
+    
+    // Sadece bugün veya daha eski onaylıları kontrol et
+    $stmt = $pdo->prepare("
+        SELECT id, tarih, saat FROM rezervasyonlar 
+        WHERE durum = 'onaylandi' 
+        AND tarih <= ?
+    ");
+    $stmt->execute([$bugun]);
+    $onaylilar = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    $gelmedi_sayisi = 0;
+    foreach ($onaylilar as $rez) {
+        $rez_zamani = strtotime($rez['tarih'] . ' ' . $rez['saat']);
+        if ($rez_zamani < $bir_saat_once) {
+            $update = $pdo->prepare("UPDATE rezervasyonlar SET durum = 'gelmedi' WHERE id = ?");
+            $update->execute([$rez['id']]);
+            $gelmedi_sayisi++;
+        }
+    }
+    
+    if ($gelmedi_sayisi > 0) {
+        echo $gelmedi_sayisi . " adet geçmiş rezervasyon 'gelmedi' olarak işaretlendi.\n";
+    }
+
 } catch (Exception $e) {
     die("Hata: " . $e->getMessage());
 }

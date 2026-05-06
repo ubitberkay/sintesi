@@ -687,6 +687,8 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                     <option value="beklemede">⏳ Beklemede</option>
                     <option value="onaylandi">✅ Onaylandı</option>
                     <option value="iptal">❌ İptal</option>
+                    <option value="geldi">📍 Geldi</option>
+                    <option value="gelmedi">❓ Gelmedi</option>
                 </select>
             </div>
             <div class="filter-group">
@@ -988,7 +990,11 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                             </div>
                             <div class="rez-info">
                                 <div class="actions">
-                                    ${r.durum !== 'onaylandi' ? `<button class="btn-action btn-approve" onclick="islem('approve',${r.id})" title="Onayla">✓</button>` : ''}
+                                    ${r.durum === 'beklemede' ? `<button class="btn-action btn-approve" onclick="islem('approve',${r.id})" title="Onayla">✓</button>` : ''}
+                                    ${r.durum === 'onaylandi' ? `
+                                        <button class="btn-action btn-arrived" onclick="islem('arrived',${r.id})" title="Geldi" style="background:#22c55e;">📍</button>
+                                        <button class="btn-action btn-no-show" onclick="islem('no-show',${r.id})" title="Gelmedi" style="background:#f59e0b;">❓</button>
+                                    ` : ''}
                                     ${r.durum !== 'iptal' ? `<button class="btn-action btn-reject" onclick="islem('reject',${r.id})" title="İptal Et">✕</button>` : ''}
                                     <button class="btn-action btn-delete" onclick="silOnay(${r.id})" title="Sil">🗑</button>
                                 </div>
@@ -1090,7 +1096,9 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             const map = {
                 'beklemede': '<span class="badge badge-beklemede">⏳ Beklemede</span>',
                 'onaylandi': '<span class="badge badge-onaylandi">✅ Onaylandı</span>',
-                'iptal': '<span class="badge badge-iptal">❌ İptal</span>'
+                'iptal': '<span class="badge badge-iptal">❌ İptal</span>',
+                'geldi': '<span class="badge" style="background:#22c55e; color:#fff;">📍 Geldi</span>',
+                'gelmedi': '<span class="badge" style="background:#f59e0b; color:#fff;">❓ Gelmedi</span>'
             };
             return map[durum] || durum;
         }

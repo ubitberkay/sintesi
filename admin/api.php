@@ -41,6 +41,12 @@ switch ($action) {
     case 'reject':
         durumGuncelle($pdo, 'iptal');
         break;
+    case 'arrived':
+        durumGuncelle($pdo, 'geldi');
+        break;
+    case 'no-show':
+        durumGuncelle($pdo, 'gelmedi');
+        break;
     case 'delete':
         silRezervasyonu($pdo);
         break;
@@ -157,8 +163,14 @@ function durumGuncelle($pdo, $yeni_durum) {
         }
     }
     
-    $durum_metin = $yeni_durum === 'onaylandi' ? 'onaylandı' : 'iptal edildi';
-    echo json_encode(['success' => true, 'message' => "Rezervasyon {$durum_metin}."]);
+    $durum_metinleri = [
+        'onaylandi' => 'onaylandı',
+        'iptal' => 'iptal edildi',
+        'geldi' => 'geldi olarak işaretlendi',
+        'gelmedi' => 'gelmedi olarak işaretlendi'
+    ];
+    $metin = $durum_metinleri[$yeni_durum] ?? $yeni_durum;
+    echo json_encode(['success' => true, 'message' => "Rezervasyon {$metin}."]);
 }
 
 /**
