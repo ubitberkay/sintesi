@@ -19,7 +19,7 @@ if (empty($kod)) {
         $pdo = veritabani_baglantisi();
         
         // Kodu kontrol et
-        $stmt = $pdo->prepare("SELECT id, ad_soyad, tarih, saat, durum FROM rezervasyonlar WHERE iptal_kodu = ? LIMIT 1");
+        $stmt = $pdo->prepare("SELECT id, ad_soyad, telefon, email, tarih, saat, durum FROM rezervasyonlar WHERE iptal_kodu = ? LIMIT 1");
         $stmt->execute([$kod]);
         $rezervasyon = $stmt->fetch(PDO::FETCH_ASSOC);
         
@@ -92,6 +92,8 @@ function gonderIptalBildirimi($rez) {
                     <p>Aşağıdaki rezervasyon müşteri tarafından <strong>iptal edilmiştir</strong>:</p>
                     <table style='width: 100%; border-collapse: collapse; margin-top: 15px;'>
                         <tr><td style='padding: 8px; font-weight: bold; width: 120px;'>Müşteri:</td><td style='padding: 8px;'>{$rez['ad_soyad']}</td></tr>
+                        <tr><td style='padding: 8px; font-weight: bold;'>Telefon:</td><td style='padding: 8px;'>{$rez['telefon']}</td></tr>
+                        <tr><td style='padding: 8px; font-weight: bold;'>E-posta:</td><td style='padding: 8px;'>" . ($rez['email'] ?: 'Belirtilmedi') . "</td></tr>
                         <tr><td style='padding: 8px; font-weight: bold;'>Tarih:</td><td style='padding: 8px;'>{$tarih_format}</td></tr>
                         <tr><td style='padding: 8px; font-weight: bold;'>Saat:</td><td style='padding: 8px;'>{$rez['saat']}</td></tr>
                     </table>
