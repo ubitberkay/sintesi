@@ -544,6 +544,9 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             .rez-special { grid-column: 1 / -1; }
             .actions { grid-column: 1 / -1; }
         }
+        .btn-status-geldi { background: #22c55e !important; color: white !important; font-size: 0.75rem !important; padding: 6px 12px !important; }
+        .btn-status-gelmedi { background: #f59e0b !important; color: white !important; font-size: 0.75rem !important; padding: 6px 12px !important; }
+        
         @media (max-width: 768px) {
             .admin-header { padding: 0.8rem 1rem; }
             .admin-main { padding: 1rem; }
@@ -990,12 +993,12 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                             </div>
                             <div class="rez-info">
                                 <div class="actions">
-                                    ${r.durum === 'beklemede' ? `<button class="btn-action btn-approve" onclick="islem('approve',${r.id})" title="Onayla">✓</button>` : ''}
+                                    ${r.durum === 'beklemede' ? `<button class="btn-action btn-approve" onclick="islem('approve',${r.id})" title="Onayla">✓ Onayla</button>` : ''}
                                     ${r.durum === 'onaylandi' ? `
-                                        <button class="btn-action btn-arrived" onclick="islem('arrived',${r.id})" title="Geldi" style="background:#22c55e;">📍</button>
-                                        <button class="btn-action btn-no-show" onclick="islem('no-show',${r.id})" title="Gelmedi" style="background:#f59e0b;">❓</button>
+                                        <button class="btn-action btn-status-geldi" onclick="islem('arrived',${r.id})">Geldi</button>
+                                        <button class="btn-action btn-status-gelmedi" onclick="islem('no-show',${r.id})">Gelmedi</button>
                                     ` : ''}
-                                    ${r.durum !== 'iptal' ? `<button class="btn-action btn-reject" onclick="islem('reject',${r.id})" title="İptal Et">✕</button>` : ''}
+                                    ${(r.durum !== 'iptal' && r.durum !== 'geldi' && r.durum !== 'gelmedi') ? `<button class="btn-action btn-reject" onclick="islem('reject',${r.id})" title="İptal Et">✕ İptal</button>` : ''}
                                     <button class="btn-action btn-delete" onclick="silOnay(${r.id})" title="Sil">🗑</button>
                                 </div>
                                 <div style="margin-top:8px; text-align:right;">${durumBadge}</div>
