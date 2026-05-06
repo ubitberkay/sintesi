@@ -265,8 +265,8 @@ function istatistikler($pdo) {
     $stmt->execute();
     $bekleyen = $stmt->fetchColumn();
     
-    // Toplam (İptaller hariç)
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM rezervasyonlar WHERE durum != 'iptal'");
+    // Toplam (Tüm kayıtlar)
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM rezervasyonlar");
     $stmt->execute();
     $toplam = $stmt->fetchColumn();
     
