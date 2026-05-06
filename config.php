@@ -1,10 +1,8 @@
 <?php
 /**
  * Sintesi - Veritabanı Konfigürasyon Dosyası
- * 
- * Local ortamda SQLite, sunucuda MySQL kullanır.
- * cPanel'e yüklerken aşağıdaki MySQL bilgilerini doldurun.
  */
+date_default_timezone_set('Europe/Istanbul');
 
 // ============================================================
 // ORTAM TESPİTİ

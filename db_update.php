@@ -78,6 +78,31 @@ try {
         echo "<p>❌ Ayarlar tablosu oluşturulurken hata oluştu: " . $e->getMessage() . "</p>";
     }
     
+    // 3. Hatırlatma Sütununun Eklenmesi
+    try {
+        if (local_mi()) {
+            $result = $pdo->query("PRAGMA table_info(rezervasyonlar)");
+            $columns = $result->fetchAll(PDO::FETCH_COLUMN, 1);
+            if (!in_array('hatirlatma_gonderildi', $columns)) {
+                $pdo->exec("ALTER TABLE rezervasyonlar ADD COLUMN hatirlatma_gonderildi INTEGER DEFAULT 0");
+                echo "<p>✅ 'hatirlatma_gonderildi' sütunu eklendi.</p>";
+            } else {
+                echo "<p>ℹ️ 'hatirlatma_gonderildi' sütunu zaten mevcut.</p>";
+            }
+        } else {
+            $stmt = $pdo->prepare("SHOW COLUMNS FROM rezervasyonlar LIKE 'hatirlatma_gonderildi'");
+            $stmt->execute();
+            if ($stmt->rowCount() == 0) {
+                $pdo->exec("ALTER TABLE rezervasyonlar ADD COLUMN hatirlatma_gonderildi TINYINT(1) DEFAULT 0");
+                echo "<p>✅ 'hatirlatma_gonderildi' sütunu eklendi.</p>";
+            } else {
+                echo "<p>ℹ️ 'hatirlatma_gonderildi' sütunu zaten mevcut.</p>";
+            }
+        }
+    } catch (Exception $e) {
+        echo "<p>❌ Hatırlatma sütunu eklenirken hata oluştu: " . $e->getMessage() . "</p>";
+    }
+    
     echo "<h3>Güncelleme Tamamlandı!</h3>";
     echo "<p style='color:red'>Güvenliğiniz için lütfen bu dosyayı (db_update.php) sunucudan siliniz.</p>";
     echo "<p><a href='/admin'>Admin Paneline Git</a></p>";
