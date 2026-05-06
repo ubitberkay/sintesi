@@ -117,6 +117,7 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             border-radius: 12px;
             padding: 1.8rem;
             transition: transform 0.3s, border-color 0.3s;
+            cursor: pointer;
         }
         .stat-card:hover {
             transform: translateY(-3px);
@@ -499,22 +500,22 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
     <main class="admin-main">
         <!-- İstatistik Kartları -->
         <div class="stats-grid">
-            <div class="stat-card">
+            <div class="stat-card" onclick="hizliFiltre('bugun')">
                 <div class="stat-icon">📅</div>
                 <div class="stat-value" id="stat-bugun">-</div>
                 <div class="stat-label">Bugünkü Rezervasyon</div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card" onclick="hizliFiltre('hafta')">
                 <div class="stat-icon">📆</div>
                 <div class="stat-value" id="stat-hafta">-</div>
                 <div class="stat-label">Bu Hafta</div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card" onclick="hizliFiltre('bekleyen')">
                 <div class="stat-icon">⏳</div>
                 <div class="stat-value" id="stat-bekleyen">-</div>
                 <div class="stat-label">Bekleyen Onay</div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card" onclick="hizliFiltre('toplam')">
                 <div class="stat-icon">📊</div>
                 <div class="stat-value" id="stat-toplam">-</div>
                 <div class="stat-label">Toplam Kayıt</div>
@@ -583,6 +584,8 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
 
         let currentDeleteId = null;
 
+        let fpBas, fpSon;
+
         function initFlatpickr() {
             const config = {
                 locale: "tr",
@@ -590,8 +593,45 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                 altInput: true,
                 altFormat: "d F Y",
             };
-            flatpickr("#filtre-tarih-bas", config);
-            flatpickr("#filtre-tarih-son", config);
+            fpBas = flatpickr("#filtre-tarih-bas", config);
+            fpSon = flatpickr("#filtre-tarih-son", config);
+        }
+
+        /**
+         * Hızlı Filtre (Stat kartlarına tıklanınca)
+         */
+        function hizliFiltre(tip) {
+            const durumSelect = document.getElementById('filtre-durum');
+            
+            // Önce her şeyi sıfırla
+            durumSelect.value = '';
+            fpBas.clear();
+            fpSon.clear();
+            
+            const bugun = new Date();
+            
+            if (tip === 'bugun') {
+                fpBas.setDate(bugun);
+                fpSon.setDate(bugun);
+            } else if (tip === 'hafta') {
+                const pazartesi = new Date(bugun);
+                const day = pazartesi.getDay() || 7; // Pazar 0'dır, onu 7 yapıyoruz
+                pazartesi.setDate(pazartesi.getDate() - day + 1);
+                
+                const pazar = new Date(pazartesi);
+                pazar.setDate(pazartesi.getDate() + 6);
+                
+                fpBas.setDate(pazartesi);
+                fpSon.setDate(pazar);
+            } else if (tip === 'bekleyen') {
+                durumSelect.value = 'beklemede';
+            }
+            
+            // Filtreyi uygula
+            yukleRezervasyonlar();
+            
+            // Tablo kısmına hafifçe scroll ol
+            document.querySelector('.table-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         /**
