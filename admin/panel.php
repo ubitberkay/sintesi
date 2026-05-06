@@ -760,7 +760,9 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                     </div>
                     <div class="modal-form-group">
                         <label>Saat</label>
-                        <input type="text" id="m-saat" placeholder="Saat Seçin" required readonly>
+                        <select id="m-saat" required>
+                            <!-- Saatler JS ile yüklenecek -->
+                        </select>
                     </div>
                 </div>
                 <div class="modal-form-group">
@@ -837,16 +839,18 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                 altFormat: "d F Y"
             });
 
-            flatpickr("#m-saat", {
-                locale: "tr",
-                enableTime: true,
-                noCalendar: true,
-                dateFormat: "H:i",
-                time_24hr: true,
-                altInput: true,
-                altFormat: "H:i",
-                placeholder: "Saat Seçin"
-            });
+            // Saat dropdown'ını doldur
+            const saatSelect = document.getElementById('m-saat');
+            saatSelect.innerHTML = '<option value="" disabled selected>Saat Seçin</option>';
+            for (let h = 10; h <= 23; h++) {
+                for (let m = 0; m < 60; m += 15) {
+                    const hh = String(h).padStart(2, '0');
+                    const mm = String(m).padStart(2, '0');
+                    const val = `${hh}:${mm}`;
+                    saatSelect.innerHTML += `<option value="${val}">${val}</option>`;
+                }
+            }
+            saatSelect.innerHTML += '<option value="00:00">00:00</option>';
             
             // Arama inputu listener'ı
             document.getElementById('filtre-arama').addEventListener('input', (e) => {
