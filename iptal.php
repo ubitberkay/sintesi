@@ -33,11 +33,70 @@ if (empty($kod)) {
             $stmt = $pdo->prepare("UPDATE rezervasyonlar SET durum = 'iptal' WHERE id = ?");
             $stmt->execute([$rezervasyon['id']]);
             
+            // Yöneticilere bildirim gönder
+            if (!local_mi()) {
+                gonderIptalBildirimi($rezervasyon);
+            }
+            
             $mesaj = "Sayın {$rezervasyon['ad_soyad']}, " . date('d.m.Y', strtotime($rezervasyon['tarih'])) . " saat {$rezervasyon['saat']} için yaptığınız rezervasyonunuz başarıyla iptal edilmiştir.";
         }
     } catch (Exception $e) {
         $hata = true;
         $mesaj = 'Sistemde bir hata oluştu, lütfen daha sonra tekrar deneyin.';
+    }
+}
+
+/**
+ * Yöneticilere iptal bildirimi gönderir
+ */
+function gonderIptalBildirimi($rez) {
+    require_once __DIR__ . '/phpmailer/Exception.php';
+    require_once __DIR__ . '/phpmailer/PHPMailer.php';
+    require_once __DIR__ . '/phpmailer/SMTP.php';
+    
+    try {
+        $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
+        $mail->isSMTP();
+        $mail->Host       = 'mail.sintesi.com.tr';
+        $mail->SMTPAuth   = true;
+        $mail->Username   = 'info@sintesi.com.tr';
+        $mail->Password   = 'qwe12ASD?';
+        $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS;
+        $mail->Port       = 465;
+        $mail->CharSet    = 'UTF-8';
+        
+        $mail->setFrom('info@sintesi.com.tr', 'Sintesi İptal Bildirimi');
+        $mail->addAddress('info@sintesi.com.tr');
+        $mail->addAddress('cagla@sintesi.com.tr');
+        $mail->addAddress('bugra@sintesi.com.tr');
+        $mail->addAddress('ersinavsar@sintesi.com.tr');
+        
+        $tarih_format = date('d.m.Y', strtotime($rez['tarih']));
+        
+        $mail->isHTML(true);
+        $mail->Subject = "❌ Rezervasyon İptal Edildi - {$rez['ad_soyad']} ({$tarih_format})";
+        $mail->Body = "
+            <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; border-radius: 10px; overflow: hidden;'>
+                <div style='background: #ef4444; color: white; padding: 20px; text-align: center;'>
+                    <h2 style='margin: 0;'>❌ Rezervasyon İptal Edildi</h2>
+                </div>
+                <div style='padding: 25px; background: #fff; color: #333;'>
+                    <p>Aşağıdaki rezervasyon müşteri tarafından <strong>iptal edilmiştir</strong>:</p>
+                    <table style='width: 100%; border-collapse: collapse; margin-top: 15px;'>
+                        <tr><td style='padding: 8px; font-weight: bold; width: 120px;'>Müşteri:</td><td style='padding: 8px;'>{$rez['ad_soyad']}</td></tr>
+                        <tr><td style='padding: 8px; font-weight: bold;'>Tarih:</td><td style='padding: 8px;'>{$tarih_format}</td></tr>
+                        <tr><td style='padding: 8px; font-weight: bold;'>Saat:</td><td style='padding: 8px;'>{$rez['saat']}</td></tr>
+                    </table>
+                    <p style='margin-top: 25px; font-size: 13px; color: #666; border-top: 1px solid #eee; padding-top: 15px;'>
+                        Bu işlem müşteri tarafından e-posta yoluyla yapılmıştır.
+                    </p>
+                </div>
+            </div>
+        ";
+        
+        $mail->send();
+    } catch (Exception $e) {
+        error_log('İptal bildirim maili hatası: ' . $e->getMessage());
     }
 }
 ?>

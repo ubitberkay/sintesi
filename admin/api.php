@@ -340,6 +340,7 @@ function istatistikler($pdo) {
 function manuelEkle($pdo) {
     $ad_soyad = $_POST['ad_soyad'] ?? '';
     $telefon = $_POST['telefon'] ?? '';
+    $email = $_POST['email'] ?? '';
     $tarih = $_POST['tarih'] ?? '';
     $saat = $_POST['saat'] ?? '';
     $kisi = intval($_POST['kisi_sayisi'] ?? 2);
@@ -353,12 +354,24 @@ function manuelEkle($pdo) {
     $iptal_kodu = bin2hex(random_bytes(16));
     
     $stmt = $pdo->prepare("
-        INSERT INTO rezervasyonlar (ad_soyad, telefon, tarih, saat, kisi_sayisi, ozel_istekler, durum, iptal_kodu)
-        VALUES (?, ?, ?, ?, ?, ?, 'onaylandi', ?)
+        INSERT INTO rezervasyonlar (ad_soyad, telefon, email, tarih, saat, kisi_sayisi, ozel_istekler, durum, iptal_kodu)
+        VALUES (?, ?, ?, ?, ?, ?, ?, 'onaylandi', ?)
     ");
-    $stmt->execute([$ad_soyad, $telefon, $tarih, $saat, $kisi, $ozel, $iptal_kodu]);
+    $stmt->execute([$ad_soyad, $telefon, $email, $tarih, $saat, $kisi, $ozel, $iptal_kodu]);
     
-    echo json_encode(['success' => true, 'message' => 'Rezervasyon başarıyla eklendi.']);
+    // Onay maili gönder (Eğer e-posta adresi varsa ve localde değilsek)
+    if (!empty($email) && !local_mi()) {
+        gonderOnayMaili([
+            'ad_soyad' => $ad_soyad,
+            'email' => $email,
+            'tarih' => $tarih,
+            'saat' => $saat,
+            'kisi_sayisi' => $kisi,
+            'iptal_kodu' => $iptal_kodu
+        ]);
+    }
+    
+    echo json_encode(['success' => true, 'message' => 'Rezervasyon başarıyla eklendi ve onay maili gönderildi.']);
 }
 
 /**

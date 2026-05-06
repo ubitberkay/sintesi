@@ -749,6 +749,10 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                     <label>Telefon</label>
                     <input type="text" id="m-tel" required>
                 </div>
+                <div class="modal-form-group">
+                    <label>E-posta (Opsiyonel)</label>
+                    <input type="email" id="m-email" placeholder="orn@mail.com">
+                </div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                     <div class="modal-form-group">
                         <label>Tarih</label>
@@ -1109,6 +1113,7 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                 formData.append('action', 'create');
                 formData.append('ad_soyad', document.getElementById('m-ad').value);
                 formData.append('telefon', document.getElementById('m-tel').value);
+                formData.append('email', document.getElementById('m-email').value);
                 formData.append('tarih', document.getElementById('m-tarih').value);
                 formData.append('saat', document.getElementById('m-saat').value);
                 formData.append('kisi_sayisi', document.getElementById('m-kisi').value);
