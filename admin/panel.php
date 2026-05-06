@@ -271,10 +271,11 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             display: flex;
             gap: 8px;
             justify-content: flex-end;
+            flex-wrap: wrap;
         }
         .btn-action {
-            width: 38px;
-            height: 38px;
+            min-height: 38px;
+            padding: 0 15px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -284,7 +285,9 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             background: var(--surface-2);
             color: var(--text);
-            font-size: 1.1rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            white-space: nowrap;
         }
         .btn-approve:hover { background: var(--success); color: #fff; border-color: var(--success); transform: translateY(-3px); }
         .btn-reject:hover { background: var(--warning); color: #000; border-color: var(--warning); transform: translateY(-3px); }
@@ -544,8 +547,10 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             .rez-special { grid-column: 1 / -1; }
             .actions { grid-column: 1 / -1; }
         }
-        .btn-status-geldi { background: #22c55e !important; color: white !important; font-size: 0.75rem !important; padding: 6px 12px !important; }
-        .btn-status-gelmedi { background: #f59e0b !important; color: white !important; font-size: 0.75rem !important; padding: 6px 12px !important; }
+        .btn-status-geldi { background: #22c55e !important; color: white !important; }
+        .btn-status-gelmedi { background: #f59e0b !important; color: white !important; }
+        .btn-approve { background: #3b82f6 !important; color: white !important; }
+        .btn-reject { background: #ef4444 !important; color: white !important; }
         
         @media (max-width: 768px) {
             .admin-header { padding: 0.8rem 1rem; }
@@ -993,7 +998,7 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                             </div>
                             <div class="rez-info">
                                 <div class="actions">
-                                    ${r.durum === 'beklemede' ? `<button class="btn-action btn-approve" onclick="islem('approve',${r.id})" title="Onayla">✓ Onayla</button>` : ''}
+                                    ${(r.durum !== 'onaylandi' && r.durum !== 'geldi' && r.durum !== 'gelmedi') ? `<button class="btn-action btn-approve" onclick="islem('approve',${r.id})" title="Onayla">✓ Onayla</button>` : ''}
                                     ${r.durum === 'onaylandi' ? `
                                         <button class="btn-action btn-status-geldi" onclick="islem('arrived',${r.id})">Geldi</button>
                                         <button class="btn-action btn-status-gelmedi" onclick="islem('no-show',${r.id})">Gelmedi</button>
