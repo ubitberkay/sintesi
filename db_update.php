@@ -7,6 +7,7 @@
 
 require_once __DIR__ . '/config.php';
 
+
 try {
     $pdo = veritabani_baglantisi();
     
