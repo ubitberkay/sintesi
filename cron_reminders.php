@@ -8,7 +8,17 @@
 require_once __DIR__ . '/config.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
+use PHPMailer\PHPMailer\Exception as PHPMailerException;
+
+/**
+ * Log yazar
+ */
+function cron_log($mesaj) {
+    $log_dosyasi = __DIR__ . '/data/cron_log.txt';
+    $tarih = date('Y-m-d H:i:s');
+    $log_mesaji = "[$tarih] $mesaj" . PHP_EOL;
+    file_put_contents($log_dosyasi, $log_mesaji, FILE_APPEND);
+}
 
 // PHPMailer dosyalarını dahil et
 require_once __DIR__ . '/phpmailer/Exception.php';
@@ -16,23 +26,20 @@ require_once __DIR__ . '/phpmailer/PHPMailer.php';
 require_once __DIR__ . '/phpmailer/SMTP.php';
 
 try {
+    cron_log("--- Cron Başladı ---");
     $pdo = veritabani_baglantisi();
-    
-    // Hatırlatma gönderilecek rezervasyonları bul:
-    // - Onaylanmış
-    // - Hatırlatma gönderilmemiş
-    // - E-posta adresi olan
-    // - Rezervasyon zamanına 2 saatten az kalmış (ve geçmiş değil)
     
     $bugun = date('Y-m-d');
     $suan = time();
     $iki_saat_sonra = $suan + (2 * 3600);
     
+    cron_log("Zaman: " . date('H:i:s', $suan) . " | Limit: " . date('H:i:s', $iki_saat_sonra));
+
     // Basitlik ve hem SQLite hem MySQL uyumu için PHP tarafında filtreleme yapıyoruz
     $stmt = $pdo->prepare("
         SELECT * FROM rezervasyonlar 
         WHERE durum = 'onaylandi' 
-        AND hatirlatma_gonderildi = 0 
+        AND (hatirlatma_gonderildi = 0 OR hatirlatma_gonderildi IS NULL)
         AND email IS NOT NULL 
         AND email != ''
         AND tarih >= ?
@@ -45,18 +52,25 @@ try {
     foreach ($rezervasyonlar as $rez) {
         $rez_zamani = strtotime($rez['tarih'] . ' ' . $rez['saat']);
         
+        cron_log("Kontrol: Rez#{$rez['id']} ({$rez['ad_soyad']}) - Saat: {$rez['saat']} - TS: " . date('H:i:s', $rez_zamani));
+
         // Eğer rezervasyona 2 saatten az kalmışsa ve henüz geçmemişse
         if ($rez_zamani <= $iki_saat_sonra && $rez_zamani > $suan) {
+            cron_log("Mail gönderiliyor: Rez#{$rez['id']}");
             if (gonderHatirlatmaMaili($rez)) {
                 // Gönderildi olarak işaretle
                 $update = $pdo->prepare("UPDATE rezervasyonlar SET hatirlatma_gonderildi = 1 WHERE id = ?");
                 $update->execute([$rez['id']]);
                 $gonderilen_sayisi++;
+                cron_log("Başarılı: Rez#{$rez['id']}");
+            } else {
+                cron_log("HATA: Rez#{$rez['id']} mail gönderilemedi.");
             }
         }
     }
     
     echo "İşlem tamamlandı. Toplam " . $gonderilen_sayisi . " hatırlatma gönderildi.\n";
+    cron_log("Bitti: $gonderilen_sayisi hatırlatma gönderildi.");
 
     // --- OTOMATİK GELMEDİ İŞARETLEME ---
     // Rezervasyon saati üzerinden 1 saat geçmiş ve hala 'onaylandi' olanları 'gelmedi' yap
@@ -85,8 +99,10 @@ try {
         echo $gelmedi_sayisi . " adet geçmiş rezervasyon 'gelmedi' olarak işaretlendi.\n";
     }
 
-} catch (Exception $e) {
-    die("Hata: " . $e->getMessage());
+} catch (\Throwable $e) {
+    $hata_mesaji = "KRİTİK HATA: " . $e->getMessage() . " (" . $e->getFile() . ":" . $e->getLine() . ")";
+    cron_log($hata_mesaji);
+    die($hata_mesaji);
 }
 
 /**
@@ -150,8 +166,13 @@ function gonderHatirlatmaMaili($rez) {
         
         $mail->send();
         return true;
-    } catch (Exception $e) {
-        error_log('Hatırlatma maili gönderilemedi: ' . $e->getMessage());
+    } catch (PHPMailerException $e) {
+        error_log('Hatırlatma maili PHPMailer hatası: ' . $e->getMessage());
+        cron_log("SMTP Hatası: " . $e->getMessage());
+        return false;
+    } catch (\Exception $e) {
+        error_log('Hatırlatma maili genel hata: ' . $e->getMessage());
+        cron_log("Mail Genel Hatası: " . $e->getMessage());
         return false;
     }
 }

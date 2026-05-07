@@ -1,0 +1,9 @@
+[2026-05-07 10:09:48] --- Cron Başladı ---
+[2026-05-07 10:09:48] Zaman: 10:09:48 | Limit: 12:09:48
+[2026-05-07 10:09:48] KRİTİK HATA: SQLSTATE[HY000]: General error: 1 no such column: hatirlatma_gonderildi (/Users/berkayulku/Desktop/sintesi/cron_reminders.php:39)
+[2026-05-07 10:09:55] --- Cron Başladı ---
+[2026-05-07 10:09:55] Zaman: 10:09:55 | Limit: 12:09:55
+[2026-05-07 10:09:55] Kontrol: Rez#2 (Berkay) - Saat: 14:00 - TS: 14:00:00
+[2026-05-07 10:09:55] Kontrol: Rez#3 (Berkay) - Saat: 11:00 - TS: 11:00:00
+[2026-05-07 10:09:55] Kontrol: Rez#5 (Esse cum reprehender) - Saat: 15:00 - TS: 15:00:00
+[2026-05-07 10:09:55] Bitti: 0 hatırlatma gönderildi.
