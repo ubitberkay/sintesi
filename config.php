@@ -7,9 +7,12 @@ date_default_timezone_set('Europe/Istanbul');
 // ============================================================
 // ORTAM TESPİTİ
 // ============================================================
-// Sunucu adresine bakarak local mı production mı belirliyoruz
+// Sunucu adresine veya dosya yoluna bakarak local mı production mı belirliyoruz
 $sunucu_adi = $_SERVER['SERVER_NAME'] ?? 'localhost';
-$local_ortam = in_array($sunucu_adi, ['localhost', '127.0.0.1', '::1']);
+
+// EĞER dosya yolu '/Users/berkayulku' içeriyorsa LOCAL'deyizdir, aksi halde SUNUCU'dayızdır.
+// Bu yöntem Cron Job (CLI) çalışırken de doğru sonucu verir.
+$local_ortam = (strpos(__DIR__, '/Users/berkayulku') !== false);
 
 // ============================================================
 // MySQL AYARLARI (cPanel / Production)
