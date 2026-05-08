@@ -903,7 +903,26 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                     <input type="number" id="ayar-kapasite" min="1" required>
                 </div>
                 <div class="modal-form-group">
-                    <label>Kapalı / Özel Günler</label>
+                    <label>Çalışma Saatleri</label>
+                    <div style="background: var(--surface-2); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); padding: 10px; margin-bottom: 20px;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+                            <thead>
+                                <tr style="color: var(--muted); border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <th style="padding: 8px; text-align: left;">Gün</th>
+                                    <th style="padding: 8px; text-align: center;">Açılış</th>
+                                    <th style="padding: 8px; text-align: center;">Kapanış</th>
+                                    <th style="padding: 8px; text-align: center;">Durum</th>
+                                </tr>
+                            </thead>
+                            <tbody id="calisma-saatleri-listesi">
+                                <!-- Günler JS ile gelecek -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="modal-form-group">
+                    <label>Kapalı / Özel Günler (Tatil, Tadilat vb.)</label>
                     <div style="margin-bottom:10px;">
                         <input type="text" id="ayar-yeni-gun" placeholder="Tarih Seçin" readonly style="width:100%;">
                     </div>
@@ -938,6 +957,15 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
         let currentDeleteId = null;
         let fpBas, fpSon, fpYeniGun;
         let kapaliGunler = {}; // { "2026-05-10": "Not", ... }
+        const gunIsimleri = {
+            "1": "Pazartesi",
+            "2": "Salı",
+            "3": "Çarşamba",
+            "4": "Perşembe",
+            "5": "Cuma",
+            "6": "Cumartesi",
+            "0": "Pazar"
+        };
 
         function initFlatpickr() {
             const config = {
@@ -1294,10 +1322,38 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                     }
                     
                     listeleKapaliGunler();
+                    renderCalismaSaatleri(json.data.calisma_saatleri || {});
                 }
             } catch(err) {
                 showToast('Ayarlar yüklenemedi', 'error');
             }
+        }
+
+        /**
+         * Çalışma saatlerini modalda render et
+         */
+        function renderCalismaSaatleri(saatler) {
+            const container = document.getElementById('calisma-saatleri-listesi');
+            let html = '';
+            ["1", "2", "3", "4", "5", "6", "0"].forEach(gun => {
+                const s = saatler[gun] || { acilis: "15:00", kapanis: "00:00", durum: "acik" };
+                html += `
+                <tr style="border-bottom:1px solid rgba(255,255,255,0.02);">
+                    <td style="padding:8px; font-weight:500;">${gunIsimleri[gun]}</td>
+                    <td style="padding:8px; text-align:center;">
+                        <input type="time" class="saat-input" data-gun="${gun}" data-type="acilis" value="${s.acilis}" 
+                               style="background:var(--surface-2); border:1px solid rgba(255,255,255,0.1); color:var(--text); border-radius:4px; padding:3px 5px; font-size:0.8rem;">
+                    </td>
+                    <td style="padding:8px; text-align:center;">
+                        <input type="time" class="saat-input" data-gun="${gun}" data-type="kapanis" value="${s.kapanis}" 
+                               style="background:var(--surface-2); border:1px solid rgba(255,255,255,0.1); color:var(--text); border-radius:4px; padding:3px 5px; font-size:0.8rem;">
+                    </td>
+                    <td style="padding:8px; text-align:center;">
+                        <input type="checkbox" class="durum-input" data-gun="${gun}" ${s.durum === 'acik' ? 'checked' : ''} style="cursor:pointer;">
+                    </td>
+                </tr>`;
+            });
+            container.innerHTML = html;
         }
 
         /**
@@ -1368,6 +1424,19 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                 formData.append('action', 'settings_save');
                 formData.append('kapasite', document.getElementById('ayar-kapasite').value);
                 formData.append('kapali_gunler', JSON.stringify(kapaliGunler));
+                
+                // Çalışma Saatlerini topla
+                const saatler = {};
+                document.querySelectorAll('#calisma-saatleri-listesi tr').forEach(tr => {
+                    const gun = tr.querySelector('.saat-input').dataset.gun;
+                    saatler[gun] = {
+                        acilis: tr.querySelector('.saat-input[data-type="acilis"]').value,
+                        kapanis: tr.querySelector('.saat-input[data-type="kapanis"]').value,
+                        durum: tr.querySelector('.durum-input').checked ? 'acik' : 'kapali'
+                    };
+                });
+                formData.append('calisma_saatleri', JSON.stringify(saatler));
+
                 formData.append('csrf_token', csrfToken);
                 
                 const res = await fetch('api.php', { method: 'POST', body: formData });

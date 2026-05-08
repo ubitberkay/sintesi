@@ -424,19 +424,39 @@ function ayarlariGetir($pdo) {
         $stmt->execute();
         $ayarlar = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
         
+        $varsayilan_saatler = [
+            "1" => ["acilis" => "15:00", "kapanis" => "00:00", "durum" => "acik"],
+            "2" => ["acilis" => "15:00", "kapanis" => "00:00", "durum" => "acik"],
+            "3" => ["acilis" => "15:00", "kapanis" => "00:00", "durum" => "acik"],
+            "4" => ["acilis" => "15:00", "kapanis" => "00:00", "durum" => "acik"],
+            "5" => ["acilis" => "15:00", "kapanis" => "00:00", "durum" => "acik"],
+            "6" => ["acilis" => "15:00", "kapanis" => "00:00", "durum" => "acik"],
+            "0" => ["acilis" => "15:00", "kapanis" => "00:00", "durum" => "acik"]
+        ];
+
         echo json_encode([
             'success' => true,
             'data' => [
                 'kapasite' => isset($ayarlar['kapasite']) ? (int)$ayarlar['kapasite'] : 16,
-                'kapali_gunler' => isset($ayarlar['kapali_gunler']) ? json_decode($ayarlar['kapali_gunler'], true) : new stdClass()
+                'kapali_gunler' => isset($ayarlar['kapali_gunler']) ? json_decode($ayarlar['kapali_gunler'], true) : new stdClass(),
+                'calisma_saatleri' => isset($ayarlar['calisma_saatleri']) ? json_decode($ayarlar['calisma_saatleri'], true) : $varsayilan_saatler
             ]
         ]);
     } catch (Exception $e) {
         echo json_encode([
-            'success' => true, // Hata olsa bile varsayılanları dönmek için true diyoruz
+            'success' => true,
             'data' => [
                 'kapasite' => 16,
-                'kapali_gunler' => new stdClass()
+                'kapali_gunler' => new stdClass(),
+                'calisma_saatleri' => [
+                    "1" => ["acilis" => "15:00", "kapanis" => "00:00", "durum" => "acik"],
+                    "2" => ["acilis" => "15:00", "kapanis" => "00:00", "durum" => "acik"],
+                    "3" => ["acilis" => "15:00", "kapanis" => "00:00", "durum" => "acik"],
+                    "4" => ["acilis" => "15:00", "kapanis" => "00:00", "durum" => "acik"],
+                    "5" => ["acilis" => "15:00", "kapanis" => "00:00", "durum" => "acik"],
+                    "6" => ["acilis" => "15:00", "kapanis" => "00:00", "durum" => "acik"],
+                    "0" => ["acilis" => "15:00", "kapanis" => "00:00", "durum" => "acik"]
+                ]
             ]
         ]);
     }
@@ -446,29 +466,38 @@ function ayarlariGetir($pdo) {
  * Ayarları kaydet
  */
 function ayarlariKaydet($pdo) {
-    $kapasite = intval($_POST['kapasite'] ?? 16);
-    $kapali_gunler = $_POST['kapali_gunler'] ?? '{}';
-    
-    // Güvenlik: JSON geçerli mi kontrol et
-    $decoded = json_decode($kapali_gunler, true);
-    if ($decoded === null) {
-        $kapali_gunler = '{}';
-    }
-
-    try {
-        // Tablonun varlığından emin ol (SQLite/MySQL uyumlu)
-        if (local_mi()) {
-            $pdo->exec("CREATE TABLE IF NOT EXISTS ayarlar (ayar_anahtari TEXT PRIMARY KEY, ayar_degeri TEXT)");
-        } else {
-            $pdo->exec("CREATE TABLE IF NOT EXISTS ayarlar (ayar_anahtari VARCHAR(50) PRIMARY KEY, ayar_degeri TEXT) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
-        }
-
-        // Ayarları Kaydet (REPLACE INTO hem SQLite hem MySQL'de çalışır)
-        $stmt = $pdo->prepare("REPLACE INTO ayarlar (ayar_anahtari, ayar_degeri) VALUES ('kapasite', ?)");
-        $stmt->execute([(string)$kapasite]);
+        $kapasite = intval($_POST['kapasite'] ?? 16);
+        $kapali_gunler = $_POST['kapali_gunler'] ?? '{}';
+        $calisma_saatleri = $_POST['calisma_saatleri'] ?? '';
         
-        $stmt = $pdo->prepare("REPLACE INTO ayarlar (ayar_anahtari, ayar_degeri) VALUES ('kapali_gunler', ?)");
-        $stmt->execute([$kapali_gunler]);
+        // Güvenlik: JSON geçerli mi kontrol et
+        $decoded = json_decode($kapali_gunler, true);
+        if ($decoded === null) $kapali_gunler = '{}';
+
+        if (!empty($calisma_saatleri)) {
+            $decoded_saatler = json_decode($calisma_saatleri, true);
+            if ($decoded_saatler === null) $calisma_saatleri = '';
+        }
+    
+        try {
+            // Tablonun varlığından emin ol (SQLite/MySQL uyumlu)
+            if (local_mi()) {
+                $pdo->exec("CREATE TABLE IF NOT EXISTS ayarlar (ayar_anahtari TEXT PRIMARY KEY, ayar_degeri TEXT)");
+            } else {
+                $pdo->exec("CREATE TABLE IF NOT EXISTS ayarlar (ayar_anahtari VARCHAR(50) PRIMARY KEY, ayar_degeri TEXT) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+            }
+    
+            // Ayarları Kaydet
+            $stmt = $pdo->prepare("REPLACE INTO ayarlar (ayar_anahtari, ayar_degeri) VALUES ('kapasite', ?)");
+            $stmt->execute([(string)$kapasite]);
+            
+            $stmt = $pdo->prepare("REPLACE INTO ayarlar (ayar_anahtari, ayar_degeri) VALUES ('kapali_gunler', ?)");
+            $stmt->execute([$kapali_gunler]);
+
+            if (!empty($calisma_saatleri)) {
+                $stmt = $pdo->prepare("REPLACE INTO ayarlar (ayar_anahtari, ayar_degeri) VALUES ('calisma_saatleri', ?)");
+                $stmt->execute([$calisma_saatleri]);
+            }
         
         echo json_encode(['success' => true, 'message' => 'Ayarlar başarıyla kaydedildi.']);
     } catch (Exception $e) {

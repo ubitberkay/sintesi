@@ -36,6 +36,15 @@ try {
     // Varsayılan: Ayarları çek
     $kapasite = 16;
     $kapali_gunler = new stdClass();
+    $calisma_saatleri = [
+        "1" => ["acilis" => "15:00", "kapanis" => "00:00", "durum" => "acik"],
+        "2" => ["acilis" => "15:00", "kapanis" => "00:00", "durum" => "acik"],
+        "3" => ["acilis" => "15:00", "kapanis" => "00:00", "durum" => "acik"],
+        "4" => ["acilis" => "15:00", "kapanis" => "00:00", "durum" => "acik"],
+        "5" => ["acilis" => "15:00", "kapanis" => "00:00", "durum" => "acik"],
+        "6" => ["acilis" => "15:00", "kapanis" => "00:00", "durum" => "acik"],
+        "0" => ["acilis" => "15:00", "kapanis" => "00:00", "durum" => "acik"]
+    ];
     
     try {
         if (local_mi()) {
@@ -55,13 +64,18 @@ try {
         if (isset($ayarlar['kapali_gunler'])) {
             $kapali_gunler = json_decode($ayarlar['kapali_gunler'], true) ?: new stdClass();
         }
+
+        if (isset($ayarlar['calisma_saatleri'])) {
+            $calisma_saatleri = json_decode($ayarlar['calisma_saatleri'], true) ?: $calisma_saatleri;
+        }
     } catch (Exception $e) {}
     
     echo json_encode([
         'success' => true,
         'data' => [
             'kapasite' => $kapasite,
-            'kapali_gunler' => $kapali_gunler
+            'kapali_gunler' => $kapali_gunler,
+            'calisma_saatleri' => $calisma_saatleri
         ]
     ]);
     

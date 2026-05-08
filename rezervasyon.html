@@ -733,6 +733,7 @@
         let personCount = 2;
         let maxKapasite = 16;
         let kapaliGunler = {};
+        let calismaSaatleri = {};
 
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
@@ -750,6 +751,7 @@
                 if (json.success) {
                     maxKapasite = json.data.kapasite;
                     kapaliGunler = json.data.kapali_gunler || {};
+                    calismaSaatleri = json.data.calisma_saatleri || {};
                 }
                 initCalendar();
             });
@@ -813,34 +815,50 @@
             updateButtonState();
 
             try {
+                // Günlük saatleri belirle
+                const d = new Date(dateStr);
+                const dayOfWeek = d.getDay(); // 0: Pazar, 1: Pzt...
+                const gunAyari = calismaSaatleri[dayOfWeek] || { acilis: "15:00", kapanis: "00:00", durum: "acik" };
+
+                if (gunAyari.durum === 'kapali') {
+                    container.innerHTML = '<div style="padding:40px; text-align:center; color:var(--color-accent); font-weight:500;">Restoranımız bugün kapalıdır.</div>';
+                    return;
+                }
+
+                // Saat listesini dinamik oluştur
+                const slots = [];
+                let [h, m] = gunAyari.acilis.split(':').map(Number);
+                let [kh, km] = gunAyari.kapanis.split(':').map(Number);
+                if (kh === 0 && km === 0) kh = 24; // Gece yarısı kontrolü
+
+                while (h < kh || (h === kh && m < km)) {
+                    slots.push(`${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`);
+                    m += 30;
+                    if (m >= 60) { m = 0; h++; }
+                }
+
                 const res = await fetch(`public_api.php?action=check_availability&date=${dateStr}`);
                 const json = await res.json();
                 const doluluk = json.data || {};
 
-                const slots = [
-                    "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30",
-                    "19:00", "19:30", "20:00", "20:30", "21:00", "21:30",
-                    "22:00", "22:30", "23:00"
-                ];
-
                 const suan = new Date();
-                const bugunStr = suan.toISOString().split('T')[0];
+                const bugunStr = suan.getFullYear() + '-' + String(suan.getMonth() + 1).padStart(2, '0') + '-' + String(suan.getDate()).padStart(2, '0');
                 const suanSaat = suan.getHours();
                 const suanDakika = suan.getMinutes();
 
                 let html = '';
                 slots.forEach(time => {
-                    const booked = doluluk[time] || 0;
-                    const remaining = maxKapasite - booked;
                     const [h, m] = time.split(':').map(Number);
-
-                    let isPast = false;
+                    
+                    // Geçmiş saat kontrolü (Bugün için)
                     if (dateStr === bugunStr) {
-                        if (h < suanSaat || (h === suanSaat && m <= suanDakika)) isPast = true;
+                        if (h < suanSaat || (h === suanSaat && m <= suanDakika)) return; // Geçmiş saati gösterme
                     }
 
-                    const isDisabled = remaining <= 0 || isPast;
-                    const statusText = isDisabled ? (isPast ? 'Geçti' : 'Dolu') : (remaining < 5 ? `Son ${remaining} Yer` : 'Müsait');
+                    const booked = doluluk[time] || 0;
+                    const remaining = maxKapasite - booked;
+                    const isDisabled = remaining <= 0;
+                    const statusText = isDisabled ? 'Dolu' : (remaining < 5 ? `Son ${remaining} Yer` : 'Müsait');
 
                     html += `
                         <div class="time-slot ${isDisabled ? 'disabled' : ''}" 
