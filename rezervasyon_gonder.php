@@ -54,38 +54,15 @@ if ($tarih === $bugun) {
     }
 }
 
-// Pazartesi kontrolü (kapalı gün)
-$gun_no = date('N', strtotime($tarih)); // 1=Pazartesi
-if ($gun_no == 1) {
-    echo json_encode(['success' => false, 'message' => 'Pazartesi günleri kapalıyız. Lütfen başka bir gün seçin.']);
-    exit;
-}
-
-// Özel gün kontrolü (14 Şubat, 8 Mart, Anneler Günü)
-function ozelGunKontrol($t) {
-    $d = strtotime($t);
-    $ay = (int)date('m', $d);
-    $gun = (int)date('d', $d);
-    $yil = (int)date('Y', $d);
-
-    if ($ay == 2 && $gun == 14) return true; // 14 Şubat
-    if ($ay == 3 && $gun == 8) return true;  // 8 Mart
-    
-    if ($ay == 5) { // Anneler Günü (Mayıs 2. Pazar)
-        $ilk_gun = strtotime("$yil-05-01");
-        $ilk_pazar = strtotime("second sunday of may $yil");
-        if ($d == $ilk_pazar) return true;
+// Bugün için geçmiş saat kontrolü
+if ($tarih === $bugun) {
+    $suan_saat = date('H:i');
+    if ($saat < $suan_saat) {
+        echo json_encode(['success' => false, 'message' => 'Geçmiş bir saat dilimi seçemezsiniz.']);
+        exit;
     }
-    return false;
 }
 
-if (ozelGunKontrol($tarih)) {
-    echo json_encode([
-        'success' => false, 
-        'message' => '✨ Seçtiğiniz tarih özel bir gündür (14 Şubat/8 Mart/Anneler Günü). Yoğunluk nedeniyle bu tarihlerde sadece telefonla rezervasyon kabul edilmektedir.'
-    ]);
-    exit;
-}
 
 // Kişi sayısı kontrolü
 if ($kisi < 1 || $kisi > 20) {

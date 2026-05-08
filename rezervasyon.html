@@ -7,23 +7,24 @@
     <title>Sintesi | Rezervasyon</title>
     <link rel="icon" type="image/webp" href="sintesi.webp">
     <link
-        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Montserrat:wght@300;400;500&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Montserrat:wght@300;400;500;600&display=swap"
         rel="stylesheet">
     <!-- Flatpickr (Modern Tarih Seçici) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/tr.js"></script>
     <style>
         :root {
             --color-bg: #0c0c0c;
-            --color-surface: #151515;
-            --color-text: #f5f5f5;
+            --color-surface: #1a1a1a;
+            --color-surface-2: #242424;
+            --color-text: #ffffff;
             --color-text-muted: #a0a0a0;
             --color-accent: #9D432C;
-            --color-accent-hover: #e8c682;
+            --color-accent-hover: #b54d33;
             --font-heading: 'Cormorant Garamond', serif;
             --font-body: 'Montserrat', sans-serif;
+            --card-radius: 20px;
         }
 
         * {
@@ -34,723 +35,889 @@
 
         body {
             font-family: var(--font-body);
-            background-color: var(--color-bg);
+            background-color: transparent;
             color: var(--color-text);
-            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
             overflow-x: hidden;
-            scroll-behavior: smooth;
         }
 
-        h1,
-        h2,
-        h3,
-        h4,
-        h5,
-        h6 {
-            font-family: var(--font-heading);
-            font-weight: 400;
-        }
-
-        h2 {
-            font-size: 3rem;
-            letter-spacing: 2px;
-            margin-bottom: 1rem;
-        }
-
-        /* Header */
-        header {
+        body::before {
+            content: '';
             position: fixed;
             top: 0;
-            width: 100%;
-            padding: 2rem 5%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 1000;
-            transition: background-color 0.4s ease, padding 0.4s ease;
-            background-color: rgba(12, 12, 12, 0.95);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .logo {
-            font-family: var(--font-heading);
-            font-size: 2rem;
-            font-weight: 600;
-            color: var(--color-text);
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            text-decoration: none;
-        }
-
-        .logo img {
-            height: 1.2em;
-            width: auto;
-            object-fit: contain;
-        }
-
-        nav ul {
-            display: flex;
-            list-style: none;
-            gap: 3rem;
-        }
-
-        .nav-link {
-            color: var(--color-text-muted);
-            text-decoration: none;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            transition: color 0.3s ease;
-            position: relative;
-        }
-
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 1px;
-            bottom: -5px;
             left: 0;
-            background-color: var(--color-accent);
-            transition: width 0.3s ease;
-        }
-
-        .nav-link:hover,
-        .nav-link.active {
-            color: var(--color-accent);
-        }
-
-        .nav-link:hover::after,
-        .nav-link.active::after {
             width: 100%;
+            height: 100%;
+            background-image: url('/assets/hero.png');
+            background-size: cover;
+            background-position: center;
+            filter: blur(8px) brightness(0.3);
+            z-index: -1;
+            transform: scale(1.1);
         }
 
-        /* Section styling */
-        .section-subtitle {
-            font-family: var(--font-body);
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 4px;
-            color: var(--color-accent);
-            display: block;
-            margin-bottom: 1rem;
-        }
-
-        section {
-            padding: 8rem 5% 5rem;
-            text-align: center;
-        }
-
-        /* Btn */
-        .btn {
-            display: inline-block;
-            padding: 14px 40px;
-            border: 1px solid var(--color-accent);
-            color: var(--color-accent);
-            text-decoration: none;
-            font-size: 0.8rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            font-family: var(--font-body);
-            background: transparent;
-        }
-
-        .btn:hover {
-            background: var(--color-accent);
-            color: var(--color-text);
-        }
-
-        /* Form styles */
-        .form-group {
-            position: relative;
-            margin-bottom: 5px;
-        }
-
-        .form-group input,
-        .form-group textarea,
-        .form-group select {
+        /* Ana Konteyner */
+        .booking-card {
+            display: flex;
             width: 100%;
-            padding: 15px 0;
-            background: transparent !important;
-            border: none;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            max-width: 1100px;
+            min-height: 650px;
+            background: var(--color-surface);
+            border-radius: var(--card-radius);
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
             color: var(--color-text);
-            font-family: var(--font-body);
-            font-size: 1rem;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border-radius: 0;
-        }
-
-        /* Autocomplete Beyaz Arka Plan Engelleme */
-        input:-webkit-autofill,
-        input:-webkit-autofill:hover,
-        input:-webkit-autofill:focus,
-        input:-webkit-autofill:active {
-            -webkit-box-shadow: 0 0 0 1000px var(--color-bg) inset !important;
-            -webkit-text-fill-color: var(--color-text) !important;
-            transition: background-color 5000s ease-in-out 0s;
-        }
-
-        .form-group input:focus,
-        .form-group textarea:focus,
-        .form-group select:focus {
-            outline: none;
-            border-bottom-color: var(--color-accent);
-            padding-left: 10px;
-        }
-
-        .form-group textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-
-        /* Rezervasyon Layout */
-        .rez-layout-container {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 4rem;
-            max-width: 1200px;
-            margin: 4rem auto 0;
-            text-align: left;
-        }
-
-        .contact-details-side {
-            display: flex;
-            flex-direction: column;
-            gap: 2.5rem;
-        }
-
-        .info-block {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .info-label {
-            font-family: var(--font-heading);
-            font-size: 1.5rem;
-            color: var(--color-accent);
-            letter-spacing: 1px;
-        }
-
-        .info-block p {
-            color: var(--color-text-muted);
-            font-size: 0.95rem;
-            line-height: 1.8;
-        }
-
-        /* Form Side */
-        .rez-form-container-v2 {
-            background: rgba(255, 255, 255, 0.02);
-            padding: 3rem;
-            border-radius: 15px;
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        .form-row {
+        /* Sol Panel - Resim ve Bilgi */
+        .card-left {
+            flex: 0 0 380px;
+            position: relative;
+            background-image: url('restaurant_interior_premium_1778251141944.png');
+            background-size: cover;
+            background-position: center;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            color: #fff;
+        }
+
+        .card-left::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.8) 100%);
+            z-index: 1;
+        }
+
+        .left-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .brand-info {
+            margin-bottom: 2rem;
+        }
+
+        .brand-logo {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 15px;
+            border-radius: 50%;
+            background: #fff;
+            padding: 5px;
+        }
+
+        .brand-name {
+            font-family: var(--font-heading);
+            font-size: 2.5rem;
+            margin-bottom: 5px;
+            color: #fff;
+        }
+
+        .contact-info {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .contact-item i {
+            margin-top: 4px;
+            color: var(--color-accent);
+        }
+
+        /* Sağ Panel - Rezervasyon Akışı */
+        .card-right {
+            flex: 1;
+            background: var(--color-surface);
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .step-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .step-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .step-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        /* Kişi Sayısı Seçici */
+        .person-counter {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 5px 15px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .counter-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #fff;
+            transition: all 0.2s;
+        }
+
+        .counter-btn:hover {
+            border-color: var(--color-accent);
+            color: var(--color-accent);
+        }
+
+        .counter-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            width: 20px;
+            text-align: center;
+            color: #fff;
+        }
+
+        /* Layout Grid */
+        .booking-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            margin-bottom: 1.5rem;
+            gap: 40px;
+            flex: 1;
         }
 
-        .form-group select {
-            -webkit-appearance: none;
-            appearance: none;
-            cursor: pointer;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239D432C'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right center;
-            background-size: 1.2rem;
-            padding-right: 2rem;
+        /* Takvim */
+        .calendar-section {
+            flex: 1;
         }
 
-        .form-group select option {
-            background: #151515;
-            color: #f5f5f5;
-            padding: 10px;
+        .flatpickr-calendar.inline {
+            box-shadow: none;
+            border: none;
+            width: 100% !important;
+            background: transparent !important;
         }
 
-        .rez-full {
-            grid-column: 1 / -1;
-        }
-
-        @media (max-width: 992px) {
-            .rez-layout-container {
-                grid-template-columns: 1fr;
-                gap: 3rem;
-            }
-
-            .rez-form-container-v2 {
-                padding: 2rem;
-            }
-        }
-
-        @media (max-width: 600px) {
-            .form-row {
-                grid-template-columns: 1fr;
-                gap: 1rem;
-            }
-        }
-
-        /* Flatpickr Özel Tema */
-        .flatpickr-calendar {
-            background: #151515 !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
-        }
-
-        .flatpickr-day.selected,
-        .flatpickr-day.startRange,
-        .flatpickr-day.endRange,
-        .flatpickr-day.selected.hover,
-        .flatpickr-day.nextMonthDay.selected,
-        .flatpickr-day.prevMonthDay.selected,
-        .flatpickr-day.selected:focus,
-        .flatpickr-day.selected:hover {
-            background: var(--color-accent) !important;
-            border-color: var(--color-accent) !important;
-        }
-
-        .flatpickr-months .flatpickr-month,
-        .flatpickr-current-month .flatpickr-monthDropdown-months {
+        .flatpickr-months .flatpickr-month {
+            height: 50px;
             background: transparent !important;
             color: #fff !important;
-            fill: #fff !important;
+        }
+
+        .flatpickr-current-month {
+            font-size: 1.1rem !important;
+            font-weight: 600 !important;
+            color: #fff !important;
         }
 
         .flatpickr-weekday {
+            font-weight: 600 !important;
             color: var(--color-accent) !important;
         }
 
         .flatpickr-day {
-            color: #ccc !important;
+            border-radius: 8px !important;
+            height: 35px !important;
+            line-height: 35px !important;
+            color: #eee !important;
+        }
+
+        .flatpickr-day:hover {
+            background: rgba(255, 255, 255, 0.1) !important;
+        }
+
+        .flatpickr-day.selected {
+            background: var(--color-accent) !important;
+            border-color: var(--color-accent) !important;
+            color: #fff !important;
+        }
+
+        .flatpickr-day.flatpickr-disabled {
+            color: #444 !important;
         }
 
         .flatpickr-day.today {
             border-color: var(--color-accent) !important;
         }
 
-        .flatpickr-day.flatpickr-disabled,
-        .flatpickr-day.flatpickr-disabled:hover {
-            color: #444 !important;
+        /* Saatler */
+        .time-section {
+            flex: 1;
         }
 
-        /* Footer */
-        footer {
-            text-align: center;
-            padding: 2rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            font-size: 0.8rem;
+        .section-label {
+            font-size: 0.9rem;
+            font-weight: 600;
             color: var(--color-text-muted);
+            margin-bottom: 15px;
+            text-transform: uppercase;
             letter-spacing: 1px;
         }
 
-        /* Mobile Menu */
-        .menu-toggle {
-            display: none;
-            flex-direction: column;
-            gap: 5px;
+        .time-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+        }
+
+        .time-slot {
+            padding: 12px 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            text-align: center;
             cursor: pointer;
-            z-index: 1001;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            background: rgba(255, 255, 255, 0.02);
+            color: #fff;
         }
 
-        .menu-toggle span {
-            width: 25px;
-            height: 2px;
-            background: var(--color-text);
-            transition: all 0.3s ease;
+        .time-slot:hover:not(.disabled) {
+            border-color: var(--color-accent);
+            background: rgba(157, 67, 44, 0.1);
         }
 
-        @media (max-width: 768px) {
-            nav ul {
-                position: fixed;
-                top: 0;
-                right: -100%;
-                width: 70%;
-                height: 100vh;
-                background: rgba(12, 12, 12, 0.98);
+        .time-slot.selected {
+            background: var(--color-accent);
+            border-color: var(--color-accent);
+            color: #fff;
+        }
+
+        .time-slot.disabled {
+            opacity: 0.2;
+            cursor: not-allowed;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .slot-time {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .slot-status {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            opacity: 0.8;
+        }
+
+        .time-slot.selected .slot-status {
+            color: #fff;
+        }
+
+        /* Form Adımı (Gizli) */
+        #form-step {
+            display: none;
+        }
+
+        .contact-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--color-text-muted);
+        }
+
+        .form-group input,
+        .form-group textarea {
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+            color: #fff;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .form-group input:focus {
+            border-color: var(--color-accent);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        /* Footer / Button */
+        .step-footer {
+            margin-top: auto;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-continue {
+            padding: 15px 40px;
+            background: #333;
+            /* Varsayılan pasif */
+            color: #888;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-continue.active {
+            background: var(--color-accent);
+            color: #fff;
+        }
+
+        .btn-continue.active:hover {
+            background: var(--color-accent-hover);
+            transform: translateY(-2px);
+        }
+
+        .btn-back {
+            background: none;
+            border: none;
+            color: var(--color-text-muted);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        /* Header linkleri için geri dönüş */
+        .home-link {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 10;
+            color: #fff;
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 8px 15px;
+            border-radius: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        /* Mobil Uyumluluk */
+        @media (max-width: 900px) {
+            body {
+                display: block;
+                padding: 20px 15px;
+            }
+
+            .home-link {
+                position: relative !important;
+                top: 0 !important;
+                left: 0 !important;
+                display: inline-flex !important;
+                margin-bottom: 20px !important;
+                background: rgba(255, 255, 255, 0.05);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .booking-card {
                 flex-direction: column;
-                padding: 6rem 2rem;
-                transition: right 0.4s ease;
-                border-left: 1px solid rgba(255, 255, 255, 0.05);
+                min-height: auto;
             }
 
-            nav ul.active {
-                right: 0;
+            .card-left {
+                flex: 0 0 200px;
+                padding: 30px;
             }
 
-            .menu-toggle {
-                display: flex;
-            }
-
-            .menu-toggle.active span:nth-child(1) {
-                transform: translateY(7px) rotate(45deg);
-            }
-
-            .menu-toggle.active span:nth-child(2) {
-                opacity: 0;
-            }
-
-            .menu-toggle.active span:nth-child(3) {
-                transform: translateY(-7px) rotate(-45deg);
-            }
-
-            .rez-form-container {
+            .booking-grid {
                 grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            .card-right {
+                padding: 30px 20px;
             }
         }
+
+        @media (max-width: 600px) {
+            .contact-form {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .card-right {
+                padding: 20px 15px;
+            }
+
+            .step-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .person-counter {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .btn-continue {
+                padding: 12px 25px;
+                font-size: 0.9rem;
+                width: 100%;
+                margin-top: 15px;
+            }
+
+            .step-footer {
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+                text-align: center;
+            }
+
+            .btn-back {
+                order: 2;
+                margin-top: 5px;
+            }
+        }
+
+        /* Toasts */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            padding: 15px 30px;
+            border-radius: 12px;
+            background: var(--color-surface-2);
+            color: #fff;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            z-index: 10000;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            opacity: 0;
+            font-size: 0.95rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .toast-success {
+            border-left: 4px solid #22c55e;
+        }
+
+        .toast-error {
+            border-left: 4px solid #ef4444;
+        }
+
+        /* Mesajlar */
+        #rez-message {
+            margin-bottom: 20px;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            text-align: center;
+            display: none;
+        }
+
+        .msg-error {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .msg-success {
+            background: rgba(34, 197, 94, 0.1);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+
+        /* Header linkleri için geri dönüş */
     </style>
 </head>
 
 <body>
+    <a href="index.html" class="home-link">← Anasayfa</a>
 
-    <!-- Header / Navbar -->
-    <header id="header">
-        <a href="index.html" class="logo">
-            <img src="sintesi.webp" alt="Sintesi Logo">
-            Sintesi
-        </a>
-        <nav>
-            <ul id="nav-links">
-                <li><a href="index.html" class="nav-link">Anasayfa</a></li>
-                <li><a href="hakkimizda.html" class="nav-link">Hakkımızda</a></li>
-                <li><a href="galeri.html" class="nav-link">Galeri</a></li>
-                <li><a href="./menu.pdf" target="_blank" class="nav-link">Menü</a></li>
-                <li><a href="rezervasyon.html" class="nav-link active">Rezervasyon</a></li>
-                <li><a href="index.html#iletisim" class="nav-link">İletişim</a></li>
-            </ul>
-        </nav>
-        <div class="menu-toggle" id="mobile-menu">
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
-    </header>
-
-    <!-- Rezervasyon Section -->
-    <section id="rezervasyon">
-        <span class="section-subtitle">Planlamanızı Yapın</span>
-        <h2>Masanızı Ayırın</h2>
-        <p id="kapasite-notu"
-            style="color: var(--color-text-muted); font-size: 0.9rem; margin-top: -0.5rem; margin-bottom: 2rem;">
-            * Her saat dilimi için maksimum 16 kişilik kapasitemiz bulunmaktadır.
-        </p>
-
-        <div class="rez-layout-container">
-            <!-- Sol Taraf: İletişim Bilgileri -->
-            <div class="contact-details-side">
-                <div class="info-block">
-                    <span class="info-label">Adres</span>
-                    <p>Atatürk Mahallesi Ertuğrul Gazi Sokak Metropol İstanbul Alışveriş Merkezi B2 Katı<br>Ataşehir,
-                        İstanbul</p>
+    <div class="booking-card">
+        <!-- Sol Panel -->
+        <div class="card-left">
+            <div class="left-content">
+                <div class="brand-info">
+                    <img src="sintesi.webp" alt="Sintesi Logo" class="brand-logo">
+                    <h1 class="brand-name">Sintesi</h1>
+                    <p style="opacity: 0.8; font-size: 1.1rem; font-family: var(--font-heading);">Fine Dining &
+                        Experience</p>
                 </div>
-
-                <div class="info-block">
-                    <span class="info-label">İletişim & Rezervasyon</span>
-                    <p>+90 (216) XXX XX XX<br>info@sintesi.com.tr</p>
-                </div>
-
-                <div class="info-block">
-                    <span class="info-label">Çalışma Saatleri</span>
-                    <p>Salı - Pazar: 10:00 - 00:00<br><strong>Pazartesi: Kapalı</strong></p>
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <span>📍</span>
+                        <p>Atatürk Mah. Ertuğrul Gazi Sok. Metropol İstanbul B2 Katı, Ataşehir</p>
+                    </div>
+                    <div class="contact-item">
+                        <span>📞</span>
+                        <p>+90 (216) XXX XX XX</p>
+                    </div>
+                    <div class="contact-item">
+                        <span>🌐</span>
+                        <p>sintesi.com.tr</p>
+                    </div>
+                    <div class="contact-item">
+                        <span>🕒</span>
+                        <p>Her Gün: 15:00 - 00:00</p>
+                    </div>
                 </div>
             </div>
+            <div class="left-content" style="font-size: 0.8rem; opacity: 0.6;">
+                &copy; 2026 Sintesi Restaurant
+            </div>
+        </div>
 
-            <!-- Sağ Taraf: Form -->
-            <div class="form-side">
-                <form class="rez-form-container-v2" id="rezervasyonForm">
-                    <div id="rez-form-message" class="rez-full"
-                        style="display: none; padding: 15px; border-radius: 5px; text-align: center; margin-bottom: 20px;">
+        <!-- Sağ Panel -->
+        <div class="card-right">
+            <form id="bookingForm">
+                <!-- Adım 1: Tarih ve Saat -->
+                <div id="selection-step" class="step-container">
+                    <div class="step-header">
+                        <h2 class="step-title">Rezervasyon Bilgileri</h2>
+                        <div class="person-counter">
+                            <span style="font-size: 0.8rem; font-weight: 600; color: #666;">KİŞİ</span>
+                            <div class="counter-btn" onclick="updateCount(-1)">-</div>
+                            <span class="counter-value" id="person-count-display">2</span>
+                            <div class="counter-btn" onclick="updateCount(1)">+</div>
+                            <input type="hidden" name="kisi_sayisi" id="rez-kisi" value="2">
+                        </div>
                     </div>
 
-                    <div class="form-row">
+                    <div id="rez-message"></div>
+
+                    <div class="booking-grid">
+                        <!-- Takvim Bölümü -->
+                        <div class="calendar-section">
+                            <p class="section-label">Tarih Seçin</p>
+                            <div id="inline-calendar"></div>
+                            <input type="hidden" name="tarih" id="rez-tarih">
+                        </div>
+
+                        <!-- Saat Bölümü -->
+                        <div class="time-section">
+                            <p class="section-label">Saat Seçin</p>
+                            <div class="time-grid" id="time-slots-container">
+                                <!-- JS ile dolacak -->
+                                <p style="color:#999; font-size:0.9rem;">Lütfen önce bir tarih seçin.</p>
+                            </div>
+                            <input type="hidden" name="saat" id="rez-saat">
+                        </div>
+                    </div>
+
+                    <div class="step-footer">
+                        <p style="font-size: 0.8rem; color: #999; max-width: 300px;">
+                            * Masanız rezervasyon saatinizden itibaren 15 dakika bekletilir.
+                        </p>
+                        <button type="button" class="btn-continue" id="next-btn" onclick="goToForm()">Devam Et</button>
+                    </div>
+                </div>
+
+                <!-- Adım 2: İletişim Bilgileri -->
+                <div id="form-step" class="step-container">
+                    <div class="step-header">
+                        <h2 class="step-title">İletişim Bilgileri</h2>
+                        <p id="summary-text" style="font-size: 0.85rem; color: var(--color-accent); font-weight: 600;">
+                        </p>
+                    </div>
+
+                    <div class="contact-form">
                         <div class="form-group">
+                            <label>AD SOYAD</label>
                             <input type="text" name="ad_soyad" id="rez-ad" placeholder="Adınız Soyadınız" required>
                         </div>
                         <div class="form-group">
-                            <input type="tel" name="telefon" id="rez-telefon" placeholder="Telefon Numaranız"
-                                oninput="this.value = this.value.replace(/[^0-9]/g, '');" maxlength="15" required>
+                            <label>TELEFON</label>
+                            <input type="tel" name="telefon" id="rez-telefon" placeholder="05XX XXX XX XX" required>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>E-POSTA (OPSİYONEL)</label>
+                            <input type="email" name="email" id="rez-email" placeholder="orn@mail.com">
+                        </div>
+                        <div class="form-group full-width">
+                            <label>ÖZEL NOT (OPSİYONEL)</label>
+                            <textarea name="ozel_istekler" id="rez-ozel" rows="3"
+                                placeholder="Alerji, kutlama veya masa tercihi..."></textarea>
                         </div>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <input type="email" name="email" id="rez-email" placeholder="E-posta Adresiniz (Opsiyonel)">
-                        </div>
-                        <div class="form-group">
-                            <input type="text" name="tarih" id="rez-tarih" placeholder="Tarih Seçin" required readonly>
-                        </div>
+                    <div class="step-footer">
+                        <button type="button" class="btn-back" onclick="goToSelection()">← Geri Dön</button>
+                        <button type="submit" class="btn-continue active" id="submit-btn">Rezervasyonu Tamamla</button>
                     </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <select name="saat" id="rez-saat" required>
-                                <option value="" disabled selected>Saat Seçin</option>
-                                <option value="10:00">10:00</option>
-                                <option value="10:30">10:30</option>
-                                <option value="11:00">11:00</option>
-                                <option value="11:30">11:30</option>
-                                <option value="12:00">12:00</option>
-                                <option value="12:30">12:30</option>
-                                <option value="13:00">13:00</option>
-                                <option value="13:30">13:30</option>
-                                <option value="14:00">14:00</option>
-                                <option value="14:30">14:30</option>
-                                <option value="15:00">15:00</option>
-                                <option value="15:30">15:30</option>
-                                <option value="16:00">16:00</option>
-                                <option value="16:30">16:30</option>
-                                <option value="17:00">17:00</option>
-                                <option value="17:30">17:30</option>
-                                <option value="18:00">18:00</option>
-                                <option value="18:30">18:30</option>
-                                <option value="19:00">19:00</option>
-                                <option value="19:30">19:30</option>
-                                <option value="20:00">20:00</option>
-                                <option value="20:30">20:30</option>
-                                <option value="21:00">21:00</option>
-                                <option value="21:30">21:30</option>
-                                <option value="22:00">22:00</option>
-                                <option value="22:30">22:30</option>
-                                <option value="23:00">23:00</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <select name="kisi_sayisi" id="rez-kisi" required>
-                                <option value="" disabled selected>Kişi Sayısı</option>
-                                <option value="1">1 Kişi</option>
-                                <option value="2" selected>2 Kişi</option>
-                                <option value="3">3 Kişi</option>
-                                <option value="4">4 Kişi</option>
-                                <option value="5">5 Kişi</option>
-                                <option value="6">6 Kişi</option>
-                                <option value="7">7 Kişi</option>
-                                <option value="8">8 Kişi</option>
-                                <option value="9">9 Kişi</option>
-                                <option value="10">10 Kişi</option>
-                                <option value="12">12 Kişi</option>
-                                <option value="15">15 Kişi</option>
-                                <option value="20">20 Kişi</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-group rez-full">
-                        <textarea name="ozel_istekler" id="rez-ozel"
-                            placeholder="Özel istekleriniz (Doğum günü, alerjiler, tercihler...)"></textarea>
-                    </div>
-
-                    <div class="rez-full" style="text-align: left; margin-top: 1rem;">
-                        <button type="submit" class="btn" id="rezSubmitBtn">Rezervasyon Talebi Gönder</button>
-                    </div>
-                </form>
-            </div>
+                </div>
+            </form>
         </div>
-    </section>
+    </div>
 
-    <footer>
-        <div style="margin-bottom: 1rem;">
-            <a href="https://www.instagram.com/sintesirestaurant/" target="_blank" rel="noopener noreferrer"
-                style="color: var(--color-text-muted); transition: color 0.3s ease;"
-                onmouseover="this.style.color='var(--color-accent)'"
-                onmouseout="this.style.color='var(--color-text-muted)'" title="Instagram">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-                </svg>
-            </a>
-        </div>
-        <p>&copy; Sintesi Restaurant. Tüm Hakları Saklıdır.</p>
-    </footer>
+    <div id="toast" class="toast"></div>
 
     <script>
-        // Mobil menü toggle
-        const mobileMenu = document.getElementById('mobile-menu');
-        const navLinks = document.getElementById('nav-links');
-        mobileMenu.addEventListener('click', () => {
-            mobileMenu.classList.toggle('active');
-            navLinks.classList.toggle('active');
-        });
-
-        // Resize kontrolü: Pencere büyütülürse mobil menüyü temizle
-        window.addEventListener('resize', () => {
-            if (window.innerWidth > 768) {
-                mobileMenu.classList.remove('active');
-                navLinks.classList.remove('active');
-            }
-        });
-
-        const rezForm = document.getElementById('rezervasyonForm');
-        const rezMessage = document.getElementById('rez-form-message');
-        const rezSubmitBtn = document.getElementById('rezSubmitBtn');
-        const rezTarihInput = document.getElementById('rez-tarih');
-
+        let selectedDate = null;
+        let selectedTime = null;
+        let personCount = 2;
         let maxKapasite = 16;
-        let kapaliGunlerStr = {};
-        let fp = null;
+        let kapaliGunler = {};
 
-        // Ayarları çek ve takvimi başlat
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast show toast-${type}`;
+            setTimeout(() => {
+                toast.className = 'toast';
+            }, 3000);
+        }
+
+        // Verileri Çek
         fetch('public_api.php')
             .then(res => res.json())
             .then(json => {
                 if (json.success) {
                     maxKapasite = json.data.kapasite;
-                    kapaliGunlerStr = json.data.kapali_gunler || {};
-                    document.getElementById('kapasite-notu').textContent = `* Her saat dilimi için maksimum ${maxKapasite} kişilik kapasitemiz bulunmaktadır.`;
+                    kapaliGunler = json.data.kapali_gunler || {};
                 }
-                initTakvim();
-            })
-            .catch(err => {
-                console.error("Ayarlar yüklenemedi", err);
-                initTakvim(); // Hata olursa varsayılanlarla başlat
+                initCalendar();
             });
 
-        function initTakvim() {
-            fp = flatpickr("#rez-tarih", {
+        // Takvim Başlat
+        function initCalendar() {
+            flatpickr("#inline-calendar", {
+                inline: true,
                 locale: "tr",
-                dateFormat: "Y-m-d",
-                altInput: true,
-                altFormat: "d F Y, l",
                 minDate: "today",
-                disable: [
-                    // Sadece geçmiş tarihleri disable et (minDate zaten yapıyor ama ek güvenlik)
-                ],
-                onChange: function (selectedDates, dateStr, instance) {
-                    if (dateStr) {
-                        rezMessage.style.display = 'none';
-                        rezSubmitBtn.disabled = false;
-                        rezSubmitBtn.style.opacity = '1';
+                dateFormat: "Y-m-d",
+                onChange: function (selectedDates, dateStr) {
+                    selectedDate = dateStr;
+                    document.getElementById('rez-tarih').value = dateStr;
+                    const isClosed = checkClosedDate(selectedDates[0], dateStr);
 
-                        const date = selectedDates[0];
-                        const isPazartesi = date.getDay() === 1;
-                        
-                        // Kapalı gün kontrolü ve notu al
-                        let kapaliGunNotu = null;
-                        if (kapaliGunlerStr && typeof kapaliGunlerStr === 'object') {
-                            if (dateStr in kapaliGunlerStr) {
-                                kapaliGunNotu = kapaliGunlerStr[dateStr] || true;
-                            }
-                        } else if (Array.isArray(kapaliGunlerStr) && kapaliGunlerStr.includes(dateStr)) {
-                            kapaliGunNotu = true;
-                        }
-
-                        if (isPazartesi) {
-                            rezMessage.style.display = 'block';
-                            rezMessage.style.backgroundColor = 'rgba(239, 68, 68, 0.2)';
-                            rezMessage.style.color = '#ef4444';
-                            rezMessage.innerHTML = '<strong>Restoranımız Kapalı:</strong> Pazartesi günleri restoranımız kapalıdır. Lütfen başka bir gün seçiniz.';
-                            rezSubmitBtn.disabled = true;
-                            rezSubmitBtn.style.opacity = '0.5';
-                        } else if (kapaliGunNotu) {
-                            rezMessage.style.display = 'block';
-                            rezMessage.style.backgroundColor = 'rgba(239, 68, 68, 0.2)';
-                            rezMessage.style.color = '#ef4444';
-                            const mesaj = (typeof kapaliGunNotu === 'string' && kapaliGunNotu.trim() !== '') 
-                                ? `<strong>Bugün İçin Rezervasyon Kapalıdır:</strong> ${kapaliGunNotu}`
-                                : '<strong>Bugün İçin Rezervasyonumuz Doludur:</strong> Lütfen başka bir tarih seçiniz veya bizimle iletişime geçiniz.';
-                            rezMessage.innerHTML = mesaj;
-                            rezSubmitBtn.disabled = true;
-                            rezSubmitBtn.style.opacity = '0.5';
-                        } else {
-                            saatleriGuncelle(dateStr);
-                        }
+                    if (isClosed) {
+                        const container = document.getElementById('time-slots-container');
+                        container.innerHTML = '<p style="color:var(--color-accent); font-weight:600;">Seçilen tarih rezervasyonlara kapalıdır.</p>';
+                        selectedTime = null;
+                        document.getElementById('rez-saat').value = '';
+                        updateButtonState();
+                    } else {
+                        loadTimeSlots(dateStr);
                     }
                 }
             });
         }
 
+        // Kapalı Gün Kontrolü
+        function checkClosedDate(date, dateStr) {
+            const msgBox = document.getElementById('rez-message');
+            msgBox.style.display = 'none';
+            msgBox.className = '';
 
-
-        function saatleriGuncelle(secilenTarih) {
-            const saatSelect = document.getElementById('rez-saat');
-            const options = saatSelect.options;
-            const suan = new Date();
-            const bugun = suan.toISOString().split('T')[0];
-            const suanSaat = suan.getHours();
-            const suanDakika = suan.getMinutes();
-
-            for (let i = 1; i < options.length; i++) {
-                const optValue = options[i].value;
-                const [optSaat, optDakika] = optValue.split(':').map(Number);
-
-                if (secilenTarih === bugun) {
-                    if (optSaat < suanSaat || (optSaat === suanSaat && optDakika <= suanDakika)) {
-                        options[i].disabled = true;
-                        options[i].style.display = 'none';
-                    } else {
-                        options[i].disabled = false;
-                        options[i].style.display = 'block';
-                    }
-                } else {
-                    options[i].disabled = false;
-                    options[i].style.display = 'block';
-                }
+            let note = null;
+            if (kapaliGunler[dateStr]) note = kapaliGunler[dateStr];
+            
+            if (note) {
+                showMsg(typeof note === 'string' ? note : 'Bu tarih rezervasyona kapalıdır.', 'error');
+                return true;
             }
+            return false;
+        }
 
-            // Eğer seçili olan saat artık devre dışıysa seçimi sıfırla
-            if (saatSelect.selectedIndex > 0 && options[saatSelect.selectedIndex].disabled) {
-                saatSelect.selectedIndex = 0;
+        function showMsg(text, type) {
+            const msgBox = document.getElementById('rez-message');
+            msgBox.textContent = text;
+            msgBox.className = type === 'error' ? 'msg-error' : 'msg-success';
+            msgBox.style.display = 'block';
+        }
+
+        // Saatleri Yükle ve Doluluk Kontrolü Yap
+        let maxPersonForSlot = 20;
+
+        async function loadTimeSlots(dateStr) {
+            const container = document.getElementById('time-slots-container');
+            container.innerHTML = '<p style="color:#999;">Yükleniyor...</p>';
+            selectedTime = null;
+            document.getElementById('rez-saat').value = '';
+            updateButtonState();
+
+            try {
+                const res = await fetch(`public_api.php?action=check_availability&date=${dateStr}`);
+                const json = await res.json();
+                const doluluk = json.data || {};
+
+                const slots = [
+                    "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30",
+                    "19:00", "19:30", "20:00", "20:30", "21:00", "21:30",
+                    "22:00", "22:30", "23:00"
+                ];
+
+                const suan = new Date();
+                const bugunStr = suan.toISOString().split('T')[0];
+                const suanSaat = suan.getHours();
+                const suanDakika = suan.getMinutes();
+
+                let html = '';
+                slots.forEach(time => {
+                    const booked = doluluk[time] || 0;
+                    const remaining = maxKapasite - booked;
+                    const [h, m] = time.split(':').map(Number);
+
+                    let isPast = false;
+                    if (dateStr === bugunStr) {
+                        if (h < suanSaat || (h === suanSaat && m <= suanDakika)) isPast = true;
+                    }
+
+                    const isDisabled = remaining <= 0 || isPast;
+                    const statusText = isDisabled ? (isPast ? 'Geçti' : 'Dolu') : (remaining < 5 ? `Son ${remaining} Yer` : 'Müsait');
+
+                    html += `
+                        <div class="time-slot ${isDisabled ? 'disabled' : ''}" 
+                             onclick="selectTime(this, '${time}', ${isDisabled}, ${remaining})">
+                            <span class="slot-time">${time}</span>
+                            <span class="slot-status">${statusText}</span>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            } catch (err) {
+                container.innerHTML = '<p style="color:red;">Saatler yüklenemedi.</p>';
             }
         }
 
-        if (rezForm) {
-            rezForm.addEventListener('submit', function (e) {
-                e.preventDefault();
+        function selectTime(el, time, disabled, remaining) {
+            if (disabled) return;
+            document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+            el.classList.add('selected');
+            selectedTime = time;
+            document.getElementById('rez-saat').value = time;
+            
+            // Kişi sayısını müsaitliğe göre sınırla
+            maxPersonForSlot = Math.min(20, remaining);
+            if (personCount > maxPersonForSlot) {
+                personCount = maxPersonForSlot;
+                document.getElementById('person-count-display').textContent = personCount;
+                document.getElementById('rez-kisi').value = personCount;
+            }
+            
+            updateButtonState();
+        }
 
-                const tarihVal = rezTarihInput.value;
-                if (!tarihVal) {
-                    rezMessage.style.display = 'block';
-                    rezMessage.style.backgroundColor = 'rgba(244, 67, 54, 0.2)';
-                    rezMessage.style.color = '#F44336';
-                    rezMessage.innerText = 'Lütfen bir tarih seçin.';
-                    return;
-                }
+        function updateCount(val) {
+            const nextVal = personCount + val;
+            if (nextVal < 1) return;
+            if (nextVal > maxPersonForSlot) {
+                showToast(`Seçilen saat için maksimum ${maxPersonForSlot} kişilik yerimiz mevcuttur.`, 'error');
+                return;
+            }
+            
+            personCount = nextVal;
+            document.getElementById('person-count-display').textContent = personCount;
+            document.getElementById('rez-kisi').value = personCount;
+        }
 
-                rezSubmitBtn.disabled = true;
-                rezSubmitBtn.innerText = 'Gönderiliyor...';
-                rezSubmitBtn.style.opacity = '0.7';
+        function updateButtonState() {
+            const btn = document.getElementById('next-btn');
+            if (selectedDate && selectedTime) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        }
 
-                const formData = new FormData(this);
+        function goToForm() {
+            if (!selectedDate || !selectedTime) return;
+            document.getElementById('selection-step').style.display = 'none';
+            document.getElementById('form-step').style.display = 'flex';
 
-                fetch('rezervasyon_gonder.php', {
+            const dateObj = new Date(selectedDate);
+            const formattedDate = dateObj.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long' });
+            document.getElementById('summary-text').textContent = `${formattedDate}, ${selectedTime} - ${personCount} Kişi`;
+        }
+
+        function goToSelection() {
+            document.getElementById('form-step').style.display = 'none';
+            document.getElementById('selection-step').style.display = 'flex';
+        }
+
+        // Form Gönderimi
+        document.getElementById('bookingForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submit-btn');
+            btn.disabled = true;
+            btn.textContent = 'İşleniyor...';
+
+            try {
+                const formData = new FormData(e.target);
+                const res = await fetch('rezervasyon_gonder.php', {
                     method: 'POST',
                     body: formData
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        rezMessage.style.display = 'block';
-                        rezMessage.innerText = data.message;
+                });
+                const json = await res.json();
 
-                        if (data.success) {
-                            rezMessage.style.backgroundColor = 'rgba(76, 175, 80, 0.2)';
-                            rezMessage.style.color = '#4CAF50';
-                            rezForm.reset();
-                        } else {
-                            rezMessage.style.backgroundColor = 'rgba(244, 67, 54, 0.2)';
-                            rezMessage.style.color = '#F44336';
-                        }
-                    })
-                    .catch(error => {
-                        rezMessage.style.display = 'block';
-                        rezMessage.style.backgroundColor = 'rgba(244, 67, 54, 0.2)';
-                        rezMessage.style.color = '#F44336';
-                        rezMessage.innerText = 'Bir hata oluştu. Lütfen daha sonra tekrar deneyin.';
-                    })
-                    .finally(() => {
-                        rezSubmitBtn.disabled = false;
-                        rezSubmitBtn.innerText = 'Rezervasyon Talebi Gönder';
-                        rezSubmitBtn.style.opacity = '1';
-                    });
-            });
-        }
+                if (json.success) {
+                    showToast('Rezervasyon talebiniz başarıyla alındı! Yönlendiriliyorsunuz...', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 2000);
+                } else {
+                    showToast('Hata: ' + json.message, 'error');
+                    btn.disabled = false;
+                    btn.textContent = 'Rezervasyonu Tamamla';
+                }
+            } catch (err) {
+                showToast('Bağlantı hatası oluştu.', 'error');
+                btn.disabled = false;
+                btn.textContent = 'Rezervasyonu Tamamla';
+            }
+        });
     </script>
 </body>
 

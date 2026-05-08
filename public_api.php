@@ -11,13 +11,33 @@ require_once __DIR__ . '/config.php';
 try {
     $pdo = veritabani_baglantisi();
     
-    // Varsayılan değerler
-    $kapasite = 16;
-    $kapali_gunler = [];
+    // İşlem Belirle
+    $action = $_GET['action'] ?? 'settings';
     
-    // Ayarları çek
+    if ($action === 'check_availability') {
+        $tarih = $_GET['date'] ?? '';
+        if (empty($tarih)) {
+            echo json_encode(['success' => false, 'message' => 'Tarih gerekli.']);
+            exit;
+        }
+
+        // Seçilen tarihteki saatlik dolulukları getir
+        $stmt = $pdo->prepare("SELECT saat, SUM(kisi_sayisi) as toplam_kisi FROM rezervasyonlar WHERE tarih = ? AND durum != 'iptal' GROUP BY saat");
+        $stmt->execute([$tarih]);
+        $doluluk = $stmt->fetchAll(PDO::FETCH_KEY_PAIR); // ['19:00' => 5, '19:30' => 12]
+
+        echo json_encode([
+            'success' => true,
+            'data' => $doluluk
+        ]);
+        exit;
+    }
+
+    // Varsayılan: Ayarları çek
+    $kapasite = 16;
+    $kapali_gunler = new stdClass();
+    
     try {
-        // Tablonun varlığından emin ol
         if (local_mi()) {
             $pdo->exec("CREATE TABLE IF NOT EXISTS ayarlar (ayar_anahtari TEXT PRIMARY KEY, ayar_degeri TEXT)");
         } else {
@@ -34,13 +54,8 @@ try {
         
         if (isset($ayarlar['kapali_gunler'])) {
             $kapali_gunler = json_decode($ayarlar['kapali_gunler'], true) ?: new stdClass();
-        } else {
-            $kapali_gunler = new stdClass();
         }
-    } catch (Exception $e) {
-        // Hata durumunda varsayılanlar kullanılır
-        $kapali_gunler = new stdClass();
-    }
+    } catch (Exception $e) {}
     
     echo json_encode([
         'success' => true,
@@ -51,12 +66,6 @@ try {
     ]);
     
 } catch (Exception $e) {
-    echo json_encode([
-        'success' => false,
-        'data' => [
-            'kapasite' => 16,
-            'kapali_gunler' => []
-        ]
-    ]);
+    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
 }
 ?>
