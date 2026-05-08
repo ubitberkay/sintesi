@@ -30,7 +30,8 @@ define('SMTP_HOST', 'mail.sintesi.com.tr');
 define('SMTP_USER', 'info@sintesi.com.tr');
 define('SMTP_PASS', 'qwe12ASD?');
 define('SMTP_PORT', 465);
-define('SMTP_SECURE', PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS); // SSL
+define('SMTP_SECURE', 'ssl'); // SSL
+
 
 
 // ============================================================
