@@ -7,6 +7,7 @@ use PHPMailer\PHPMailer\Exception;
 require 'phpmailer/Exception.php';
 require 'phpmailer/PHPMailer.php';
 require 'phpmailer/SMTP.php';
+require_once 'config.php';
 
 // Form verilerini al
 $ad = isset($_POST['ad']) ? htmlspecialchars(strip_tags(trim($_POST['ad']))) : '';
@@ -30,12 +31,12 @@ $mail = new PHPMailer(true);
 try {
     // Sunucu Ayarları
     $mail->isSMTP();                                            // SMTP kullan
-    $mail->Host       = 'mail.sintesi.com.tr';                  // SMTP sunucusu
+    $mail->Host       = SMTP_HOST;                  // SMTP sunucusu
     $mail->SMTPAuth   = true;                                   // SMTP doğrulama
-    $mail->Username   = 'info@sintesi.com.tr';                  // SMTP kullanıcı adı
-    $mail->Password   = 'qwe12ASD?';               // SMTP şifresi
-    $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;            // Güvenlik (SSL)
-    $mail->Port       = 465;                                    // TCP port
+    $mail->Username   = SMTP_USER;                  // SMTP kullanıcı adı
+    $mail->Password   = SMTP_PASS;               // SMTP şifresi
+    $mail->SMTPSecure = SMTP_SECURE;            // Güvenlik (SSL)
+    $mail->Port       = SMTP_PORT;                                    // TCP port
 
     // Karakter seti
     $mail->CharSet = 'UTF-8';

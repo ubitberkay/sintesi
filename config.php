@@ -24,6 +24,16 @@ define('DB_USER', 'sintesic_admin');          // cPanel'de oluşturduğunuz veri
 define('DB_PASS', 'qwe12ASD?');     // Veritabanı kullanıcı şifresi
 
 // ============================================================
+// SMTP AYARLARI (E-posta Gönderimi İçin)
+// ============================================================
+define('SMTP_HOST', 'mail.sintesi.com.tr');
+define('SMTP_USER', 'info@sintesi.com.tr');
+define('SMTP_PASS', 'qwe12ASD?');
+define('SMTP_PORT', 465);
+define('SMTP_SECURE', PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS); // SSL
+
+
+// ============================================================
 // VERİTABANI BAĞLANTISI
 // ============================================================
 function veritabani_baglantisi() {

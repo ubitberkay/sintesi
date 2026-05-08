@@ -195,12 +195,12 @@ function gonderOnayMaili($rez) {
     try {
         $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
         $mail->isSMTP();
-        $mail->Host       = 'mail.sintesi.com.tr';
+        $mail->Host       = SMTP_HOST;
         $mail->SMTPAuth   = true;
-        $mail->Username   = 'info@sintesi.com.tr';
-        $mail->Password   = 'qwe12ASD?';
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
-        $mail->Port       = 465;
+        $mail->Username   = SMTP_USER;
+        $mail->Password   = SMTP_PASS;
+        $mail->SMTPSecure = SMTP_SECURE;
+        $mail->Port       = SMTP_PORT;
         $mail->CharSet    = 'UTF-8';
         
         $mail->setFrom('info@sintesi.com.tr', 'Sintesi');
@@ -272,12 +272,12 @@ function gonderIptalMaili($rez) {
     try {
         $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
         $mail->isSMTP();
-        $mail->Host       = 'mail.sintesi.com.tr';
+        $mail->Host       = SMTP_HOST;
         $mail->SMTPAuth   = true;
-        $mail->Username   = 'info@sintesi.com.tr';
-        $mail->Password   = 'qwe12ASD?';
-        $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS;
-        $mail->Port       = 465;
+        $mail->Username   = SMTP_USER;
+        $mail->Password   = SMTP_PASS;
+        $mail->SMTPSecure = SMTP_SECURE;
+        $mail->Port       = SMTP_PORT;
         $mail->CharSet    = 'UTF-8';
         
         $mail->setFrom('info@sintesi.com.tr', 'Sintesi');
@@ -566,12 +566,12 @@ function topluMailGonder($pdo) {
         try {
             $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
             $mail->isSMTP();
-            $mail->Host       = 'mail.sintesi.com.tr';
+            $mail->Host       = SMTP_HOST;
             $mail->SMTPAuth   = true;
-            $mail->Username   = 'info@sintesi.com.tr';
-            $mail->Password   = 'qwe12ASD?';
-            $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS;
-            $mail->Port       = 465;
+            $mail->Username   = SMTP_USER;
+            $mail->Password   = SMTP_PASS;
+            $mail->SMTPSecure = SMTP_SECURE;
+            $mail->Port       = SMTP_PORT;
             $mail->CharSet    = 'UTF-8';
             
             $mail->setFrom('info@sintesi.com.tr', 'Sintesi');
