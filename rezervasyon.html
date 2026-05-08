@@ -144,7 +144,9 @@
             transform: translateY(0);
         }
 
-        .toast-error { background: #ff4444; }
+        .toast-error {
+            background: #ff4444;
+        }
 
         .brand-name {
             font-family: var(--font-heading);
@@ -821,7 +823,7 @@
                 const gunAyari = calismaSaatleri[dayOfWeek] || { acilis: "15:00", kapanis: "00:00", durum: "acik" };
 
                 if (gunAyari.durum === 'kapali') {
-                    container.innerHTML = '<div style="padding:40px; text-align:center; color:var(--color-accent); font-weight:500;">Restoranımız bugün kapalıdır.</div>';
+                    container.innerHTML = '<div style="grid-column: 1 / -1; padding: 20px; text-align: center; color: var(--color-accent); font-weight: 500; background: rgba(157, 67, 44, 0.05); border-radius: 10px;">Restoranımız bugün kapalıdır.</div>';
                     return;
                 }
 
@@ -849,7 +851,7 @@
                 let html = '';
                 slots.forEach(time => {
                     const [h, m] = time.split(':').map(Number);
-                    
+
                     // Geçmiş saat kontrolü (Bugün için)
                     if (dateStr === bugunStr) {
                         if (h < suanSaat || (h === suanSaat && m <= suanDakika)) return; // Geçmiş saati gösterme

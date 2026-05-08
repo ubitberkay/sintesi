@@ -853,7 +853,7 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
         <div class="charts-grid">
             <div class="chart-card">
                 <div class="chart-title">
-                    <span>📈 Aylık Rezervasyon Trendi</span>
+                    <span>📈 Yıllık Rezervasyon Trendi</span>
                 </div>
                 <div class="chart-container">
                     <canvas id="trendChart"></canvas>
@@ -1212,7 +1212,7 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                 data: {
                     labels: data.aylik_trend.map(a => a.ay),
                     datasets: [{
-                        label: 'Rezervasyon',
+                        label: 'Aylık Rezervasyon',
                         data: data.aylik_trend.map(a => a.count),
                         borderColor: '#9D432C',
                         backgroundColor: 'rgba(157, 67, 44, 0.1)',
