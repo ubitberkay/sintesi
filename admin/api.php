@@ -62,6 +62,15 @@ switch ($action) {
     case 'settings_save':
         ayarlariKaydet($pdo);
         break;
+    case 'get_emails':
+        musteriMailleriniGetir($pdo);
+        break;
+    case 'send_bulk_email':
+        topluMailGonder($pdo);
+        break;
+    case 'export_excel':
+        exportReservations($pdo);
+        break;
     default:
         echo json_encode(['success' => false, 'message' => 'Geçersiz işlem.']);
 }
@@ -78,30 +87,32 @@ function listeleRezervasyonlar($pdo) {
     $limit = 50;
     $offset = ($page - 1) * $limit;
     
-    $sql = "SELECT * FROM rezervasyonlar WHERE 1=1";
+    $sql = "SELECT r.*, 
+            (SELECT COUNT(*) FROM rezervasyonlar r2 WHERE r2.telefon = r.telefon) as toplam_ziyaret
+            FROM rezervasyonlar r WHERE 1=1";
     $count_sql = "SELECT COUNT(*) FROM rezervasyonlar WHERE 1=1";
     $params = [];
     
     if (!empty($durum) && in_array($durum, ['beklemede', 'onaylandi', 'iptal'])) {
-        $sql .= " AND durum = ?";
+        $sql .= " AND r.durum = ?";
         $count_sql .= " AND durum = ?";
         $params[] = $durum;
     }
     
     if (!empty($tarih_bas)) {
-        $sql .= " AND tarih >= ?";
+        $sql .= " AND r.tarih >= ?";
         $count_sql .= " AND tarih >= ?";
         $params[] = $tarih_bas;
     }
     
     if (!empty($tarih_son)) {
-        $sql .= " AND tarih <= ?";
+        $sql .= " AND r.tarih <= ?";
         $count_sql .= " AND tarih <= ?";
         $params[] = $tarih_son;
     }
     
     if (!empty($search)) {
-        $sql .= " AND (ad_soyad LIKE ? OR telefon LIKE ?)";
+        $sql .= " AND (r.ad_soyad LIKE ? OR r.telefon LIKE ?)";
         $count_sql .= " AND (ad_soyad LIKE ? OR telefon LIKE ?)";
         $params[] = "%$search%";
         $params[] = "%$search%";
@@ -113,7 +124,7 @@ function listeleRezervasyonlar($pdo) {
     $total_records = (int)$stmt->fetchColumn();
     $total_pages = max(1, ceil($total_records / $limit));
     
-    $sql .= " ORDER BY tarih ASC, saat ASC LIMIT " . (int)$limit . " OFFSET " . (int)$offset;
+    $sql .= " ORDER BY r.tarih ASC, r.saat ASC LIMIT " . (int)$limit . " OFFSET " . (int)$offset;
     
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
@@ -401,17 +412,34 @@ function manuelEkle($pdo) {
  * Ayarları getir
  */
 function ayarlariGetir($pdo) {
-    $stmt = $pdo->prepare("SELECT ayar_anahtari, ayar_degeri FROM ayarlar");
-    $stmt->execute();
-    $ayarlar = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
-    
-    echo json_encode([
-        'success' => true,
-        'data' => [
-            'kapasite' => isset($ayarlar['kapasite']) ? (int)$ayarlar['kapasite'] : 16,
-            'kapali_gunler' => isset($ayarlar['kapali_gunler']) ? json_decode($ayarlar['kapali_gunler'], true) : []
-        ]
-    ]);
+    try {
+        // Tablonun varlığından emin ol
+        if (local_mi()) {
+            $pdo->exec("CREATE TABLE IF NOT EXISTS ayarlar (ayar_anahtari TEXT PRIMARY KEY, ayar_degeri TEXT)");
+        } else {
+            $pdo->exec("CREATE TABLE IF NOT EXISTS ayarlar (ayar_anahtari VARCHAR(50) PRIMARY KEY, ayar_degeri TEXT) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+        }
+
+        $stmt = $pdo->prepare("SELECT ayar_anahtari, ayar_degeri FROM ayarlar");
+        $stmt->execute();
+        $ayarlar = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+        
+        echo json_encode([
+            'success' => true,
+            'data' => [
+                'kapasite' => isset($ayarlar['kapasite']) ? (int)$ayarlar['kapasite'] : 16,
+                'kapali_gunler' => isset($ayarlar['kapali_gunler']) ? json_decode($ayarlar['kapali_gunler'], true) : new stdClass()
+            ]
+        ]);
+    } catch (Exception $e) {
+        echo json_encode([
+            'success' => true, // Hata olsa bile varsayılanları dönmek için true diyoruz
+            'data' => [
+                'kapasite' => 16,
+                'kapali_gunler' => new stdClass()
+            ]
+        ]);
+    }
 }
 
 /**
@@ -419,14 +447,195 @@ function ayarlariGetir($pdo) {
  */
 function ayarlariKaydet($pdo) {
     $kapasite = intval($_POST['kapasite'] ?? 16);
-    $kapali_gunler = $_POST['kapali_gunler'] ?? '[]';
+    $kapali_gunler = $_POST['kapali_gunler'] ?? '{}';
     
-    $stmt = $pdo->prepare("UPDATE ayarlar SET ayar_degeri = ? WHERE ayar_anahtari = 'kapasite'");
-    $stmt->execute([(string)$kapasite]);
+    // Güvenlik: JSON geçerli mi kontrol et
+    $decoded = json_decode($kapali_gunler, true);
+    if ($decoded === null) {
+        $kapali_gunler = '{}';
+    }
+
+    try {
+        // Tablonun varlığından emin ol (SQLite/MySQL uyumlu)
+        if (local_mi()) {
+            $pdo->exec("CREATE TABLE IF NOT EXISTS ayarlar (ayar_anahtari TEXT PRIMARY KEY, ayar_degeri TEXT)");
+        } else {
+            $pdo->exec("CREATE TABLE IF NOT EXISTS ayarlar (ayar_anahtari VARCHAR(50) PRIMARY KEY, ayar_degeri TEXT) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+        }
+
+        // Ayarları Kaydet (REPLACE INTO hem SQLite hem MySQL'de çalışır)
+        $stmt = $pdo->prepare("REPLACE INTO ayarlar (ayar_anahtari, ayar_degeri) VALUES ('kapasite', ?)");
+        $stmt->execute([(string)$kapasite]);
+        
+        $stmt = $pdo->prepare("REPLACE INTO ayarlar (ayar_anahtari, ayar_degeri) VALUES ('kapali_gunler', ?)");
+        $stmt->execute([$kapali_gunler]);
+        
+        echo json_encode(['success' => true, 'message' => 'Ayarlar başarıyla kaydedildi.']);
+    } catch (Exception $e) {
+        echo json_encode(['success' => false, 'message' => 'Veritabanı hatası: ' . $e->getMessage()]);
+    }
+}
+
+/**
+ * Benzersiz müşteri maillerini getir
+ */
+function musteriMailleriniGetir($pdo) {
+    $stmt = $pdo->prepare("
+        SELECT DISTINCT ad_soyad, email 
+        FROM rezervasyonlar 
+        WHERE email IS NOT NULL AND email != '' 
+        ORDER BY ad_soyad ASC
+    ");
+    $stmt->execute();
+    $emails = $stmt->fetchAll();
     
-    $stmt = $pdo->prepare("UPDATE ayarlar SET ayar_degeri = ? WHERE ayar_anahtari = 'kapali_gunler'");
-    $stmt->execute([$kapali_gunler]);
+    echo json_encode(['success' => true, 'data' => $emails]);
+}
+
+/**
+ * Toplu mail gönder
+ */
+function topluMailGonder($pdo) {
+    $emails = $_POST['emails'] ?? [];
+    $subject = $_POST['subject'] ?? '';
+    $message = $_POST['message'] ?? '';
     
-    echo json_encode(['success' => true, 'message' => 'Ayarlar başarıyla kaydedildi.']);
+    if (empty($emails) || empty($subject) || empty($message)) {
+        echo json_encode(['success' => false, 'message' => 'Lütfen alıcıları, başlığı ve mesajı doldurun.']);
+        return;
+    }
+
+    if (!is_array($emails)) {
+        $emails = explode(',', $emails);
+    }
+
+    require_once __DIR__ . '/../phpmailer/Exception.php';
+    require_once __DIR__ . '/../phpmailer/PHPMailer.php';
+    require_once __DIR__ . '/../phpmailer/SMTP.php';
+
+    $success_count = 0;
+    $error_count = 0;
+
+    foreach ($emails as $email) {
+        try {
+            $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
+            $mail->isSMTP();
+            $mail->Host       = 'mail.sintesi.com.tr';
+            $mail->SMTPAuth   = true;
+            $mail->Username   = 'info@sintesi.com.tr';
+            $mail->Password   = 'qwe12ASD?';
+            $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS;
+            $mail->Port       = 465;
+            $mail->CharSet    = 'UTF-8';
+            
+            $mail->setFrom('info@sintesi.com.tr', 'Sintesi');
+            $mail->addAddress(trim($email));
+            
+            $mail->isHTML(true);
+            $mail->Subject = $subject;
+            
+            // Mail şablonu (Onay maili ile benzer stil)
+            $mail->Body = "
+                <div style=\"font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; border-radius: 15px; overflow: hidden; background: #000 url('https://sintesi.com.tr/background.png') no-repeat center center; background-size: cover; color: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.5);\">
+                    <div style='padding: 40px 20px; text-align: center;'>
+                        <img src='https://sintesi.com.tr/sintesi.webp' alt='Sintesi' style='max-width: 150px; margin-bottom: 20px;'>
+                        <div style='width: 50px; height: 2px; background: #9D432C; margin: 20px auto;'></div>
+                    </div>
+                    <div style='padding: 0 40px 40px 40px;'>
+                        <h2 style='color: #9D432C; font-family: Georgia, serif; margin-bottom: 20px;'>{$subject}</h2>
+                        <div style='font-size: 16px; line-height: 1.8; color: #e0e0e0; white-space: pre-wrap;'>{$message}</div>
+                    </div>
+                    <div style='background: rgba(0,0,0,0.4); padding: 30px; text-align: center; border-top: 1px solid rgba(255,255,255,0.05);'>
+                        <p style='margin: 0; color: #888; font-size: 13px;'>Sintesi Restaurant</p>
+                        <p style='margin: 10px 0 0 0; color: #888; font-size: 13px;'>Metropol İstanbul AVM, B2 Katı, Ataşehir/İstanbul</p>
+                    </div>
+                </div>
+            ";
+            
+            if ($mail->send()) {
+                $success_count++;
+            } else {
+                $error_count++;
+            }
+        } catch (Exception $e) {
+            $error_count++;
+            error_log('Özel mail gönderilemedi (' . $email . '): ' . $e->getMessage());
+        }
+    }
+
+    echo json_encode([
+        'success' => true, 
+        'message' => "İşlem tamamlandı. {$success_count} mail başarıyla gönderildi, {$error_count} hata oluştu."
+    ]);
+}
+
+/**
+ * Tüm rezervasyonları Excel (XLS) olarak dışa aktar
+ */
+function exportReservations($pdo) {
+    $filename = "sintesi_rezervasyonlar_" . date('Y-m-d_H-i') . ".xls";
+    
+    header('Content-Type: application/vnd.ms-excel; charset=utf-8');
+    header('Content-Disposition: attachment; filename="' . $filename . '"');
+    header('Cache-Control: max-age=0');
+
+    // UTF-8 için BOM ve HTML yapısı
+    echo '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">';
+    echo '<head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><style>td, th { border: 0.5pt solid #ccc; font-family: Calibri, sans-serif; }</style></head>';
+    echo '<body>';
+    echo '<table>';
+    
+    // Başlık satırı
+    echo '<tr style="background-color: #9D432C; color: #ffffff; font-weight: bold;">';
+    echo '<th>ID</th>';
+    echo '<th>Ad Soyad</th>';
+    echo '<th>E-posta</th>';
+    echo '<th>Telefon</th>';
+    echo '<th>Tarih</th>';
+    echo '<th>Saat</th>';
+    echo '<th>Kişi Sayısı</th>';
+    echo '<th>Durum</th>';
+    echo '<th>Özel İstekler</th>';
+    echo '<th>Oluşturma Tarihi</th>';
+    echo '<th>Hatırlatma</th>';
+    echo '<th>Ziyaret Sayısı</th>';
+    echo '</tr>';
+    
+    // Verileri çek (Ziyaret sayısıyla beraber)
+    $stmt = $pdo->prepare("SELECT r.*, (SELECT COUNT(*) FROM rezervasyonlar r2 WHERE r2.telefon = r.telefon) as toplam_ziyaret FROM rezervasyonlar r ORDER BY r.tarih DESC, r.saat DESC");
+    $stmt->execute();
+    
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $durum_tr = [
+            'beklemede' => 'Beklemede',
+            'onaylandi' => 'Onaylandı',
+            'iptal' => 'İptal',
+            'geldi' => 'Geldi',
+            'gelmedi' => 'Gelmedi'
+        ];
+        $durum = $durum_tr[$row['durum']] ?? ucfirst($row['durum']);
+        $hatirlatma = (isset($row['hatirlatma_gonderildi']) && $row['hatirlatma_gonderildi']) ? 'Gönderildi' : 'Gönderilmedi';
+        $tarih = date('d.m.Y', strtotime($row['tarih']));
+        $ziyaret_metni = $row['toplam_ziyaret'] . " kez";
+
+        echo '<tr>';
+        echo '<td>' . $row['id'] . '</td>';
+        echo '<td>' . htmlspecialchars($row['ad_soyad']) . '</td>';
+        echo '<td>' . htmlspecialchars($row['email']) . '</td>';
+        echo '<td>' . htmlspecialchars($row['telefon']) . '</td>';
+        echo '<td>' . $tarih . '</td>';
+        echo '<td>' . $row['saat'] . '</td>';
+        echo '<td>' . $row['kisi_sayisi'] . '</td>';
+        echo '<td>' . $durum . '</td>';
+        echo '<td>' . htmlspecialchars($row['ozel_istekler']) . '</td>';
+        echo '<td>' . $row['olusturma_tarihi'] . '</td>';
+        echo '<td>' . $hatirlatma . '</td>';
+        echo '<td>' . $ziyaret_metni . '</td>';
+        echo '</tr>';
+    }
+    
+    echo '</table>';
+    echo '</body></html>';
+    exit;
 }
 ?>

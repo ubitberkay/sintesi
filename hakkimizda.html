@@ -367,6 +367,15 @@
             mobileMenu.classList.toggle('active');
             navLinks.classList.toggle('active');
         });
+
+        // Resize kontrolü: Pencere büyütülürse mobil menüyü temizle
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                mobileMenu.classList.remove('active');
+                navLinks.classList.remove('active');
+            }
+        
+        });
     </script>
 </body>
 

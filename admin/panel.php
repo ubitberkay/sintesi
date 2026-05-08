@@ -249,6 +249,21 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             border-left: 3px solid var(--accent);
             margin-top: 5px;
         }
+        
+        .badge-visitor {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            background: rgba(217, 119, 6, 0.1);
+            color: #f59e0b;
+            border: 1px solid rgba(217, 119, 6, 0.3);
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 5px;
+            width: fit-content;
+        }
 
         /* Durum badge'leri */
         .badge {
@@ -629,6 +644,56 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             }
             .admin-user { font-size: 1.2rem; margin-right: 0.5rem; }
         }
+
+        /* Mail Modalı Özel Stiller */
+        .email-list-container {
+            max-height: 200px;
+            overflow-y: auto;
+            background: var(--surface-2);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+        .email-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            cursor: pointer;
+        }
+        .email-item:last-child { border-bottom: none; }
+        .email-item:hover { background: rgba(157,67,44,0.1); }
+        .email-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent);
+        }
+        .email-item label {
+            cursor: pointer;
+            font-size: 0.9rem;
+            flex: 1;
+        }
+        .email-search {
+            width: 100%;
+            padding: 10px;
+            background: var(--surface-2);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: var(--text);
+            margin-bottom: 10px;
+            font-size: 0.85rem;
+        }
+        .select-all-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
         @media (max-width: 480px) {
             .stats-grid { grid-template-columns: 1fr; }
             .rez-card { grid-template-columns: 1fr; }
@@ -709,6 +774,45 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             </div>
             <button class="btn-filtrele" onclick="yukleRezervasyonlar()">Filtrele</button>
         </div>
+
+        <!-- Mail Gönder Modal -->
+        <div id="mailGonderModal" class="modal-overlay">
+            <div class="modal-content" style="max-width: 600px;">
+                <h3 class="modal-title">📧 Özel Mail Gönder</h3>
+                <form id="mailGonderForm">
+                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                    
+                    <div class="filter-group" style="margin-bottom: 15px;">
+                        <label>Alıcılar</label>
+                        <input type="text" class="email-search" id="emailSearch" placeholder="Müşteri ara..." onkeyup="filtreleMailler()">
+                        <div class="select-all-container">
+                            <input type="checkbox" id="selectAllEmails" onclick="toggleSelectAll(this)">
+                            <label for="selectAllEmails" style="font-weight: 600; font-size: 0.85rem;">Tümünü Seç</label>
+                        </div>
+                        <div class="email-list-container" id="customerEmailList">
+                            <!-- Mailler JS ile buraya yüklenecek -->
+                            <div style="padding: 20px; text-align: center; color: var(--muted);">Yükleniyor...</div>
+                        </div>
+                    </div>
+
+                    <div class="filter-group" style="margin-bottom: 15px;">
+                        <label>Konu / Başlık</label>
+                        <input type="text" name="subject" required placeholder="Mail başlığını girin...">
+                    </div>
+
+                    <div class="filter-group" style="margin-bottom: 20px;">
+                        <label>Mesaj İçeriği</label>
+                        <textarea name="message" required style="min-height: 150px;" placeholder="Mesajınızı buraya yazın..."></textarea>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" class="btn-modal btn-cancel" onclick="kapatModal('mailGonderModal')">İptal</button>
+                        <button type="submit" class="btn-modal btn-confirm" style="background: var(--accent);">Maili Gönder</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         <!-- Rezervasyonlar Tablosu -->
         <h2>🍽️ Rezervasyonlar</h2>
         <div class="table-container">
@@ -718,6 +822,8 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                 <div class="top-actions">
                     <button class="btn-primary" onclick="acModal('manuelEkleModal')"><span>+</span> <span class="btn-text">Yeni Ekle</span></button>
                     <button class="btn-primary" onclick="ayarlariAc()" style="background:var(--surface-2);border:1px solid rgba(255,255,255,0.1);"><span>⚙️</span> <span class="btn-text">Ayarlar</span></button>
+                    <button class="btn-primary" onclick="mailGonderAc()" style="background:var(--surface-2);border:1px solid rgba(255,255,255,0.1);"><span>📧</span> <span class="btn-text">Mail Gönder</span></button>
+                    <button class="btn-primary" onclick="window.location.href='api.php?action=export_excel'" style="background:var(--surface-2);border:1px solid rgba(255,255,255,0.1);"><span>📊</span> <span class="btn-text">Excel İndir</span></button>
                     <button class="btn-refresh" onclick="yukleHerSeyi(this)">
                         <span class="icon">🔄</span>
                         <span class="btn-text">Yenile</span>
@@ -789,7 +895,7 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
 
     <!-- Ayarlar Modal -->
     <div id="ayarlarModal" class="modal-overlay">
-        <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-content" style="max-width: 650px;">
             <h3 class="modal-title">Sistem Ayarları</h3>
             <form id="ayarlarForm" onsubmit="ayarlariKaydetSubmit(event)">
                 <div class="modal-form-group">
@@ -798,8 +904,17 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                 </div>
                 <div class="modal-form-group">
                     <label>Kapalı / Özel Günler</label>
-                    <input type="text" id="ayar-kapali-gunler" placeholder="Tarihleri seçin" readonly>
-                    <small style="color:var(--muted); font-size:0.75rem;">Bu tarihlerde rezervasyon alınamaz.</small>
+                    <div style="margin-bottom:10px;">
+                        <input type="text" id="ayar-yeni-gun" placeholder="Tarih Seçin" readonly style="width:100%;">
+                    </div>
+                    <div style="display:flex; gap:10px; margin-bottom:15px;">
+                        <input type="text" id="ayar-yeni-gun-not" placeholder="Kapatma Açıklaması (Müşteriye gösterilir)" style="flex:1;">
+                        <button type="button" class="btn-primary" onclick="kapaliGunEkle()" style="padding: 0 25px;">Ekle</button>
+                    </div>
+                    <div id="kapali-gunler-listesi" style="max-height: 200px; overflow-y: auto; background: var(--surface-2); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
+                        <!-- Günler JS ile buraya gelecek -->
+                    </div>
+                    <small style="color:var(--muted); font-size:0.75rem; margin-top:5px; display:block;">Bu tarihlerde rezervasyon alınamaz ve açıklama müşteriye gösterilir.</small>
                 </div>
                 <div class="modal-actions">
                     <button type="button" class="btn-modal btn-cancel" onclick="kapatModal('ayarlarModal')">İptal</button>
@@ -821,8 +936,8 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
 
         let currentPage = 1;
         let currentDeleteId = null;
-
-        let fpBas, fpSon, fpAyarlar;
+        let fpBas, fpSon, fpYeniGun;
+        let kapaliGunler = {}; // { "2026-05-10": "Not", ... }
 
         function initFlatpickr() {
             const config = {
@@ -834,13 +949,7 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             fpBas = flatpickr("#filtre-tarih-bas", config);
             fpSon = flatpickr("#filtre-tarih-son", config);
             
-            fpAyarlar = flatpickr("#ayar-kapali-gunler", {
-                locale: "tr",
-                mode: "multiple",
-                dateFormat: "Y-m-d",
-                altInput: true,
-                altFormat: "d F Y"
-            });
+            fpYeniGun = flatpickr("#ayar-yeni-gun", config);
             
             flatpickr("#m-tarih", {
                 locale: "tr",
@@ -983,6 +1092,7 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                             <div class="rez-info">
                                 <span class="rez-label">Telefon</span>
                                 <span class="rez-value">${r.telefon}</span>
+                                ${r.toplam_ziyaret > 1 ? `<div class="badge-visitor" title="Daha önce ${r.toplam_ziyaret - 1} kez rezervasyon yapmış">⭐ Tekrar Gelen Müşteri (${r.toplam_ziyaret}. Ziyaret)</div>` : ''}
                             </div>
                             <div class="rez-info">
                                 <span class="rez-label">Tarih</span>
@@ -1066,14 +1176,14 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                 const json = await res.json();
 
                 if (json.success) {
-                    toastGoster(json.message, 'success');
+                    showToast(json.message, 'success');
                     yukleRezervasyonlar();
                     yukleIstatistikler();
                 } else {
-                    toastGoster(json.message, 'error');
+                    showToast(json.message, 'error');
                 }
             } catch (e) {
-                toastGoster('İşlem sırasında hata oluştu.', 'error');
+                showToast('İşlem sırasında hata oluştu.', 'error');
             }
         }
 
@@ -1143,15 +1253,15 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                 const json = await res.json();
                 
                 if (json.success) {
-                    toastGoster(json.message, 'success');
+                    showToast(json.message, 'success');
                     kapatModal('manuelEkleModal');
                     e.target.reset();
                     yukleHerSeyi();
                 } else {
-                    toastGoster(json.message, 'error');
+                    showToast(json.message, 'error');
                 }
             } catch(err) {
-                toastGoster('Bağlantı hatası.', 'error');
+                showToast('Bağlantı hatası.', 'error');
             }
             btn.disabled = false;
             btn.textContent = "Kaydet";
@@ -1163,18 +1273,85 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
         async function ayarlariAc() {
             acModal('ayarlarModal');
             document.getElementById('ayar-kapasite').value = '';
-            fpAyarlar.clear();
+            document.getElementById('ayar-yeni-gun-not').value = '';
+            fpYeniGun.clear();
+            kapaliGunler = {};
+            listeleKapaliGunler();
             
             try {
                 const res = await fetch('api.php?action=settings_get');
                 const json = await res.json();
                 if (json.success) {
                     document.getElementById('ayar-kapasite').value = json.data.kapasite;
-                    fpAyarlar.setDate(json.data.kapali_gunler);
+                    
+                    // Eski dizi formatını nesneye dönüştür (JSON.stringify hatasını önlemek için)
+                    let loadedData = json.data.kapali_gunler || {};
+                    if (Array.isArray(loadedData)) {
+                        kapaliGunler = {};
+                        loadedData.forEach(d => { kapaliGunler[d] = ""; });
+                    } else {
+                        kapaliGunler = loadedData;
+                    }
+                    
+                    listeleKapaliGunler();
                 }
             } catch(err) {
-                toastGoster('Ayarlar yüklenemedi', 'error');
+                showToast('Ayarlar yüklenemedi', 'error');
             }
+        }
+
+        /**
+         * Kapalı günleri modalda listele
+         */
+        function listeleKapaliGunler() {
+            const container = document.getElementById('kapali-gunler-listesi');
+            const keys = Object.keys(kapaliGunler).sort();
+            
+            if (keys.length === 0) {
+                container.innerHTML = '<div style="padding:15px; color:var(--muted); text-align:center; font-size:0.85rem;">Henüz kapalı gün eklenmedi.</div>';
+                return;
+            }
+            
+            let html = '';
+            keys.forEach(date => {
+                html += `
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px; border-bottom:1px solid rgba(255,255,255,0.03);">
+                    <div>
+                        <div style="font-size:0.85rem; font-weight:500;">${formatTarih(date)}</div>
+                        <div style="font-size:0.75rem; color:var(--muted);">${kapaliGunler[date] || 'Açıklama yok'}</div>
+                    </div>
+                    <button type="button" onclick="kapaliGunSil('${date}')" style="background:none; border:none; color:var(--danger); cursor:pointer; font-size:1.1rem;">×</button>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        /**
+         * Yeni kapalı gün ekle
+         */
+        function kapaliGunEkle() {
+            const date = document.getElementById('ayar-yeni-gun').value;
+            const note = document.getElementById('ayar-yeni-gun-not').value;
+            
+            if (!date) {
+                showToast('Lütfen bir tarih seçin.', 'error');
+                return;
+            }
+            
+            kapaliGunler[date] = note;
+            listeleKapaliGunler();
+            
+            // Temizle
+            fpYeniGun.clear();
+            document.getElementById('ayar-yeni-gun-not').value = '';
+        }
+
+        /**
+         * Kapalı gün sil
+         */
+        function kapaliGunSil(date) {
+            delete kapaliGunler[date];
+            listeleKapaliGunler();
         }
 
         /**
@@ -1190,26 +1367,20 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                 const formData = new FormData();
                 formData.append('action', 'settings_save');
                 formData.append('kapasite', document.getElementById('ayar-kapasite').value);
-                
-                const seciliGunler = fpAyarlar.selectedDates.map(date => {
-                    return date.getFullYear() + "-" + 
-                           String(date.getMonth() + 1).padStart(2, '0') + "-" + 
-                           String(date.getDate()).padStart(2, '0');
-                });
-                formData.append('kapali_gunler', JSON.stringify(seciliGunler));
+                formData.append('kapali_gunler', JSON.stringify(kapaliGunler));
                 formData.append('csrf_token', csrfToken);
                 
                 const res = await fetch('api.php', { method: 'POST', body: formData });
                 const json = await res.json();
                 
                 if (json.success) {
-                    toastGoster(json.message, 'success');
+                    showToast(json.message, 'success');
                     kapatModal('ayarlarModal');
                 } else {
-                    toastGoster(json.message, 'error');
+                    showToast(json.message, 'error');
                 }
             } catch(err) {
-                toastGoster('Bağlantı hatası.', 'error');
+                showToast('Bağlantı hatası.', 'error');
             }
             btn.disabled = false;
             btn.textContent = "Ayarları Kaydet";
@@ -1218,7 +1389,7 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
         /**
          * Toast mesajı göster
          */
-        function toastGoster(mesaj, tip) {
+        function showToast(mesaj, tip) {
             const toast = document.getElementById('toast');
             toast.textContent = mesaj;
             toast.className = `toast toast-${tip} show`;
@@ -1226,6 +1397,114 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                 toast.classList.remove('show');
             }, 3000);
         }
+        /**
+         * Mail Gönder Modalını Aç
+         */
+        async function mailGonderAc() {
+            acModal('mailGonderModal');
+            const listContainer = document.getElementById('customerEmailList');
+            listContainer.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--muted);">Yükleniyor...</div>';
+            
+            try {
+                const response = await fetch('api.php?action=get_emails');
+                const result = await response.json();
+                
+                if (result.success) {
+                    if (result.data.length === 0) {
+                        listContainer.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--muted);">Kayıtlı e-posta adresi bulunamadı.</div>';
+                        return;
+                    }
+                    
+                    let html = '';
+                    result.data.forEach((item, index) => {
+                        html += `
+                            <div class="email-item" data-search="${item.ad_soyad.toLowerCase()} ${item.email.toLowerCase()}">
+                                <input type="checkbox" name="emails[]" value="${item.email}" id="em_${index}">
+                                <label for="em_${index}"><strong>${item.ad_soyad}</strong> (${item.email})</label>
+                            </div>
+                        `;
+                    });
+                    listContainer.innerHTML = html;
+                } else {
+                    showToast(result.message, 'error');
+                }
+            } catch (error) {
+                showToast('Mailler yüklenirken bir hata oluştu.', 'error');
+            }
+        }
+
+        /**
+         * Mailleri Listede Filtrele
+         */
+        function filtreleMailler() {
+            const search = document.getElementById('emailSearch').value.toLowerCase();
+            const items = document.querySelectorAll('.email-item');
+            items.forEach(item => {
+                const text = item.getAttribute('data-search');
+                if (text.includes(search)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        /**
+         * Tümünü Seç/Kaldır
+         */
+        function toggleSelectAll(source) {
+            const checkboxes = document.querySelectorAll('#customerEmailList input[type="checkbox"]');
+            checkboxes.forEach(cb => {
+                if (cb.parentElement.style.display !== 'none') {
+                    cb.checked = source.checked;
+                }
+            });
+        }
+
+        /**
+         * Mail Gönder Form İşlemi
+         */
+        document.getElementById('mailGonderForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const selectedEmails = Array.from(document.querySelectorAll('input[name="emails[]"]:checked')).map(cb => cb.value);
+            if (selectedEmails.length === 0) {
+                showToast('Lütfen en az bir alıcı seçin.', 'error');
+                return;
+            }
+            
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerText;
+            submitBtn.disabled = true;
+            submitBtn.innerText = 'Gönderiliyor...';
+            
+            const formData = new FormData(this);
+            formData.append('action', 'send_bulk_email');
+            // Checkbox'ları elle ekliyoruz çünkü normal FormData ile alması zor olabilir (seçilenleri array yapıyoruz)
+            formData.delete('emails[]');
+            selectedEmails.forEach(email => formData.append('emails[]', email));
+            
+            try {
+                const response = await fetch('api.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    showToast(result.message, 'success');
+                    kapatModal('mailGonderModal');
+                    this.reset();
+                } else {
+                    showToast(result.message, 'error');
+                }
+            } catch (error) {
+                showToast('Bir hata oluştu.', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = originalText;
+            }
+        });
     </script>
 </body>
 </html>

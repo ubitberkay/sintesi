@@ -16,16 +16,30 @@ try {
     $kapali_gunler = [];
     
     // Ayarları çek
-    $stmt = $pdo->prepare("SELECT ayar_anahtari, ayar_degeri FROM ayarlar");
-    $stmt->execute();
-    $ayarlar = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
-    
-    if (isset($ayarlar['kapasite'])) {
-        $kapasite = (int)$ayarlar['kapasite'];
-    }
-    
-    if (isset($ayarlar['kapali_gunler'])) {
-        $kapali_gunler = json_decode($ayarlar['kapali_gunler'], true) ?: [];
+    try {
+        // Tablonun varlığından emin ol
+        if (local_mi()) {
+            $pdo->exec("CREATE TABLE IF NOT EXISTS ayarlar (ayar_anahtari TEXT PRIMARY KEY, ayar_degeri TEXT)");
+        } else {
+            $pdo->exec("CREATE TABLE IF NOT EXISTS ayarlar (ayar_anahtari VARCHAR(50) PRIMARY KEY, ayar_degeri TEXT) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+        }
+
+        $stmt = $pdo->prepare("SELECT ayar_anahtari, ayar_degeri FROM ayarlar");
+        $stmt->execute();
+        $ayarlar = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+        
+        if (isset($ayarlar['kapasite'])) {
+            $kapasite = (int)$ayarlar['kapasite'];
+        }
+        
+        if (isset($ayarlar['kapali_gunler'])) {
+            $kapali_gunler = json_decode($ayarlar['kapali_gunler'], true) ?: new stdClass();
+        } else {
+            $kapali_gunler = new stdClass();
+        }
+    } catch (Exception $e) {
+        // Hata durumunda varsayılanlar kullanılır
+        $kapali_gunler = new stdClass();
     }
     
     echo json_encode([

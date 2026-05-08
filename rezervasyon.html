@@ -62,42 +62,45 @@
             position: fixed;
             top: 0;
             width: 100%;
-            padding: 1.2rem 5%;
+            padding: 2rem 5%;
             display: flex;
             justify-content: space-between;
             align-items: center;
             z-index: 1000;
-            transition: all 0.4s ease;
-            background: rgba(12, 12, 12, 0.95);
-            backdrop-filter: blur(10px);
+            transition: background-color 0.4s ease, padding 0.4s ease;
+            background-color: rgba(12, 12, 12, 0.95);
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .logo {
             font-family: var(--font-heading);
-            font-size: 1.5rem;
-            color: var(--color-accent);
-            text-decoration: none;
-            letter-spacing: 3px;
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--color-text);
+            letter-spacing: 4px;
+            text-transform: uppercase;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 15px;
+            text-decoration: none;
         }
 
         .logo img {
-            height: 40px;
+            height: 1.2em;
+            width: auto;
+            object-fit: contain;
         }
 
         nav ul {
             display: flex;
             list-style: none;
-            gap: 2rem;
+            gap: 3rem;
         }
 
         .nav-link {
             color: var(--color-text-muted);
             text-decoration: none;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             text-transform: uppercase;
             letter-spacing: 2px;
             transition: color 0.3s ease;
@@ -434,7 +437,8 @@
     <section id="rezervasyon">
         <span class="section-subtitle">Planlamanızı Yapın</span>
         <h2>Masanızı Ayırın</h2>
-        <p id="kapasite-notu" style="color: var(--color-text-muted); font-size: 0.9rem; margin-top: -0.5rem; margin-bottom: 2rem;">
+        <p id="kapasite-notu"
+            style="color: var(--color-text-muted); font-size: 0.9rem; margin-top: -0.5rem; margin-bottom: 2rem;">
             * Her saat dilimi için maksimum 16 kişilik kapasitemiz bulunmaktadır.
         </p>
 
@@ -552,8 +556,12 @@
 
     <footer>
         <div style="margin-bottom: 1rem;">
-            <a href="https://www.instagram.com/sintesirestaurant/" target="_blank" rel="noopener noreferrer" style="color: var(--color-text-muted); transition: color 0.3s ease;" onmouseover="this.style.color='var(--color-accent)'" onmouseout="this.style.color='var(--color-text-muted)'" title="Instagram">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <a href="https://www.instagram.com/sintesirestaurant/" target="_blank" rel="noopener noreferrer"
+                style="color: var(--color-text-muted); transition: color 0.3s ease;"
+                onmouseover="this.style.color='var(--color-accent)'"
+                onmouseout="this.style.color='var(--color-text-muted)'" title="Instagram">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
                     <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
                     <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
@@ -572,13 +580,21 @@
             navLinks.classList.toggle('active');
         });
 
+        // Resize kontrolü: Pencere büyütülürse mobil menüyü temizle
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                mobileMenu.classList.remove('active');
+                navLinks.classList.remove('active');
+            }
+        });
+
         const rezForm = document.getElementById('rezervasyonForm');
         const rezMessage = document.getElementById('rez-form-message');
         const rezSubmitBtn = document.getElementById('rezSubmitBtn');
         const rezTarihInput = document.getElementById('rez-tarih');
 
         let maxKapasite = 16;
-        let kapaliGunlerStr = [];
+        let kapaliGunlerStr = {};
         let fp = null;
 
         // Ayarları çek ve takvimi başlat
@@ -587,7 +603,7 @@
             .then(json => {
                 if (json.success) {
                     maxKapasite = json.data.kapasite;
-                    kapaliGunlerStr = json.data.kapali_gunler || [];
+                    kapaliGunlerStr = json.data.kapali_gunler || {};
                     document.getElementById('kapasite-notu').textContent = `* Her saat dilimi için maksimum ${maxKapasite} kişilik kapasitemiz bulunmaktadır.`;
                 }
                 initTakvim();
@@ -605,59 +621,53 @@
                 altFormat: "d F Y, l",
                 minDate: "today",
                 disable: [
-                    function (date) {
-                        return (date.getDay() === 1); // Pazartesi kapalı
-                    },
-                    function (date) {
-                        // Özel/Kapalı gün kontrolü
-                        const dateString = date.getFullYear() + "-" + 
-                            String(date.getMonth() + 1).padStart(2, '0') + "-" + 
-                            String(date.getDate()).padStart(2, '0');
-                        return kapaliGunlerStr.includes(dateString);
-                    }
+                    // Sadece geçmiş tarihleri disable et (minDate zaten yapıyor ama ek güvenlik)
                 ],
                 onChange: function (selectedDates, dateStr, instance) {
-                if (dateStr) {
-                    rezMessage.style.display = 'none';
-                    rezSubmitBtn.disabled = false;
-                    rezSubmitBtn.style.opacity = '1';
+                    if (dateStr) {
+                        rezMessage.style.display = 'none';
+                        rezSubmitBtn.disabled = false;
+                        rezSubmitBtn.style.opacity = '1';
 
-                    if (ozelGunMu(dateStr)) {
-                        rezMessage.style.display = 'block';
-                        rezMessage.style.backgroundColor = 'rgba(234, 179, 8, 0.2)';
-                        rezMessage.style.color = '#eab308';
-                        rezMessage.innerHTML = '<strong>Özel Gün Uyarısı:</strong> 14 Şubat, 8 Mart ve Anneler Günü gibi özel günlerde rezervasyonlar yoğunluk nedeniyle sadece <strong>telefon ile</strong> alınmaktadır. <br><br> Lütfen bize ulaşın: <strong>+90 (216) XXX XX XX</strong>';
-                        rezSubmitBtn.disabled = true;
-                        rezSubmitBtn.style.opacity = '0.5';
-                    } else {
-                        saatleriGuncelle(dateStr);
+                        const date = selectedDates[0];
+                        const isPazartesi = date.getDay() === 1;
+                        
+                        // Kapalı gün kontrolü ve notu al
+                        let kapaliGunNotu = null;
+                        if (kapaliGunlerStr && typeof kapaliGunlerStr === 'object') {
+                            if (dateStr in kapaliGunlerStr) {
+                                kapaliGunNotu = kapaliGunlerStr[dateStr] || true;
+                            }
+                        } else if (Array.isArray(kapaliGunlerStr) && kapaliGunlerStr.includes(dateStr)) {
+                            kapaliGunNotu = true;
+                        }
+
+                        if (isPazartesi) {
+                            rezMessage.style.display = 'block';
+                            rezMessage.style.backgroundColor = 'rgba(239, 68, 68, 0.2)';
+                            rezMessage.style.color = '#ef4444';
+                            rezMessage.innerHTML = '<strong>Restoranımız Kapalı:</strong> Pazartesi günleri restoranımız kapalıdır. Lütfen başka bir gün seçiniz.';
+                            rezSubmitBtn.disabled = true;
+                            rezSubmitBtn.style.opacity = '0.5';
+                        } else if (kapaliGunNotu) {
+                            rezMessage.style.display = 'block';
+                            rezMessage.style.backgroundColor = 'rgba(239, 68, 68, 0.2)';
+                            rezMessage.style.color = '#ef4444';
+                            const mesaj = (typeof kapaliGunNotu === 'string' && kapaliGunNotu.trim() !== '') 
+                                ? `<strong>Bugün İçin Rezervasyon Kapalıdır:</strong> ${kapaliGunNotu}`
+                                : '<strong>Bugün İçin Rezervasyonumuz Doludur:</strong> Lütfen başka bir tarih seçiniz veya bizimle iletişime geçiniz.';
+                            rezMessage.innerHTML = mesaj;
+                            rezSubmitBtn.disabled = true;
+                            rezSubmitBtn.style.opacity = '0.5';
+                        } else {
+                            saatleriGuncelle(dateStr);
+                        }
                     }
                 }
-            }
-        });
+            });
         }
 
-        function ozelGunMu(tarihStr) {
-            const date = new Date(tarihStr);
-            const ay = date.getMonth() + 1;
-            const gun = date.getDate();
-            const yil = date.getFullYear();
 
-            // 14 Şubat
-            if (ay === 2 && gun === 14) return true;
-            // 8 Mart
-            if (ay === 3 && gun === 8) return true;
-
-            // Anneler Günü (Mayıs'ın 2. Pazarı)
-            if (ay === 5) {
-                const ilkGun = new Date(yil, 4, 1);
-                const ilkPazar = (7 - ilkGun.getDay()) % 7 + 1;
-                const ikinciPazar = ilkPazar + 7;
-                if (gun === ikinciPazar) return true;
-            }
-
-            return false;
-        }
 
         function saatleriGuncelle(secilenTarih) {
             const saatSelect = document.getElementById('rez-saat');
