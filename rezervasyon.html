@@ -66,7 +66,8 @@
             display: flex;
             width: 100%;
             max-width: 1100px;
-            min-height: 650px;
+            height: 700px;
+            /* Sabit yükseklik */
             background: var(--color-surface);
             border-radius: var(--card-radius);
             overflow: hidden;
@@ -124,7 +125,7 @@
         }
 
         .brand-logo {
-            width: 60px;
+            width: 70px;
             height: 60px;
             margin-bottom: 15px;
             border-radius: 50%;
@@ -180,12 +181,21 @@
             padding: 40px;
             display: flex;
             flex-direction: column;
+            height: 100%;
+        }
+
+        #bookingForm {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
         }
 
         .step-container {
             display: flex;
             flex-direction: column;
             height: 100%;
+            min-height: 0;
+            /* Flexbox scroll fix */
         }
 
         .step-header {
@@ -246,7 +256,29 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 40px;
+        }
+
+        .booking-scroll-area {
             flex: 1;
+            overflow-y: auto;
+            padding-right: 10px;
+            margin-right: -10px;
+            min-height: 0;
+            /* ÖNEMLİ: Flex child scroll fix */
+        }
+
+        /* Custom Scrollbar */
+        .booking-scroll-area::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .booking-scroll-area::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .booking-scroll-area::-webkit-scrollbar-thumb {
+            background: var(--color-accent);
+            border-radius: 10px;
         }
 
         /* Takvim */
@@ -493,7 +525,13 @@
 
             .booking-card {
                 flex-direction: column;
+                height: auto;
                 min-height: auto;
+            }
+
+            .booking-scroll-area {
+                overflow: visible;
+                height: auto;
             }
 
             .card-left {
@@ -663,22 +701,24 @@
 
                     <div id="rez-message"></div>
 
-                    <div class="booking-grid">
-                        <!-- Takvim Bölümü -->
-                        <div class="calendar-section">
-                            <p class="section-label">Tarih Seçin</p>
-                            <div id="inline-calendar"></div>
-                            <input type="hidden" name="tarih" id="rez-tarih">
-                        </div>
-
-                        <!-- Saat Bölümü -->
-                        <div class="time-section">
-                            <p class="section-label">Saat Seçin</p>
-                            <div class="time-grid" id="time-slots-container">
-                                <!-- JS ile dolacak -->
-                                <p style="color:#999; font-size:0.9rem;">Lütfen önce bir tarih seçin.</p>
+                    <div class="booking-scroll-area">
+                        <div class="booking-grid">
+                            <!-- Takvim Bölümü -->
+                            <div class="calendar-section">
+                                <p class="section-label">Tarih Seçin</p>
+                                <div id="inline-calendar"></div>
+                                <input type="hidden" name="tarih" id="rez-tarih">
                             </div>
-                            <input type="hidden" name="saat" id="rez-saat">
+
+                            <!-- Saat Bölümü -->
+                            <div class="time-section">
+                                <p class="section-label">Saat Seçin</p>
+                                <div class="time-grid" id="time-slots-container">
+                                    <!-- JS ile dolacak -->
+                                    <p style="color:#999; font-size:0.9rem;">Lütfen önce bir tarih seçin.</p>
+                                </div>
+                                <input type="hidden" name="saat" id="rez-saat">
+                            </div>
                         </div>
                     </div>
 
@@ -698,23 +738,25 @@
                         </p>
                     </div>
 
-                    <div class="contact-form">
-                        <div class="form-group">
-                            <label>AD SOYAD</label>
-                            <input type="text" name="ad_soyad" id="rez-ad" placeholder="Adınız Soyadınız" required>
-                        </div>
-                        <div class="form-group">
-                            <label>TELEFON</label>
-                            <input type="tel" name="telefon" id="rez-telefon" placeholder="05XX XXX XX XX" required>
-                        </div>
-                        <div class="form-group full-width">
-                            <label>E-POSTA (OPSİYONEL)</label>
-                            <input type="email" name="email" id="rez-email" placeholder="orn@mail.com">
-                        </div>
-                        <div class="form-group full-width">
-                            <label>ÖZEL NOT (OPSİYONEL)</label>
-                            <textarea name="ozel_istekler" id="rez-ozel" rows="3"
-                                placeholder="Alerji, kutlama veya masa tercihi..."></textarea>
+                    <div class="booking-scroll-area">
+                        <div class="contact-form">
+                            <div class="form-group">
+                                <label>AD SOYAD</label>
+                                <input type="text" name="ad_soyad" id="rez-ad" placeholder="Adınız Soyadınız" required>
+                            </div>
+                            <div class="form-group">
+                                <label>TELEFON</label>
+                                <input type="tel" name="telefon" id="rez-telefon" placeholder="05XX XXX XX XX" required>
+                            </div>
+                            <div class="form-group full-width">
+                                <label>E-POSTA (OPSİYONEL)</label>
+                                <input type="email" name="email" id="rez-email" placeholder="orn@mail.com">
+                            </div>
+                            <div class="form-group full-width">
+                                <label>ÖZEL NOT (OPSİYONEL)</label>
+                                <textarea name="ozel_istekler" id="rez-ozel" rows="3"
+                                    placeholder="Alerji, kutlama veya masa tercihi..."></textarea>
+                            </div>
                         </div>
                     </div>
 
