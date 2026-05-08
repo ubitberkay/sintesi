@@ -56,7 +56,7 @@
             background-image: url('/assets/hero.png');
             background-size: cover;
             background-position: center;
-            filter: blur(8px) brightness(0.3);
+            filter: blur(4px) brightness(0.3);
             z-index: -1;
             transform: scale(1.1);
         }
@@ -79,14 +79,28 @@
         .card-left {
             flex: 0 0 380px;
             position: relative;
-            background-image: url('restaurant_interior_premium_1778251141944.png');
-            background-size: cover;
-            background-position: center;
             padding: 40px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             color: #fff;
+            overflow: hidden;
+        }
+
+        .card-left::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('assets/optimized/galeri9.webp');
+            background-size: cover;
+            background-position: center;
+            filter: blur(2px);
+            transform: scale(1.1);
+            /* Kenarlardaki beyazlığı önlemek için */
+            z-index: 0;
         }
 
         .card-left::after {
@@ -96,7 +110,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.8) 100%);
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.8) 100%);
             z-index: 1;
         }
 
@@ -605,10 +619,6 @@
                         <p>+90 (216) XXX XX XX</p>
                     </div>
                     <div class="contact-item">
-                        <span>🌐</span>
-                        <p>sintesi.com.tr</p>
-                    </div>
-                    <div class="contact-item">
                         <span>🕒</span>
                         <p>Her Gün: 15:00 - 00:00</p>
                     </div>
@@ -763,7 +773,7 @@
 
             let note = null;
             if (kapaliGunler[dateStr]) note = kapaliGunler[dateStr];
-            
+
             if (note) {
                 showMsg(typeof note === 'string' ? note : 'Bu tarih rezervasyona kapalıdır.', 'error');
                 return true;
@@ -838,7 +848,7 @@
             el.classList.add('selected');
             selectedTime = time;
             document.getElementById('rez-saat').value = time;
-            
+
             // Kişi sayısını müsaitliğe göre sınırla
             maxPersonForSlot = Math.min(20, remaining);
             if (personCount > maxPersonForSlot) {
@@ -846,7 +856,7 @@
                 document.getElementById('person-count-display').textContent = personCount;
                 document.getElementById('rez-kisi').value = personCount;
             }
-            
+
             updateButtonState();
         }
 
@@ -857,7 +867,7 @@
                 showToast(`Seçilen saat için maksimum ${maxPersonForSlot} kişilik yerimiz mevcuttur.`, 'error');
                 return;
             }
-            
+
             personCount = nextVal;
             document.getElementById('person-count-display').textContent = personCount;
             document.getElementById('rez-kisi').value = personCount;
