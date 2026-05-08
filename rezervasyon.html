@@ -132,6 +132,20 @@
             padding: 5px;
         }
 
+        /* Scroll Reveal Animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .toast-error { background: #ff4444; }
+
         .brand-name {
             font-family: var(--font-heading);
             font-size: 2.5rem;
@@ -599,7 +613,7 @@
 <body>
     <a href="index.html" class="home-link">← Anasayfa</a>
 
-    <div class="booking-card">
+    <div class="booking-card reveal">
         <!-- Sol Panel -->
         <div class="card-left">
             <div class="left-content">
@@ -928,6 +942,17 @@
                 btn.textContent = 'Rezervasyonu Tamamla';
             }
         });
+
+        // Scroll Reveal Observer
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
     </script>
 </body>
 

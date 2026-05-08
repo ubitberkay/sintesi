@@ -250,6 +250,18 @@
             color: var(--color-text-muted);
         }
 
+        /* Scroll Reveal Animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
         .menu-toggle {
             display: none;
             flex-direction: column;
@@ -291,6 +303,84 @@
         .close-modal:hover { transform: scale(1.2); color: var(--color-accent); }
         
         .hero-image { cursor: pointer; position: relative; }
+
+        /* Inquiry Modal */
+        .modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: var(--color-surface);
+            width: 100%;
+            max-width: 650px;
+            padding: 45px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            animation: modalFadeUp 0.4s ease;
+        }
+        @keyframes modalFadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .close-form {
+            position: absolute;
+            top: 25px; right: 25px;
+            font-size: 2rem; color: #fff; cursor: pointer;
+            transition: 0.3s;
+        }
+        .close-form:hover { color: var(--color-accent); }
+        
+        .modal-title { font-size: 2.2rem; color: var(--color-accent); margin-bottom: 2rem; text-align: center; }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+        .form-group label { font-size: 0.75rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+        .form-group input, .form-group select, .form-group textarea {
+            padding: 14px; background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #fff; border-radius: 8px; font-family: inherit; font-size: 0.95rem;
+            transition: 0.3s; outline: none;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            border-color: var(--color-accent);
+            background: rgba(255,255,255,0.06);
+        }
+        .full-width { grid-column: 1 / -1; }
+        
+        .btn-submit {
+            width: 100%;
+            padding: 16px;
+            background: var(--color-accent);
+            color: #fff; border: none; border-radius: 8px;
+            font-size: 1rem; font-weight: 600; cursor: pointer;
+            text-transform: uppercase; letter-spacing: 2px;
+            margin-top: 25px; transition: 0.3s;
+        }
+        .btn-submit:hover { background: #b54d33; transform: translateY(-2px); }
+        .btn-submit:disabled { background: #555; cursor: not-allowed; }
+
+        /* Toast Notifications */
+        .toast {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            padding: 15px 30px; border-radius: 50px; color: #fff; font-weight: 500;
+            z-index: 10001; opacity: 0; pointer-events: none; transition: 0.3s;
+        }
+        .toast.show { opacity: 1; bottom: 50px; }
+        .toast-success { background: #28a745; }
+        .toast-error { background: #dc3545; }
 
         @media (max-width: 992px) {
             #catering-hero {
@@ -360,7 +450,7 @@
     </header>
 
     <div class="container">
-        <section id="catering-hero">
+        <section id="catering-hero" class="reveal">
             <div class="hero-text">
                 <span class="section-subtitle">Sintesi Caterıng</span>
                 <h2>Özel Anlarınıza Şef Dokunuşu</h2>
@@ -374,7 +464,7 @@
         </section>
     </div>
 
-    <section id="catering-services">
+    <section id="catering-services" class="reveal">
         <div class="container">
             <span class="section-subtitle">Hizmetlerimiz</span>
             <h2>Size Özel Çözümler</h2>
@@ -397,19 +487,73 @@
         </div>
     </section>
 
-    <section id="catering-cta">
+    <section id="catering-cta" class="reveal">
         <div class="container cta-content">
             <h2>Hayalinizdeki Etkinliği Birlikte Planlayalım</h2>
             <p>Size özel menü teklifi ve detaylı bilgi için bizimle iletişime geçin.</p>
-            <a href="index.html#iletisim" class="btn-large">Teklif Alın</a>
+            <button type="button" class="btn-large" onclick="openInquiry()">Teklif Alın</button>
         </div>
     </section>
+
+    <!-- Teklif Formu Modal -->
+    <div class="modal" id="inquiryModal">
+        <div class="modal-content">
+            <span class="close-form" onclick="closeInquiry()">&times;</span>
+            <h2 class="modal-title">Catering Teklif Formu</h2>
+            <form id="cateringForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>AD SOYAD</label>
+                        <input type="text" name="ad_soyad" required placeholder="Adınız Soyadınız">
+                    </div>
+                    <div class="form-group">
+                        <label>TELEFON</label>
+                        <input type="tel" name="telefon" required placeholder="05XX XXX XX XX">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>E-POSTA</label>
+                        <input type="email" name="email" required placeholder="orn@mail.com">
+                    </div>
+                    <div class="form-group">
+                        <label>ETKİNLİK TİPİ</label>
+                        <select name="etkinlik_tipi" required>
+                            <option value="">Seçiniz</option>
+                            <option value="Düğün">Düğün</option>
+                            <option value="Kurumsal">Kurumsal</option>
+                            <option value="Ev Daveti">Ev Daveti</option>
+                            <option value="Doğum Günü">Doğum Günü</option>
+                            <option value="Diğer">Diğer</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>TAHMİNİ KİŞİ SAYISI</label>
+                        <input type="number" name="kisi_sayisi" required placeholder="Örn: 50">
+                    </div>
+                    <div class="form-group">
+                        <label>ETKİNLİK TARİHİ</label>
+                        <input type="date" name="tarih" required>
+                    </div>
+                    <div class="form-group">
+                        <label>LOKASYON</label>
+                        <input type="text" name="lokasyon" required placeholder="Şehir/Semt">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>EK NOTLAR (OPSİYONEL)</label>
+                        <textarea name="notlar" rows="3" placeholder="Özel istekleriniz..."></textarea>
+                    </div>
+                </div>
+                <button type="submit" class="btn-submit" id="catering-submit">Talebi Gönder</button>
+            </form>
+        </div>
+    </div>
 
     <!-- Video Modal -->
     <div class="video-modal" id="videoModal">
         <span class="close-modal">&times;</span>
         <video id="modalVideo" src="./assets/catering.mp4" controls></video>
     </div>
+
+    <div id="toast" class="toast"></div>
 
     <footer>
         <div style="margin-bottom: 1rem;">
@@ -465,6 +609,60 @@
         modal.addEventListener('click', (e) => {
             if (e.target === modal) {
                 closeModal.click();
+            }
+        });
+
+        // Scroll Reveal Observer
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+        // Catering Inquiry Logic
+        const inquiryModal = document.getElementById('inquiryModal');
+        const cateringForm = document.getElementById('cateringForm');
+        const cateringSubmit = document.getElementById('catering-submit');
+        const toast = document.getElementById('toast');
+
+        function openInquiry() { inquiryModal.classList.add('active'); }
+        function closeInquiry() { inquiryModal.classList.remove('active'); }
+
+        function showToast(msg, type = 'success') {
+            toast.textContent = msg;
+            toast.className = `toast show toast-${type}`;
+            setTimeout(() => { toast.className = 'toast'; }, 4000);
+        }
+
+        cateringForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            cateringSubmit.disabled = true;
+            cateringSubmit.textContent = 'Gönderiliyor...';
+
+            try {
+                const formData = new FormData(cateringForm);
+                const res = await fetch('catering_gonder.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                const json = await res.json();
+
+                if (json.success) {
+                    showToast('Talebiniz başarıyla alındı. En kısa sürede sizinle iletişime geçeceğiz.', 'success');
+                    cateringForm.reset();
+                    setTimeout(closeInquiry, 2000);
+                } else {
+                    showToast(json.message || 'Bir hata oluştu.', 'error');
+                }
+            } catch (err) {
+                showToast('Bağlantı hatası oluştu.', 'error');
+            } finally {
+                cateringSubmit.disabled = false;
+                cateringSubmit.textContent = 'Talebi Gönder';
             }
         });
     </script>

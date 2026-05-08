@@ -227,15 +227,20 @@
         }
 
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        /* Scroll Reveal Animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         /* Sections General */
@@ -665,7 +670,7 @@
     </section>
 
     <!-- Hakkımızda -->
-    <section id="hakkimizda">
+    <section id="hakkimizda" class="reveal">
         <div class="about-text">
             <span class="section-subtitle">Hikayemiz</span>
             <h2>Tutkuyla Harmanlanmış Lezzetler</h2>
@@ -683,7 +688,7 @@
     </section>
 
     <!-- Galeri -->
-    <section id="galeri">
+    <section id="galeri" class="reveal">
         <span class="section-subtitle">Atmosfer & Sunum</span>
         <h2>Görsel Bir Şölen</h2>
 
@@ -720,7 +725,7 @@
     </section>
 
     <!-- İletişim -->
-    <section id="iletisim">
+    <section id="iletisim" class="reveal">
         <div class="contact-container">
             <div class="contact-info">
 
@@ -1030,6 +1035,21 @@
                     });
             });
         }
+
+        // Scroll Reveal Observer
+        const observerOptions = {
+            threshold: 0.1
+        };
+
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
     </script>
 </body>
 
