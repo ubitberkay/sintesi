@@ -333,6 +333,7 @@ function silRezervasyonu($pdo) {
  * İstatistikleri getir
  */
 function istatistikler($pdo) {
+    global $local_ortam;
     $bugun = date('Y-m-d');
     $hafta_bas = date('Y-m-d', strtotime('monday this week'));
     $hafta_son = date('Y-m-d', strtotime('sunday this week'));
@@ -356,6 +357,19 @@ function istatistikler($pdo) {
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM rezervasyonlar");
     $stmt->execute();
     $toplam = $stmt->fetchColumn();
+
+    // En popüler saatler (Tüm zamanlar, iptaller hariç)
+    $stmt = $pdo->query("SELECT saat, COUNT(*) as count FROM rezervasyonlar WHERE durum != 'iptal' GROUP BY saat ORDER BY count DESC LIMIT 8");
+    $saat_dagilimi = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Durum dağılımı (Oranlar için)
+    $stmt = $pdo->query("SELECT durum, COUNT(*) as count FROM rezervasyonlar GROUP BY durum");
+    $durum_dagilimi = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+
+    // Aylık Trend (Son 12 ay)
+    $ay_sql = $local_ortam ? "strftime('%Y-%m', tarih)" : "DATE_FORMAT(tarih, '%Y-%m')";
+    $stmt = $pdo->query("SELECT $ay_sql as ay, COUNT(*) as count FROM rezervasyonlar WHERE durum != 'iptal' GROUP BY ay ORDER BY ay DESC LIMIT 12");
+    $aylik_trend = array_reverse($stmt->fetchAll(PDO::FETCH_ASSOC));
     
     echo json_encode([
         'success' => true,
@@ -363,7 +377,10 @@ function istatistikler($pdo) {
             'bugunki' => (int)$bugunki,
             'haftalik' => (int)$haftalik,
             'bekleyen' => (int)$bekleyen,
-            'toplam' => (int)$toplam
+            'toplam' => (int)$toplam,
+            'saat_dagilimi' => $saat_dagilimi,
+            'durum_dagilimi' => $durum_dagilimi,
+            'aylik_trend' => $aylik_trend
         ]
     ]);
 }

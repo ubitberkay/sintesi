@@ -23,6 +23,8 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/tr.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -145,8 +147,41 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             letter-spacing: 1px;
             margin-top: 0.3rem;
         }
-        
-        /* ===== FILTERS ===== */
+
+        /* ===== CHARTS ===== */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+        .chart-card {
+            background: var(--surface);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+        .chart-title {
+            font-size: 0.9rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
         .filters {
             background: var(--surface);
             border-radius: 12px;
@@ -694,17 +729,84 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             border-bottom: 1px solid rgba(255,255,255,0.1);
         }
 
-        @media (max-width: 480px) {
-            .stats-grid { grid-template-columns: 1fr; }
-            .rez-card { grid-template-columns: 1fr; }
+        /* ============================================================ */
+        /* RESPONSIVE DESIGN (MOBİL UYUMLULUK) */
+        /* ============================================================ */
+        
+        @media (max-width: 1024px) {
+            .rez-card {
+                grid-template-columns: 1.5fr 1fr 1fr;
+                gap: 1.2rem;
+            }
+            .rez-special { grid-column: span 3; }
+            .actions { grid-column: span 3; }
+        }
+
+        @media (max-width: 768px) {
+            .admin-header { padding: 0.8rem 1.2rem; }
+            .admin-user-name { display: none; }
+            .admin-main { padding: 1.2rem; }
+            
+            .stats-grid { grid-template-columns: 1fr 1fr; gap: 1rem; }
+            .stat-card { padding: 1.2rem; }
+            .stat-value { font-size: 1.8rem; }
+            
+            .charts-grid { grid-template-columns: 1fr; }
+            
+            .filters { flex-direction: column; align-items: stretch; gap: 1rem; padding: 1.2rem; }
+            .filter-group { width: 100%; }
+            .btn-filtrele { width: 100%; padding: 12px; font-weight: 600; }
+            
             .top-actions {
-                grid-template-columns: 1fr 1fr 1fr;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 0.8rem;
+                width: 100%;
             }
-            .btn-text { display: none; }
             .top-actions .btn-primary, .top-actions .btn-refresh {
-                font-size: 1.2rem;
-                padding: 12px;
+                width: 100%;
+                justify-content: center;
+                padding: 10px;
             }
+            
+            .rez-card {
+                grid-template-columns: 1fr 1fr;
+                padding: 1rem;
+            }
+            .rez-special { grid-column: span 2; }
+            .actions { grid-column: span 2; }
+        }
+
+        @media (max-width: 480px) {
+            .logo-text { display: none; }
+            .header-right { gap: 0.8rem; }
+            
+            .stats-grid { grid-template-columns: 1fr; }
+            
+            .rez-card {
+                grid-template-columns: 1fr;
+                gap: 0.8rem;
+            }
+            .rez-special { grid-column: span 1; }
+            .actions { 
+                grid-column: span 1; 
+                flex-direction: column;
+                align-items: stretch;
+                width: 100%;
+                gap: 6px;
+            }
+            .btn-action { width: 100%; }
+            
+            .modal-content { 
+                width: 95%; 
+                padding: 1.5rem; 
+                margin: 10px;
+                max-height: 90vh;
+                overflow-y: auto;
+            }
+            .chart-container { height: 220px; }
+            
+            .top-actions { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -744,6 +846,34 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                 <div class="stat-icon">📊</div>
                 <div class="stat-value" id="stat-toplam">-</div>
                 <div class="stat-label">Toplam Kayıt</div>
+            </div>
+        </div>
+
+        <!-- Gelişmiş İstatistikler - Grafikler -->
+        <div class="charts-grid">
+            <div class="chart-card">
+                <div class="chart-title">
+                    <span>📈 Aylık Rezervasyon Trendi</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="trendChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-card">
+                <div class="chart-title">
+                    <span>📊 Rezervasyon Durumları</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="statusChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-card" style="grid-column: 1 / -1;">
+                <div class="chart-title">
+                    <span>🕒 En Yoğun Saatler (Popülerlik)</span>
+                </div>
+                <div class="chart-container" style="height: 250px;">
+                    <canvas id="hourChart"></canvas>
+                </div>
             </div>
         </div>
 
@@ -957,6 +1087,7 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
         let currentDeleteId = null;
         let fpBas, fpSon, fpYeniGun;
         let kapaliGunler = {}; // { "2026-05-10": "Not", ... }
+        let charts = {}; // ChartJS örneklerini tutmak için
         const gunIsimleri = {
             "1": "Pazartesi",
             "2": "Salı",
@@ -1060,10 +1191,105 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                     document.getElementById('stat-hafta').textContent = json.data.haftalik;
                     document.getElementById('stat-bekleyen').textContent = json.data.bekleyen;
                     document.getElementById('stat-toplam').textContent = json.data.toplam;
+                    
+                    renderCharts(json.data);
                 }
             } catch (e) {
                 console.error('İstatistik hatası:', e);
             }
+        }
+        /**
+         * Grafikleri Render Et
+         */
+        function renderCharts(data) {
+            Chart.defaults.color = '#a0a0a0';
+            Chart.defaults.font.family = "'Montserrat', sans-serif";
+
+            // 1. Aylık Trend
+            if (charts.trend) charts.trend.destroy();
+            charts.trend = new Chart(document.getElementById('trendChart'), {
+                type: 'line',
+                data: {
+                    labels: data.aylik_trend.map(a => a.ay),
+                    datasets: [{
+                        label: 'Rezervasyon',
+                        data: data.aylik_trend.map(a => a.count),
+                        borderColor: '#9D432C',
+                        backgroundColor: 'rgba(157, 67, 44, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointBackgroundColor: '#9D432C'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // 2. Durum Dağılımı
+            if (charts.status) charts.status.destroy();
+            const statusLabels = {
+                'beklemede': 'Beklemede',
+                'onaylandi': 'Onaylandı',
+                'iptal': 'İptal',
+                'geldi': 'Geldi',
+                'gelmedi': 'Gelmedi'
+            };
+            charts.status = new Chart(document.getElementById('statusChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(data.durum_dagilimi).map(d => statusLabels[d] || d),
+                    datasets: [{
+                        data: Object.values(data.durum_dagilimi),
+                        backgroundColor: ['#eab308', '#22c55e', '#ef4444', '#3b82f6', '#666'],
+                        borderWidth: 0,
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { 
+                            position: 'bottom',
+                            labels: { padding: 20, usePointStyle: true, font: { size: 11 } }
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+
+            // 3. Yoğun Saatler
+            if (charts.hour) charts.hour.destroy();
+            charts.hour = new Chart(document.getElementById('hourChart'), {
+                type: 'bar',
+                data: {
+                    labels: data.saat_dagilimi.map(s => s.saat),
+                    datasets: [{
+                        label: 'Rezervasyon Sayısı',
+                        data: data.saat_dagilimi.map(s => s.count),
+                        backgroundColor: '#9D432C',
+                        borderRadius: 5,
+                        hoverBackgroundColor: '#b85436'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
         }
 
         /**
