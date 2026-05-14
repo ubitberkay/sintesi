@@ -501,64 +501,87 @@
         <div id="lightbox-thumbnails" class="lightbox-thumbnails"></div>
     </div>
 
+    <script src="js/translations.js"></script>
     <script>
-        const mobileMenu = document.getElementById('mobile-menu');
-        const navLinks = document.getElementById('nav-links');
-        mobileMenu.addEventListener('click', () => {
-            mobileMenu.classList.toggle('active');
-            navLinks.classList.toggle('active');
-        });
-
-        // Resize kontrolü: Pencere büyütülürse mobil menüyü temizle
-        window.addEventListener('resize', () => {
-            if (window.innerWidth > 768) {
-                mobileMenu.classList.remove('active');
-                navLinks.classList.remove('active');
-            }
-
-        });
-
-        // Lightbox functionality
+        // Global variables for gallery
+        let galleryImages = [];
+        let currentIndex = 0;
         const lightbox = document.getElementById('lightbox');
         const lightboxImg = document.getElementById('lightbox-img');
-        const closeBtn = document.querySelector('.close-btn');
-        const prevBtn = document.querySelector('.prev-btn');
-        const nextBtn = document.querySelector('.next-btn');
-
-        const galleryImages = Array.from(document.querySelectorAll('.gallery-item img'));
-        let currentIndex = 0;
-
         const lightboxThumbnails = document.getElementById('lightbox-thumbnails');
 
-        if (lightboxThumbnails) {
-            galleryImages.forEach((img, index) => {
-                const thumb = document.createElement('img');
-                thumb.src = img.src;
-                thumb.addEventListener('click', () => {
-                    openLightbox(index);
+        document.addEventListener('DOMContentLoaded', () => {
+            // Mobil Menü
+            const mobileMenu = document.getElementById('mobile-menu');
+            const navLinks = document.getElementById('nav-links');
+            if (mobileMenu) {
+                mobileMenu.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('active');
+                    navLinks.classList.toggle('active');
                 });
-                lightboxThumbnails.appendChild(thumb);
-            });
-        }
+            }
 
-        function updateThumbnails() {
-            if (!lightboxThumbnails) return;
-            const thumbs = lightboxThumbnails.querySelectorAll('img');
-            thumbs.forEach((t, i) => {
-                if (i === currentIndex) {
-                    t.classList.add('active');
-                    t.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-                } else {
-                    t.classList.remove('active');
+            // Scroll Efekti
+            window.addEventListener('scroll', () => {
+                const header = document.getElementById('header');
+                if (header) {
+                    if (window.scrollY > 50) header.classList.add('scrolled');
+                    else header.classList.remove('scrolled');
                 }
             });
+
+            // Dinamik Galeri Yükle
+            loadGallery();
+        });
+
+        async function loadGallery() {
+            const grid = document.querySelector('.gallery-grid');
+            try {
+                const res = await fetch('public_api.php?action=gallery_list');
+                const json = await res.json();
+                
+                if (json.success && json.data.length > 0) {
+                    let html = '';
+                    json.data.forEach(item => {
+                        html += `
+                            <div class="gallery-item">
+                                <img src="${item.resim_yolu}" loading="lazy" alt="${item.aciklama || 'Sintesi Galeri'}">
+                                <div class="gallery-overlay"></div>
+                            </div>
+                        `;
+                    });
+                    grid.innerHTML = html;
+                }
+            } catch (err) {
+                console.error('Galeri yüklenirken hata:', err);
+            }
+            
+            // Re-initialize Lightbox after loading items
+            initLightbox();
+        }
+
+        function initLightbox() {
+            galleryImages = Array.from(document.querySelectorAll('.gallery-item img'));
+            if (lightboxThumbnails) {
+                lightboxThumbnails.innerHTML = '';
+                galleryImages.forEach((img, index) => {
+                    const thumb = document.createElement('img');
+                    thumb.src = img.src;
+                    thumb.addEventListener('click', () => openLightbox(index));
+                    lightboxThumbnails.appendChild(thumb);
+                    
+                    img.parentElement.addEventListener('click', () => openLightbox(index));
+                });
+            }
         }
 
         function openLightbox(index) {
             currentIndex = index;
-            lightboxImg.src = galleryImages[currentIndex].src;
-            lightbox.style.display = 'block';
-            updateThumbnails();
+            if (galleryImages[currentIndex]) {
+                lightboxImg.src = galleryImages[currentIndex].src;
+                lightbox.style.display = 'block';
+                updateThumbnails();
+            }
         }
 
         function closeLightbox() {
@@ -577,24 +600,32 @@
             updateThumbnails();
         }
 
-        galleryImages.forEach((img, index) => {
-            img.parentElement.addEventListener('click', () => {
-                openLightbox(index);
+        function updateThumbnails() {
+            if (!lightboxThumbnails) return;
+            const thumbs = lightboxThumbnails.querySelectorAll('img');
+            thumbs.forEach((t, i) => {
+                if (i === currentIndex) {
+                    t.classList.add('active');
+                    t.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                } else {
+                    t.classList.remove('active');
+                }
             });
-        });
+        }
 
-        closeBtn.addEventListener('click', closeLightbox);
-        nextBtn.addEventListener('click', showNext);
-        prevBtn.addEventListener('click', showPrev);
+        // Event Listeners for Lightbox
+        if (document.querySelector('.close-btn')) document.querySelector('.close-btn').addEventListener('click', closeLightbox);
+        if (document.querySelector('.next-btn')) document.querySelector('.next-btn').addEventListener('click', showNext);
+        if (document.querySelector('.prev-btn')) document.querySelector('.prev-btn').addEventListener('click', showPrev);
 
-        lightbox.addEventListener('click', (e) => {
-            if (e.target === lightbox) {
-                closeLightbox();
-            }
-        });
+        if (lightbox) {
+            lightbox.addEventListener('click', (e) => {
+                if (e.target === lightbox) closeLightbox();
+            });
+        }
 
         document.addEventListener('keydown', (e) => {
-            if (lightbox.style.display === 'block') {
+            if (lightbox && lightbox.style.display === 'block') {
                 if (e.key === 'Escape') closeLightbox();
                 if (e.key === 'ArrowRight') showNext();
                 if (e.key === 'ArrowLeft') showPrev();

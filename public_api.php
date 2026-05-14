@@ -33,6 +33,17 @@ try {
         exit;
     }
 
+    if ($action === 'gallery_list') {
+        $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 0;
+        $sql = "SELECT resim_yolu, aciklama FROM galeri ORDER BY siralama ASC, id DESC";
+        if ($limit > 0) $sql .= " LIMIT " . $limit;
+        
+        $stmt = $pdo->query($sql);
+        $gallery = $stmt->fetchAll();
+        echo json_encode(['success' => true, 'data' => $gallery]);
+        exit;
+    }
+
     // Varsayılan: Ayarları çek
     $kapasite = 16;
     $kapali_gunler = new stdClass();

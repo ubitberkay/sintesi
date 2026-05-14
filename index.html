@@ -866,131 +866,86 @@
     </div>
 
     <!-- JavaScript -->
+    <script src="js/translations.js"></script>
     <script>
-        // Header scroll efekti
-        window.addEventListener('scroll', () => {
-            const header = document.getElementById('header');
-            if (window.scrollY > 50) {
-                header.classList.add('scrolled');
-            } else {
-                header.classList.remove('scrolled');
-            }
-        });
-
-        // Mobil menü toggle
+        // Global variables
+        let galleryImages = [];
+        let currentIndex = 0;
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+        const lightboxThumbnails = document.getElementById('lightbox-thumbnails');
         const mobileMenu = document.getElementById('mobile-menu');
         const navLinks = document.getElementById('nav-links');
 
-        mobileMenu.addEventListener('click', () => {
-            mobileMenu.classList.toggle('active');
-            navLinks.classList.toggle('active');
-        });
-
-        // Resize kontrolü: Pencere büyütülürse mobil menüyü temizle
-        window.addEventListener('resize', () => {
-            if (window.innerWidth > 768) {
-                mobileMenu.classList.remove('active');
-                navLinks.classList.remove('active');
-            }
-        });
-
-        // Menü linklerine tıklandığında mobil menüyü kapatma ve URL hash temizleme
-        const links = document.querySelectorAll('.nav-link');
-        links.forEach(link => {
-            link.addEventListener('click', function (e) {
-                mobileMenu.classList.remove('active');
-                navLinks.classList.remove('active');
-
-                const href = this.getAttribute('href');
-
-                // Eğer link aynı sayfadaki bir # id'ye gidiyorsa
-                if (href.startsWith('#')) {
-                    e.preventDefault(); // URL'ye # eklenmesini engeller
-                    const targetElement = document.querySelector(href);
-                    if (targetElement) {
-                        // Oraya yumuşak bir şekilde kaydır
-                        const offsetTop = targetElement.offsetTop;
-                        window.scrollTo({
-                            top: offsetTop - 80, // header yüksekliği kadar pay bırak (opsiyonel)
-                            behavior: 'smooth'
-                        });
-                    }
-                }
-            });
-        });
-
-        // Eğer kullanıcı başka sayfadan "index.html#iletisim" gibi gelirse URL'yi temizle
-        window.addEventListener('load', () => {
-            if (window.location.hash) {
-                setTimeout(() => {
-                    history.replaceState(null, null, window.location.pathname + window.location.search);
-                }, 100);
-            }
-        });
-
-        // Scroll spy (Aktif menü linkini belirleme)
-        const sections = document.querySelectorAll('section');
-
-        window.addEventListener('scroll', () => {
-            let current = '';
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop;
-                const sectionHeight = section.clientHeight;
-                if (pageYOffset >= (sectionTop - 200)) {
-                    current = section.getAttribute('id');
-                }
+        document.addEventListener('DOMContentLoaded', () => {
+            // Header scroll efekti
+            window.addEventListener('scroll', () => {
+                const header = document.getElementById('header');
+                if (window.scrollY > 50) header.classList.add('scrolled');
+                else header.classList.remove('scrolled');
             });
 
-            links.forEach(link => {
-                link.classList.remove('active');
-                if (link.getAttribute('href').includes(current)) {
-                    link.classList.add('active');
-                }
-            });
-        });
-
-        // Lightbox functionality
-        const lightbox = document.getElementById('lightbox');
-        const lightboxImg = document.getElementById('lightbox-img');
-        const closeBtn = document.querySelector('.close-btn');
-        const prevBtn = document.querySelector('.prev-btn');
-        const nextBtn = document.querySelector('.next-btn');
-
-        const galleryImages = Array.from(document.querySelectorAll('.gallery-item img'));
-        let currentIndex = 0;
-
-        const lightboxThumbnails = document.getElementById('lightbox-thumbnails');
-
-        // Küçük resimleri oluştur
-        if (lightboxThumbnails) {
-            galleryImages.forEach((img, index) => {
-                const thumb = document.createElement('img');
-                thumb.src = img.src;
-                thumb.addEventListener('click', () => {
-                    openLightbox(index);
+            // Mobil menü toggle
+            if (mobileMenu) {
+                mobileMenu.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('active');
+                    navLinks.classList.toggle('active');
                 });
-                lightboxThumbnails.appendChild(thumb);
-            });
+            }
+
+            // Dinamik Galeri Yükle (İlk 6 Resim)
+            loadGallery();
+        });
+
+        async function loadGallery() {
+            const grid = document.querySelector('.gallery-grid');
+            if (!grid) return;
+            
+            try {
+                const res = await fetch('public_api.php?action=gallery_list&limit=6');
+                const json = await res.json();
+                
+                if (json.success && json.data.length > 0) {
+                    let html = '';
+                    json.data.forEach(item => {
+                        html += `
+                            <div class="gallery-item">
+                                <img src="${item.resim_yolu}" loading="lazy" alt="${item.aciklama || 'Sintesi Galeri'}">
+                                <div class="gallery-overlay"></div>
+                            </div>
+                        `;
+                    });
+                    grid.innerHTML = html;
+                }
+            } catch (err) {
+                console.error('Galeri yüklenirken hata:', err);
+            }
+            
+            // Re-initialize Lightbox after loading items
+            initLightbox();
         }
 
-        function updateThumbnails() {
-            if (!lightboxThumbnails) return;
-            const thumbs = lightboxThumbnails.querySelectorAll('img');
-            thumbs.forEach((t, i) => {
-                if (i === currentIndex) {
-                    t.classList.add('active');
-                    t.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-                } else {
-                    t.classList.remove('active');
-                }
-            });
+        function initLightbox() {
+            galleryImages = Array.from(document.querySelectorAll('.gallery-item img'));
+            if (lightboxThumbnails) {
+                lightboxThumbnails.innerHTML = '';
+                galleryImages.forEach((img, index) => {
+                    const thumb = document.createElement('img');
+                    thumb.src = img.src;
+                    thumb.addEventListener('click', () => openLightbox(index));
+                    lightboxThumbnails.appendChild(thumb);
+                    img.parentElement.addEventListener('click', () => openLightbox(index));
+                });
+            }
         }
 
         function openLightbox(index) {
             currentIndex = index;
-            lightboxImg.src = galleryImages[currentIndex].src;
-            lightbox.style.display = 'block';
-            updateThumbnails();
+            if (galleryImages[currentIndex]) {
+                lightboxImg.src = galleryImages[currentIndex].src;
+                lightbox.style.display = 'block';
+                updateThumbnails();
+            }
         }
 
         function closeLightbox() {
@@ -1009,28 +964,59 @@
             updateThumbnails();
         }
 
-        galleryImages.forEach((img, index) => {
-            img.parentElement.addEventListener('click', () => {
-                openLightbox(index);
+        function updateThumbnails() {
+            if (!lightboxThumbnails) return;
+            const thumbs = lightboxThumbnails.querySelectorAll('img');
+            thumbs.forEach((t, i) => {
+                if (i === currentIndex) {
+                    t.classList.add('active');
+                    t.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                } else {
+                    t.classList.remove('active');
+                }
             });
-        });
+        }
 
-        closeBtn.addEventListener('click', closeLightbox);
-        nextBtn.addEventListener('click', showNext);
-        prevBtn.addEventListener('click', showPrev);
+        // Event Listeners for Lightbox
+        if (document.querySelector('.close-btn')) document.querySelector('.close-btn').addEventListener('click', closeLightbox);
+        if (document.querySelector('.next-btn')) document.querySelector('.next-btn').addEventListener('click', showNext);
+        if (document.querySelector('.prev-btn')) document.querySelector('.prev-btn').addEventListener('click', showPrev);
 
-        lightbox.addEventListener('click', (e) => {
-            if (e.target === lightbox) {
-                closeLightbox();
-            }
-        });
+        if (lightbox) {
+            lightbox.addEventListener('click', (e) => {
+                if (e.target === lightbox) closeLightbox();
+            });
+        }
 
         document.addEventListener('keydown', (e) => {
-            if (lightbox.style.display === 'block') {
+            if (lightbox && lightbox.style.display === 'block') {
                 if (e.key === 'Escape') closeLightbox();
                 if (e.key === 'ArrowRight') showNext();
                 if (e.key === 'ArrowLeft') showPrev();
             }
+        });
+
+        // Menü linklerine tıklandığında mobil menüyü kapatma ve yumuşak kaydırma
+        const links = document.querySelectorAll('.nav-link');
+        links.forEach(link => {
+            link.addEventListener('click', function (e) {
+                if (mobileMenu) {
+                    mobileMenu.classList.remove('active');
+                    navLinks.classList.remove('active');
+                }
+
+                const href = this.getAttribute('href');
+                if (href && href.startsWith('#')) {
+                    e.preventDefault();
+                    const targetElement = document.querySelector(href);
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                    }
+                }
+            });
         });
 
         // İletişim Formu AJAX İşlemi
@@ -1041,8 +1027,6 @@
         if (contactForm) {
             contactForm.addEventListener('submit', function (e) {
                 e.preventDefault();
-
-                // E-posta format kontrolü
                 const emailInput = document.getElementById('eposta').value;
                 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 if (!emailRegex.test(emailInput)) {
@@ -1053,57 +1037,37 @@
                     return;
                 }
 
-                // Butonu deaktive et
                 submitBtn.disabled = true;
                 submitBtn.innerText = 'Gönderiliyor...';
-                submitBtn.style.opacity = '0.7';
-
+                
                 const formData = new FormData(this);
-
-                fetch('gonder.php', {
-                    method: 'POST',
-                    body: formData
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        formMessage.style.display = 'block';
-                        formMessage.innerText = data.message;
-
-                        if (data.success) {
-                            formMessage.style.backgroundColor = 'rgba(76, 175, 80, 0.2)';
-                            formMessage.style.color = '#4CAF50';
-                            contactForm.reset();
-                        } else {
-                            formMessage.style.backgroundColor = 'rgba(244, 67, 54, 0.2)';
-                            formMessage.style.color = '#F44336';
-                        }
-                    })
-                    .catch(error => {
-                        formMessage.style.display = 'block';
+                fetch('gonder.php', { method: 'POST', body: formData })
+                .then(res => res.json())
+                .then(data => {
+                    formMessage.style.display = 'block';
+                    formMessage.innerText = data.message;
+                    if (data.success) {
+                        formMessage.style.backgroundColor = 'rgba(76, 175, 80, 0.2)';
+                        formMessage.style.color = '#4CAF50';
+                        contactForm.reset();
+                    } else {
                         formMessage.style.backgroundColor = 'rgba(244, 67, 54, 0.2)';
                         formMessage.style.color = '#F44336';
-                        formMessage.innerText = 'Bir hata oluştu. Lütfen daha sonra tekrar deneyin.';
-                    })
-                    .finally(() => {
-                        submitBtn.disabled = false;
-                        submitBtn.innerText = 'Gönder';
-                        submitBtn.style.opacity = '1';
-                    });
+                    }
+                })
+                .finally(() => {
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = 'Gönder';
+                });
             });
         }
 
         // Scroll Reveal Observer
-        const observerOptions = {
-            threshold: 0.1
-        };
-
         const revealObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('active');
-                }
+                if (entry.isIntersecting) entry.target.classList.add('active');
             });
-        }, observerOptions);
+        }, { threshold: 0.1 });
 
         document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
     </script>

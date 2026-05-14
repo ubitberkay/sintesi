@@ -713,7 +713,75 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             font-size: 0.9rem;
             flex: 1;
         }
-        .email-search {
+
+        /* Galeri Admin Stilleri */
+        #galeri-liste {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            padding: 10px;
+        }
+        .galeri-item-admin {
+            position: relative;
+            background: var(--surface-2);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        .galeri-item-admin:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+        .galeri-item-admin img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            display: block;
+        }
+        .galeri-item-admin .controls {
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0,0,0,0.2);
+            margin-top: auto;
+        }
+        .galeri-item-admin .btn-del {
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 5px;
+            transition: transform 0.2s;
+        }
+        .galeri-item-admin .btn-del:hover {
+            transform: scale(1.2);
+        }
+        .galeri-item-admin .move-btns {
+            display: flex;
+            gap: 8px;
+        }
+        .galeri-item-admin .move-btn {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        .galeri-item-admin .move-btn:hover {
+            background: var(--accent);
+            color: #fff;
+        }search {
             width: 100%;
             padding: 10px;
             background: var(--surface-2);
@@ -954,7 +1022,8 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
              
                 <div class="top-actions">
                     <button class="btn-primary" onclick="acModal('manuelEkleModal')"><span>+</span> <span class="btn-text">Yeni Ekle</span></button>
-                    <button class="btn-primary" onclick="menuYonetimiAc()" style="background:var(--surface-2);border:1px solid rgba(255,255,255,0.1);"><span>📋</span> <span class="btn-text">Menü Yönetimi</span></button>
+                    <button class="btn-primary" onclick="menuYonetimiAc()" style="background:var(--surface-2);border:1px solid rgba(255,255,255,0.1);"><span>🍴</span> <span class="btn-text">Menü</span></button>
+                    <button class="btn-primary" onclick="galeriYonetimiAc()" style="background:var(--surface-2);border:1px solid rgba(255,255,255,0.1);"><span>🖼️</span> <span class="btn-text">Galeri</span></button>
                     <button class="btn-primary" onclick="ayarlariAc()" style="background:var(--surface-2);border:1px solid rgba(255,255,255,0.1);"><span>⚙️</span> <span class="btn-text">Ayarlar</span></button>
                     <button class="btn-primary" onclick="mailGonderAc()" style="background:var(--surface-2);border:1px solid rgba(255,255,255,0.1);"><span>📧</span> <span class="btn-text">Mail Gönder</span></button>
                     <button class="btn-primary" onclick="window.location.href='api.php?action=export_excel'" style="background:var(--surface-2);border:1px solid rgba(255,255,255,0.1);"><span>📊</span> <span class="btn-text">Excel İndir</span></button>
@@ -1137,6 +1206,31 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                     <button type="submit" class="btn-modal btn-primary">Menüleri Kaydet</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Galeri Yönetimi Modal -->
+    <div id="galeriModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 900px;">
+            <h3 class="modal-title">Galeri Yönetimi</h3>
+            
+            <div style="background: rgba(59, 130, 246, 0.05); padding: 15px; border-radius: 10px; border: 1px solid rgba(59, 130, 246, 0.2); margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 10px; font-weight: 500; font-size: 0.9rem;">Yeni Fotoğraf Ekle (Çoklu Seçim Yapılabilir)</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="file" id="galeri-yukle-input" accept="image/*" multiple style="flex: 1; padding: 8px; background: var(--surface-2); border: 1px dashed rgba(255,255,255,0.2); border-radius: 6px;">
+                    <button class="btn-primary" onclick="galeriResimYukle()" id="galeri-yukle-btn">Yükle</button>
+                </div>
+                <small style="color: var(--muted); margin-top: 5px; display: block;">Maksimum 1200px genişliğe düşürülür ve WebP formatına dönüştürülür.</small>
+            </div>
+
+            <div id="galeri-liste" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; max-height: 450px; overflow-y: auto; padding: 5px;">
+                <!-- Galeri öğeleri JS ile gelecek -->
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn-modal btn-cancel" onclick="kapatModal('galeriModal')">Kapat</button>
+                <button type="button" class="btn-modal btn-primary" onclick="galeriSiralamayiKaydet()" id="galeri-sirala-btn">Sıralamayı Kaydet</button>
+            </div>
         </div>
     </div>
 
@@ -1822,6 +1916,148 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             }
             btn.disabled = false;
             btn.textContent = "Ayarları Kaydet";
+        }
+
+        /**
+         * Galeri Yönetimi İşlemleri
+         */
+        let galleryData = [];
+
+        async function galeriYonetimiAc() {
+            acModal('galeriModal');
+            galeriListeleYukle();
+        }
+
+        async function galeriListeleYukle() {
+            const container = document.getElementById('galeri-liste');
+            container.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:20px;">Yükleniyor...</div>';
+            
+            try {
+                const res = await fetch('api.php?action=gallery_list');
+                const json = await res.json();
+                if (json.success) {
+                    galleryData = json.data;
+                    renderGaleri();
+                }
+            } catch(err) {
+                showToast('Galeri listesi alınamadı.', 'error');
+            }
+        }
+
+        function renderGaleri() {
+            const container = document.getElementById('galeri-liste');
+            if (galleryData.length === 0) {
+                container.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:20px; color:var(--muted);">Henüz fotoğraf eklenmedi.</div>';
+                return;
+            }
+
+            container.innerHTML = galleryData.map((item, index) => `
+                <div class="galeri-item-admin" data-id="${item.id}">
+                    <img src="../${item.resim_yolu}" alt="Galeri">
+                    <div class="controls">
+                        <div class="move-btns">
+                            <button class="move-btn" onclick="galeriSirala(${index}, -1)" title="Sola Taşı">←</button>
+                            <button class="move-btn" onclick="galeriSirala(${index}, 1)" title="Sağa Taşı">→</button>
+                        </div>
+                        <span class="btn-del" onclick="galeriResimSil(${item.id})" title="Sil">🗑</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function galeriSirala(index, direction) {
+            const newIndex = index + direction;
+            if (newIndex >= 0 && newIndex < galleryData.length) {
+                const item = galleryData.splice(index, 1)[0];
+                galleryData.splice(newIndex, 0, item);
+                renderGaleri();
+            }
+        }
+
+        async function galeriSiralamayiKaydet() {
+            const btn = document.getElementById('galeri-sirala-btn');
+            btn.disabled = true;
+            btn.textContent = "Kaydediliyor...";
+
+            const order = galleryData.map(item => item.id);
+            const formData = new FormData();
+            formData.append('order', JSON.stringify(order));
+            formData.append('csrf_token', csrfToken);
+
+            try {
+                const res = await fetch('api.php?action=gallery_reorder', { method: 'POST', body: formData });
+                const json = await res.json();
+                if (json.success) {
+                    showToast(json.message, 'success');
+                }
+            } catch(err) {
+                showToast('Sıralama kaydedilemedi.', 'error');
+            }
+            btn.disabled = false;
+            btn.textContent = "Sıralamayı Kaydet";
+        }
+
+        async function galeriResimYukle() {
+            const input = document.getElementById('galeri-yukle-input');
+            const btn = document.getElementById('galeri-yukle-btn');
+            
+            if (!input.files.length) {
+                showToast('Lütfen en az bir resim seçin.', 'error');
+                return;
+            }
+
+            btn.disabled = true;
+            const files = Array.from(input.files);
+            let successCount = 0;
+            let errorCount = 0;
+
+            for (let i = 0; i < files.length; i++) {
+                btn.textContent = `Yükleniyor (${i+1}/${files.length})...`;
+                
+                const formData = new FormData();
+                formData.append('image', files[i]);
+                formData.append('csrf_token', csrfToken);
+
+                try {
+                    const res = await fetch('api.php?action=gallery_upload', { method: 'POST', body: formData });
+                    const json = await res.json();
+                    if (json.success) successCount++;
+                    else errorCount++;
+                } catch(err) {
+                    errorCount++;
+                }
+            }
+
+            if (successCount > 0) {
+                showToast(`${successCount} resim başarıyla yüklendi.`, 'success');
+                input.value = '';
+                galeriListeleYukle();
+            }
+            if (errorCount > 0) {
+                showToast(`${errorCount} resim yüklenemedi.`, 'error');
+            }
+
+            btn.disabled = false;
+            btn.textContent = "Yükle";
+        }
+
+        async function galeriResimSil(id) {
+            if (!confirm('Bu resmi galeriden silmek istediğinize emin misiniz?')) return;
+
+            const formData = new FormData();
+            formData.append('id', id);
+            formData.append('csrf_token', csrfToken);
+
+            try {
+                const res = await fetch('api.php?action=gallery_delete', { method: 'POST', body: formData });
+                const json = await res.json();
+                if (json.success) {
+                    showToast(json.message, 'success');
+                    galeriListeleYukle();
+                }
+            } catch(err) {
+                showToast('Silme işlemi başarısız.', 'error');
+            }
         }
 
         /**
