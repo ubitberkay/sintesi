@@ -44,6 +44,24 @@ try {
         exit;
     }
 
+    if ($action === 'menu_list') {
+        $type = $_GET['type'] ?? 'food';
+        
+        // Kategorileri çek
+        $stmt = $pdo->prepare("SELECT * FROM menu_categories WHERE type = ? ORDER BY order_num ASC");
+        $stmt->execute([$type]);
+        $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        foreach ($categories as &$cat) {
+            $stmt = $pdo->prepare("SELECT * FROM menu_items WHERE category_id = ? AND status = 1 ORDER BY order_num ASC");
+            $stmt->execute([$cat['id']]);
+            $cat['items'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+        
+        echo json_encode(['success' => true, 'data' => $categories]);
+        exit;
+    }
+
     // Varsayılan: Ayarları çek
     $kapasite = 16;
     $kapali_gunler = new stdClass();

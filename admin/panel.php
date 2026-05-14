@@ -420,6 +420,48 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
+
+        /* DİJİTAL MENÜ STİLLERİ */
+        .category-card {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.05);
+            margin-bottom: 2rem;
+        }
+        .category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .category-title-admin {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.6rem;
+            color: var(--accent);
+        }
+        .category-actions { display: flex; gap: 10px; }
+        
+        .item-list { display: flex; flex-direction: column; }
+        .item-row {
+            display: grid;
+            grid-template-columns: 2fr 3fr 100px 150px;
+            gap: 1.5rem;
+            padding: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            align-items: center;
+        }
+        .item-row:hover { background: rgba(255,255,255,0.02); }
+        .item-name-admin { font-weight: 500; font-size: 0.95rem; }
+        .item-desc-admin { font-size: 0.8rem; color: var(--muted); font-style: italic; }
+        .item-price-admin { color: var(--accent); font-weight: 600; text-align: right; }
+        
+        @media (max-width: 768px) {
+            .item-row { grid-template-columns: 1fr; gap: 0.5rem; text-align: left; }
+            .item-price-admin { text-align: left; }
+        }
         
         /* Boş durum */
         .empty-state {
@@ -1118,8 +1160,8 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             <div class="nav-item" onclick="switchView('gallery', this)">
                 <span>🖼️</span> Galeri Yönetimi
             </div>
-            <div class="nav-item" onclick="switchView('menu', this)">
-                <span>🍴</span> Menü Yönetimi
+            <div class="nav-item" onclick="switchView('digital-menu', this)">
+                <span>🍴</span> Dijital Menü Listesi
             </div>
             <div class="nav-item" onclick="switchView('settings', this)">
                 <span>⚙️</span> Ayarlar
@@ -1268,51 +1310,28 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             </div>
         </section>
 
-        <!-- MENU VIEW -->
-        <section id="view-menu" class="view-section">
+
+        <!-- DIGITAL MENU VIEW -->
+        <section id="view-digital-menu" class="view-section">
             <div class="content-header">
                 <div class="page-title">
-                    <h1>Menü Yönetimi</h1>
-                    <p>Menü linklerini (PDF/Link) güncelleyin</p>
+                    <h1>Dijital Menü Yönetimi</h1>
+                    <p>Yemek ve Alkol menüsündeki ürünleri yönetin (TR / EN)</p>
+                </div>
+                <div class="top-actions">
+                    <div class="filter-group">
+                        <select id="digital-menu-type" onchange="loadDigitalMenu()">
+                            <option value="food">🍴 Yemek Menüsü</option>
+                            <option value="alcohol">🍷 Alkol Menüsü</option>
+                        </select>
+                    </div>
+                    <button class="btn-primary" onclick="openCategoryModal()">+ Yeni Kategori Ekle</button>
                 </div>
             </div>
-            
-            <div class="glass-card">
-                <form id="menuFormMain" onsubmit="menuKaydetMain(event)" enctype="multipart/form-data">
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
-                        <!-- Türkçe Menüler -->
-                        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-                            <h3 style="font-family: 'Cormorant Garamond'; color: var(--accent); font-size: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px;">🇹🇷 Türkçe Menüler</h3>
-                            <div class="filter-group">
-                                <label>Yemek Menüsü (PDF)</label>
-                                <div id="current-menu-yemek-tr-main" style="font-size: 0.75rem; color: var(--muted); margin-bottom: 5px;"></div>
-                                <input type="file" name="menu_yemek" id="menu-yemek-tr-main" accept=".pdf">
-                            </div>
-                            <div class="filter-group">
-                                <label>Alkol Menüsü (PDF)</label>
-                                <div id="current-menu-alkol-tr-main" style="font-size: 0.75rem; color: var(--muted); margin-bottom: 5px;"></div>
-                                <input type="file" name="menu_alkol" id="menu-alkol-tr-main" accept=".pdf">
-                            </div>
-                        </div>
-                        <!-- İngilizce Menüler -->
-                        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-                            <h3 style="font-family: 'Cormorant Garamond'; color: var(--accent); font-size: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px;">🇬🇧 English Menus</h3>
-                            <div class="filter-group">
-                                <label>Food Menu (PDF)</label>
-                                <div id="current-menu-yemek-en-main" style="font-size: 0.75rem; color: var(--muted); margin-bottom: 5px;"></div>
-                                <input type="file" name="menu_yemek_en" id="menu-yemek-en-main" accept=".pdf">
-                            </div>
-                            <div class="filter-group">
-                                <label>Alcohol Menu (PDF)</label>
-                                <div id="current-menu-alkol-en-main" style="font-size: 0.75rem; color: var(--muted); margin-bottom: 5px;"></div>
-                                <input type="file" name="menu_alkol_en" id="menu-alkol-en-main" accept=".pdf">
-                            </div>
-                        </div>
-                    </div>
-                    <div style="margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1.5rem; display: flex; justify-content: flex-end;">
-                        <button type="submit" id="menu-submit-btn-main" class="btn-primary">💾 Değişiklikleri Yükle ve Kaydet</button>
-                    </div>
-                </form>
+
+            <div id="digital-menu-container" style="display: flex; flex-direction: column; gap: 2rem;">
+                <!-- Kategoriler ve Ürünler Buraya Gelecek -->
+                <div class="loading">Menü yükleniyor...</div>
             </div>
         </section>
 
@@ -1631,7 +1650,6 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             if (viewId === 'dashboard') yukleIstatistikler();
             if (viewId === 'reservations') yukleRezervasyonlar();
             if (viewId === 'gallery') galeriListeleYukleMain();
-            if (viewId === 'menu') menuYonetimiAcMain();
             if (viewId === 'settings') ayarlariAcMain();
             if (viewId === 'bulk-mail') mailGonderYukle();
         }
@@ -2729,57 +2747,6 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             btn.disabled = false;
         }
 
-        /**
-         * Menü Yönetimi Ana Görünüm
-         */
-        async function menuYonetimiAcMain() {
-            try {
-                const res = await fetch('api.php?action=settings_get');
-                const json = await res.json();
-                if (json.success) {
-                    const data = json.data;
-                    document.getElementById('current-menu-yemek-tr-main').textContent = data.menu_yemek ? 'Mevcut: ' + data.menu_yemek.split('/').pop() : 'Yüklü değil';
-                    document.getElementById('current-menu-alkol-tr-main').textContent = data.menu_alkol ? 'Mevcut: ' + data.menu_alkol.split('/').pop() : 'Yüklü değil';
-
-                    
-                    document.getElementById('current-menu-yemek-en-main').textContent = data.menu_yemek_en ? 'Mevcut: ' + data.menu_yemek_en.split('/').pop() : 'Yüklü değil';
-                    document.getElementById('current-menu-alkol-en-main').textContent = data.menu_alkol_en ? 'Mevcut: ' + data.menu_alkol_en.split('/').pop() : 'Yüklü değil';
-
-                    
-                    // Inputları temizle
-                    ['yemek', 'alkol'].forEach(t => {
-                        document.getElementById(`menu-${t}-tr-main`).value = '';
-                        document.getElementById(`menu-${t}-en-main`).value = '';
-                    });
-                }
-            } catch(e) {}
-        }
-
-        async function menuKaydetMain(e) {
-            e.preventDefault();
-            const btn = document.getElementById('menu-submit-btn-main');
-            btn.disabled = true;
-            btn.textContent = "Kaydediliyor...";
-
-            const formData = new FormData(e.target);
-            formData.append('action', 'settings_save');
-            formData.append('csrf_token', csrfToken);
-            
-            try {
-                const res = await fetch('api.php', { method: 'POST', body: formData });
-                const json = await res.json();
-                if (json.success) {
-                    showToast('Menüler başarıyla güncellendi.', 'success');
-                    menuYonetimiAcMain(); // İsimleri güncelle
-                } else {
-                    showToast(json.message || 'Hata oluştu.', 'error');
-                }
-            } catch(e) {
-                showToast('Bağlantı hatası.', 'error');
-            }
-            btn.disabled = false;
-            btn.textContent = "💾 Değişiklikleri Yükle ve Kaydet";
-        }
 
         /**
          * Ayarlar Ana Görünüm
@@ -2905,6 +2872,223 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                 if (window.innerWidth <= 768) toggleSidebar();
             });
         });
+
+        // ===== DİJİTAL MENÜ YÖNETİMİ JS =====
+        let digitalMenuData = [];
+
+        async function loadDigitalMenu() {
+            const type = document.getElementById('digital-menu-type').value;
+            const container = document.getElementById('digital-menu-container');
+            container.innerHTML = '<div class="loading">Menü yükleniyor...</div>';
+
+            try {
+                const res = await fetch(`api.php?action=menu_list&type=${type}`);
+                const json = await res.json();
+                
+                if (json.success) {
+                    digitalMenuData = json.data;
+                    renderDigitalMenu();
+                }
+            } catch (err) {
+                showToast('Hata: ' + err.message, 'error');
+            }
+        }
+
+        function renderDigitalMenu() {
+            const container = document.getElementById('digital-menu-container');
+            if (digitalMenuData.length === 0) {
+                container.innerHTML = '<div class="empty-state">Bu menü tipinde henüz kategori eklenmemiş.</div>';
+                return;
+            }
+
+            container.innerHTML = digitalMenuData.map(cat => `
+                <div class="category-card" data-id="${cat.id}">
+                    <div class="category-header">
+                        <div class="category-title-admin">
+                            ${cat.name_tr} <span style="font-size: 0.9rem; color: var(--muted); opacity: 0.6; margin-left: 10px;">| ${cat.name_en}</span>
+                        </div>
+                        <div class="category-actions">
+                            <button class="btn-action" onclick="openItemModal(0, ${cat.id})">➕ Ürün Ekle</button>
+                            <button class="btn-action" onclick="openCategoryModal(${cat.id}, '${cat.name_tr}', '${cat.name_en}')">✏️ Düzenle</button>
+                            <button class="btn-action" style="color: var(--danger)" onclick="deleteCategory(${cat.id})">🗑️ Sil</button>
+                        </div>
+                    </div>
+                    <div class="item-list">
+                        ${cat.items.length === 0 ? '<div style="padding: 15px; color: var(--muted); font-size: 0.85rem;">Henüz ürün eklenmemiş.</div>' : 
+                          cat.items.map(item => `
+                            <div class="item-row" data-id="${item.id}">
+                                <div>
+                                    <div class="item-name-admin">${item.name_tr}</div>
+                                    <div class="item-desc-admin">${item.description_tr || ''}</div>
+                                </div>
+                                <div>
+                                    <div class="item-name-admin" style="opacity: 0.7;">${item.name_en}</div>
+                                    <div class="item-desc-admin">${item.description_en || ''}</div>
+                                </div>
+                                <div class="item-price-admin">${item.price || '-'}</div>
+                                <div class="actions">
+                                    <button class="btn-action" onclick="openItemModal(${item.id}, ${cat.id}, '${item.name_tr.replace(/'/g, "\\'")}', '${item.name_en.replace(/'/g, "\\'")}', '${(item.description_tr||'').replace(/'/g, "\\'")}', '${(item.description_en||'').replace(/'/g, "\\'")}', '${item.price}')">✏️</button>
+                                    <button class="btn-action" style="color: var(--danger)" onclick="deleteItem(${item.id})">🗑️</button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openCategoryModal(id = 0, nameTr = '', nameEn = '') {
+            document.getElementById('cat-id').value = id;
+            document.getElementById('cat-name-tr').value = nameTr;
+            document.getElementById('cat-name-en').value = nameEn;
+            document.getElementById('cat-modal-title').textContent = id > 0 ? 'Kategoriyi Düzenle' : 'Yeni Kategori Ekle';
+            acModal('modal-digital-category');
+        }
+
+        async function saveCategory(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            formData.append('type', document.getElementById('digital-menu-type').value);
+            formData.append('csrf_token', csrfToken);
+            formData.append('action', 'menu_category_save');
+
+            const res = await fetch('api.php', { method: 'POST', body: formData });
+            const json = await res.json();
+            if (json.success) {
+                kapatModal('modal-digital-category');
+                loadDigitalMenu();
+                showToast(json.message, 'success');
+            }
+        }
+
+        async function deleteCategory(id) {
+            if (!confirm('Bu kategoriyi ve içindeki TÜM ürünleri silmek istediğinize emin misiniz?')) return;
+            const formData = new FormData();
+            formData.append('id', id);
+            formData.append('action', 'menu_category_delete');
+            formData.append('csrf_token', csrfToken);
+
+            const res = await fetch('api.php', { method: 'POST', body: formData });
+            const json = await res.json();
+            if (json.success) {
+                loadDigitalMenu();
+                showToast(json.message, 'success');
+            }
+        }
+
+        function openItemModal(id = 0, catId = 0, nameTr = '', nameEn = '', descTr = '', descEn = '', price = '') {
+            document.getElementById('item-id').value = id;
+            document.getElementById('item-cat-id').value = catId;
+            document.getElementById('item-name-tr').value = nameTr;
+            document.getElementById('item-name-en').value = nameEn;
+            document.getElementById('item-desc-tr').value = descTr;
+            document.getElementById('item-desc-en').value = descEn;
+            document.getElementById('item-price').value = price;
+            document.getElementById('item-modal-title').textContent = id > 0 ? 'Ürünü Düzenle' : 'Yeni Ürün Ekle';
+            acModal('modal-digital-item');
+        }
+
+        async function saveItem(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            formData.append('csrf_token', csrfToken);
+            formData.append('action', 'menu_item_save');
+
+            const res = await fetch('api.php', { method: 'POST', body: formData });
+            const json = await res.json();
+            if (json.success) {
+                kapatModal('modal-digital-item');
+                loadDigitalMenu();
+                showToast(json.message, 'success');
+            }
+        }
+
+        async function deleteItem(id) {
+            if (!confirm('Bu ürünü silmek istediğinize emin misiniz?')) return;
+            const formData = new FormData();
+            formData.append('id', id);
+            formData.append('action', 'menu_item_delete');
+            formData.append('csrf_token', csrfToken);
+
+            const res = await fetch('api.php', { method: 'POST', body: formData });
+            const json = await res.json();
+            if (json.success) {
+                loadDigitalMenu();
+                showToast(json.message, 'success');
+            }
+        }
+
+        // Dashboard switchView içinde digital menu'yü de tetikleyelim
+        const originalSwitchView = switchView;
+        switchView = function(view, el) {
+            originalSwitchView(view, el);
+            if (view === 'digital-menu') {
+                loadDigitalMenu();
+            }
+        }
     </script>
+
+    <!-- DİJİTAL KATEGORİ MODAL -->
+    <div id="modal-digital-category" class="modal-overlay">
+        <div class="modal-content">
+            <h3 class="modal-title" id="cat-modal-title">Kategori Yönetimi</h3>
+            <form id="catForm" onsubmit="saveCategory(event)">
+                <input type="hidden" id="cat-id" name="id">
+                <div class="modal-form-group">
+                    <label>Kategori Adı (TR)</label>
+                    <input type="text" id="cat-name-tr" name="name_tr" required>
+                </div>
+                <div class="modal-form-group">
+                    <label>Kategori Adı (EN)</label>
+                    <input type="text" id="cat-name-en" name="name_en" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-modal btn-cancel" onclick="kapatModal('modal-digital-category')">İptal</button>
+                    <button type="submit" class="btn-modal btn-primary">Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- DİJİTAL ÜRÜN MODAL -->
+    <div id="modal-digital-item" class="modal-overlay">
+        <div class="modal-content" style="max-width: 600px;">
+            <h3 class="modal-title" id="item-modal-title">Ürün Yönetimi</h3>
+            <form id="itemForm" onsubmit="saveItem(event)">
+                <input type="hidden" id="item-id" name="id">
+                <input type="hidden" id="item-cat-id" name="category_id">
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="modal-form-group">
+                        <label>Ürün Adı (TR)</label>
+                        <input type="text" id="item-name-tr" name="name_tr" required>
+                    </div>
+                    <div class="modal-form-group">
+                        <label>Ürün Adı (EN)</label>
+                        <input type="text" id="item-name-en" name="name_en" required>
+                    </div>
+                </div>
+
+                <div class="modal-form-group">
+                    <label>Açıklama (TR)</label>
+                    <textarea id="item-desc-tr" name="description_tr" rows="2"></textarea>
+                </div>
+                <div class="modal-form-group">
+                    <label>Açıklama (EN)</label>
+                    <textarea id="item-desc-en" name="description_en" rows="2"></textarea>
+                </div>
+
+                <div class="modal-form-group">
+                    <label>Fiyat (Örn: 100 TL)</label>
+                    <input type="text" id="item-price" name="price">
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-modal btn-cancel" onclick="kapatModal('modal-digital-item')">İptal</button>
+                    <button type="submit" class="btn-modal btn-primary">Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </body>
 </html>

@@ -116,6 +116,24 @@ switch ($action) {
     case 'export_excel':
         exportReservations($pdo);
         break;
+    case 'menu_list':
+        menuListele($pdo);
+        break;
+    case 'menu_category_save':
+        menuKategoriKaydet($pdo);
+        break;
+    case 'menu_category_delete':
+        menuKategoriSil($pdo);
+        break;
+    case 'menu_item_save':
+        menuItemKaydet($pdo);
+        break;
+    case 'menu_item_delete':
+        menuItemSil($pdo);
+        break;
+    case 'menu_reorder':
+        menuSirala($pdo);
+        break;
     default:
         echo json_encode(['success' => false, 'message' => 'Geçersiz işlem.']);
 }
@@ -934,5 +952,120 @@ function galeriSirala($pdo) {
         }
         echo json_encode(['success' => true, 'message' => 'Sıralama güncellendi.']);
     }
+}
+
+/**
+ * Menü Listele
+ */
+function menuListele($pdo) {
+    $type = $_GET['type'] ?? 'food';
+    
+    // Kategorileri çek
+    $stmt = $pdo->prepare("SELECT * FROM menu_categories WHERE type = ? ORDER BY order_num ASC");
+    $stmt->execute([$type]);
+    $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    foreach ($categories as &$cat) {
+        $stmt = $pdo->prepare("SELECT * FROM menu_items WHERE category_id = ? ORDER BY order_num ASC");
+        $stmt->execute([$cat['id']]);
+        $cat['items'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
+    echo json_encode(['success' => true, 'data' => $categories]);
+}
+
+/**
+ * Menü Kategorisi Kaydet (Ekle/Güncelle)
+ */
+function menuKategoriKaydet($pdo) {
+    $id = intval($_POST['id'] ?? 0);
+    $type = $_POST['type'] ?? 'food';
+    $name_tr = $_POST['name_tr'] ?? '';
+    $name_en = $_POST['name_en'] ?? '';
+    
+    if (empty($name_tr) || empty($name_en)) {
+        echo json_encode(['success' => false, 'message' => 'Kategori adlarını doldurun.']);
+        return;
+    }
+    
+    if ($id > 0) {
+        $stmt = $pdo->prepare("UPDATE menu_categories SET name_tr = ?, name_en = ? WHERE id = ?");
+        $stmt->execute([$name_tr, $name_en, $id]);
+    } else {
+        $stmt = $pdo->prepare("INSERT INTO menu_categories (type, name_tr, name_en, order_num) VALUES (?, ?, ?, 99)");
+        $stmt->execute([$type, $name_tr, $name_en]);
+    }
+    
+    echo json_encode(['success' => true, 'message' => 'Kategori kaydedildi.']);
+}
+
+/**
+ * Menü Kategorisi Sil
+ */
+function menuKategoriSil($pdo) {
+    $id = intval($_POST['id'] ?? 0);
+    
+    // Önce içindeki ürünleri sil
+    $pdo->prepare("DELETE FROM menu_items WHERE category_id = ?")->execute([$id]);
+    // Sonra kategoriyi sil
+    $pdo->prepare("DELETE FROM menu_categories WHERE id = ?")->execute([$id]);
+    
+    echo json_encode(['success' => true, 'message' => 'Kategori ve bağlı tüm ürünler silindi.']);
+}
+
+/**
+ * Menü Ürünü Kaydet (Ekle/Güncelle)
+ */
+function menuItemKaydet($pdo) {
+    $id = intval($_POST['id'] ?? 0);
+    $category_id = intval($_POST['category_id'] ?? 0);
+    $name_tr = $_POST['name_tr'] ?? '';
+    $name_en = $_POST['name_en'] ?? '';
+    $description_tr = $_POST['description_tr'] ?? '';
+    $description_en = $_POST['description_en'] ?? '';
+    $price = $_POST['price'] ?? '';
+    
+    if (empty($name_tr) || empty($category_id)) {
+        echo json_encode(['success' => false, 'message' => 'Ürün adı ve kategori seçimi zorunludur.']);
+        return;
+    }
+    
+    if ($id > 0) {
+        $stmt = $pdo->prepare("UPDATE menu_items SET name_tr = ?, name_en = ?, description_tr = ?, description_en = ?, price = ? WHERE id = ?");
+        $stmt->execute([$name_tr, $name_en, $description_tr, $description_en, $price, $id]);
+    } else {
+        $stmt = $pdo->prepare("INSERT INTO menu_items (category_id, name_tr, name_en, description_tr, description_en, price, order_num) VALUES (?, ?, ?, ?, ?, ?, 99)");
+        $stmt->execute([$category_id, $name_tr, $name_en, $description_tr, $description_en, $price]);
+    }
+    
+    echo json_encode(['success' => true, 'message' => 'Ürün kaydedildi.']);
+}
+
+/**
+ * Menü Ürünü Sil
+ */
+function menuItemSil($pdo) {
+    $id = intval($_POST['id'] ?? 0);
+    $pdo->prepare("DELETE FROM menu_items WHERE id = ?")->execute([$id]);
+    echo json_encode(['success' => true, 'message' => 'Ürün silindi.']);
+}
+
+/**
+ * Menü Sıralama
+ */
+function menuSirala($pdo) {
+    $target = $_POST['target'] ?? 'item'; // 'category' veya 'item'
+    $items = $_POST['items'] ?? []; // [id1, id2, id3...]
+    
+    if (empty($items)) return;
+    
+    $table = ($target === 'category') ? 'menu_categories' : 'menu_items';
+    
+    foreach ($items as $index => $id) {
+        $stmt = $pdo->prepare("UPDATE $table SET order_num = ? WHERE id = ?");
+        $stmt->execute([$index, $id]);
+    }
+    
+    echo json_encode(['success' => true]);
 }
 ?>

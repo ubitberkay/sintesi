@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Sintesi - İçecek Menüsü</title>
+    <link rel="icon" type="image/webp" href="sintesi.webp">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --color-bg: #0c0c0c;
+            --color-surface: #151515;
+            --color-text: #f5f5f5;
+            --color-text-muted: #a0a0a0;
+            --color-accent: #9D432C;
+            --font-heading: 'Cormorant Garamond', serif;
+            --font-body: 'Montserrat', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+        }
+
+        .page-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('./assets/aiSintesi.png');
+            background-size: cover;
+            background-position: center;
+            z-index: -2;
+            filter: brightness(0.3) blur(3px);
+        }
+
+        .page-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, transparent, var(--color-bg));
+            z-index: -1;
+        }
+
+        .menu-wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 6rem 2rem;
+            position: relative;
+        }
+
+        .top-nav {
+            position: fixed;
+            top: 2rem;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 2rem;
+            z-index: 100;
+        }
+
+        .back-btn {
+            color: var(--color-text);
+            text-decoration: none;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 3px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 10px 20px;
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .lang-switcher {
+            display: flex;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 10px 20px;
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .lang-btn {
+            cursor: pointer;
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .lang-btn.active { color: #fff; }
+
+        .menu-header {
+            text-align: center;
+            margin-bottom: 6rem;
+        }
+
+        .menu-header h1 {
+            font-family: var(--font-heading);
+            font-size: 4.5rem;
+            font-weight: 400;
+            letter-spacing: 5px;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        .menu-header .subtitle {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            color: var(--color-accent);
+        }
+
+        .category-section {
+            margin-bottom: 8rem;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1s ease;
+        }
+
+        .category-section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .category-title {
+            text-align: center;
+            margin-bottom: 4rem;
+            position: relative;
+        }
+
+        .category-title h2 {
+            font-family: var(--font-heading);
+            font-size: 3rem;
+            text-transform: uppercase;
+            letter-spacing: 8px;
+            display: inline-block;
+            padding: 0 40px;
+        }
+
+        .menu-item {
+            margin-bottom: 2rem;
+        }
+
+        .item-main {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 20px;
+        }
+
+        .item-name {
+            font-family: var(--font-heading);
+            font-size: 1.6rem;
+            font-weight: 500;
+        }
+
+        .item-dots { flex: 1; border-bottom: 1px dotted rgba(255, 255, 255, 0.2); }
+
+        .item-price { font-family: var(--font-heading); font-size: 1.4rem; color: var(--color-accent); }
+
+        .item-description { font-size: 0.85rem; color: var(--color-text-muted); font-style: italic; max-width: 85%; line-height: 1.4; margin-top: 2px; }
+
+        @media (max-width: 768px) {
+            .top-nav { padding: 0 1rem; top: 1rem; }
+            .menu-header h1 { font-size: 3rem; }
+            .category-title h2 { font-size: 2rem; }
+            .item-name { font-size: 1.3rem; }
+            .item-price { font-size: 1.1rem; }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page-bg"></div>
+    <div class="page-overlay"></div>
+
+    <div class="top-nav">
+        <a href="menu.html" class="back-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            <span id="back-text">GERİ DÖN</span>
+        </a>
+        <div class="lang-switcher">
+            <span class="lang-btn" onclick="setLanguage('tr')" data-lang="tr">TR</span>
+            <span style="color: rgba(255,255,255,0.2)">|</span>
+            <span class="lang-btn" onclick="setLanguage('en')" data-lang="en">EN</span>
+        </div>
+    </div>
+
+    <div class="menu-wrapper">
+        <header class="menu-header">
+            <span class="subtitle">Sintesi</span>
+            <h1 id="page-title">İçecek Menüsü</h1>
+        </header>
+
+        <div id="menu-content">
+            <!-- Dinamik İçerik Buraya Gelecek -->
+        </div>
+
+        <div style="text-align: center; margin-top: 4rem; opacity: 0.5;">
+            <img src="sintesi.webp" alt="Logo" style="height: 60px;">
+        </div>
+    </div>
+
+    <script>
+        let currentLang = localStorage.getItem('preferredLanguage') || 'tr';
+        let menuData = [];
+
+        async function fetchMenu() {
+            try {
+                const res = await fetch('public_api.php?action=menu_list&type=alcohol');
+                const json = await res.json();
+                if (json.success) {
+                    menuData = json.data;
+                    renderMenu();
+                }
+            } catch (err) { console.error(err); }
+        }
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('preferredLanguage', lang);
+            renderMenu();
+        }
+
+        function renderMenu() {
+            document.documentElement.lang = currentLang;
+            
+            const backText = { tr: 'GERİ DÖN', en: 'GO BACK' };
+            const pageTitle = { tr: 'İÇECEK MENÜSÜ', en: 'DRINKS MENU' };
+            document.getElementById('back-text').textContent = backText[currentLang];
+            document.getElementById('page-title').textContent = pageTitle[currentLang];
+
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-lang') === currentLang);
+            });
+
+            const container = document.getElementById('menu-content');
+            container.innerHTML = menuData.map(cat => `
+                <section class="category-section">
+                    <div class="category-title">
+                        <h2>${currentLang === 'tr' ? cat.name_tr : cat.name_en}</h2>
+                    </div>
+                    <div class="menu-items">
+                        ${cat.items.map(item => `
+                            <div class="menu-item">
+                                <div class="item-main">
+                                    <span class="item-name">${currentLang === 'tr' ? item.name_tr : item.name_en}</span>
+                                    <div class="item-dots"></div>
+                                    <span class="item-price">${item.price}</span>
+                                </div>
+                                ${ (currentLang === 'tr' ? item.description_tr : item.description_en) ? `
+                                    <p class="item-description">${currentLang === 'tr' ? item.description_tr : item.description_en}</p>
+                                ` : '' }
+                            </div>
+                        `).join('')}
+                    </div>
+                </section>
+            `).join('');
+
+            observeSections();
+        }
+
+        function observeSections() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) entry.target.classList.add('visible');
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.category-section').forEach(section => {
+                observer.observe(section);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchMenu);
+    </script>
+</body>
+</html>
