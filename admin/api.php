@@ -568,10 +568,8 @@ function ayarlariGetir($pdo) {
                 'calisma_saatleri' => isset($ayarlar['calisma_saatleri']) ? json_decode($ayarlar['calisma_saatleri'], true) : $varsayilan_saatler,
                 'menu_yemek' => $ayarlar['menu_yemek'] ?? '',
                 'menu_alkol' => $ayarlar['menu_alkol'] ?? '',
-                'menu_tatli' => $ayarlar['menu_tatli'] ?? '',
                 'menu_yemek_en' => $ayarlar['menu_yemek_en'] ?? '',
-                'menu_alkol_en' => $ayarlar['menu_alkol_en'] ?? '',
-                'menu_tatli_en' => $ayarlar['menu_tatli_en'] ?? ''
+                'menu_alkol_en' => $ayarlar['menu_alkol_en'] ?? ''
             ]
         ]);
     } catch (Exception $e) {
@@ -584,10 +582,8 @@ function ayarlariGetir($pdo) {
                 'calisma_saatleri' => $varsayilan_saatler,
                 'menu_yemek' => '',
                 'menu_alkol' => '',
-                'menu_tatli' => '',
                 'menu_yemek_en' => '',
-                'menu_alkol_en' => '',
-                'menu_tatli_en' => ''
+                'menu_alkol_en' => ''
             ]
         ]);
     }
@@ -640,7 +636,7 @@ function ayarlariKaydet($pdo) {
             }
 
             // Menü PDF Yüklemeleri
-            $menu_keys = ['menu_yemek', 'menu_alkol', 'menu_tatli', 'menu_yemek_en', 'menu_alkol_en', 'menu_tatli_en'];
+            $menu_keys = ['menu_yemek', 'menu_alkol', 'menu_yemek_en', 'menu_alkol_en'];
             foreach ($menu_keys as $key) {
                 if (isset($_FILES[$key]) && $_FILES[$key]['error'] === UPLOAD_ERR_OK) {
                     $tmp_name = $_FILES[$key]['tmp_name'];

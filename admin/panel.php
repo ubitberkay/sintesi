@@ -1293,11 +1293,6 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                                 <div id="current-menu-alkol-tr-main" style="font-size: 0.75rem; color: var(--muted); margin-bottom: 5px;"></div>
                                 <input type="file" name="menu_alkol" id="menu-alkol-tr-main" accept=".pdf">
                             </div>
-                            <div class="filter-group">
-                                <label>Tatlı Menüsü (PDF)</label>
-                                <div id="current-menu-tatli-tr-main" style="font-size: 0.75rem; color: var(--muted); margin-bottom: 5px;"></div>
-                                <input type="file" name="menu_tatli" id="menu-tatli-tr-main" accept=".pdf">
-                            </div>
                         </div>
                         <!-- İngilizce Menüler -->
                         <div style="display: flex; flex-direction: column; gap: 1.5rem;">
@@ -1311,11 +1306,6 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                                 <label>Alcohol Menu (PDF)</label>
                                 <div id="current-menu-alkol-en-main" style="font-size: 0.75rem; color: var(--muted); margin-bottom: 5px;"></div>
                                 <input type="file" name="menu_alkol_en" id="menu-alkol-en-main" accept=".pdf">
-                            </div>
-                            <div class="filter-group">
-                                <label>Dessert Menu (PDF)</label>
-                                <div id="current-menu-tatli-en-main" style="font-size: 0.75rem; color: var(--muted); margin-bottom: 5px;"></div>
-                                <input type="file" name="menu_tatli_en" id="menu-tatli-en-main" accept=".pdf">
                             </div>
                         </div>
                     </div>
@@ -1536,7 +1526,7 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
     <div id="menuModal" class="modal-overlay">
         <div class="modal-content" style="max-width: 700px;">
             <h3 class="modal-title">Menü Yönetimi</h3>
-            <p class="modal-text">Yemek, Alkol ve Tatlı menülerini PDF formatında buradan güncelleyebilirsiniz.</p>
+            <p class="modal-text">Yemek ve Alkol menülerini PDF formatında buradan güncelleyebilirsiniz.</p>
             <form id="menuForm" onsubmit="menuKaydetSubmit(event)">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px; text-align: left; margin-bottom: 25px;">
                     <!-- Türkçe Menüler -->
@@ -1555,11 +1545,7 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                             <div id="current-menu-alkol-tr" style="font-size: 0.7rem; color: var(--muted); margin-top: 4px;"></div>
                         </div>
                         
-                        <div class="modal-form-group">
-                            <label>Tatlı Menüsü (TR)</label>
-                            <input type="file" id="menu-tatli-tr" accept=".pdf" style="font-size: 0.8rem;">
-                            <div id="current-menu-tatli-tr" style="font-size: 0.7rem; color: var(--muted); margin-top: 4px;"></div>
-                        </div>
+
                     </div>
 
                     <!-- İngilizce Menüler -->
@@ -1578,11 +1564,7 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                             <div id="current-menu-alkol-en" style="font-size: 0.7rem; color: var(--muted); margin-top: 4px;"></div>
                         </div>
                         
-                        <div class="modal-form-group">
-                            <label>Tatlı Menüsü (EN)</label>
-                            <input type="file" id="menu-tatli-en" accept=".pdf" style="font-size: 0.8rem;">
-                            <div id="current-menu-tatli-en" style="font-size: 0.7rem; color: var(--muted); margin-top: 4px;"></div>
-                        </div>
+
                     </div>
                 </div>
 
@@ -2180,16 +2162,16 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                     // Mevcut dosyalar (TR)
                     document.getElementById('current-menu-yemek-tr').textContent = json.data.menu_yemek ? 'Mevcut: ' + json.data.menu_yemek.split('/').pop() : 'Henüz yüklenmedi';
                     document.getElementById('current-menu-alkol-tr').textContent = json.data.menu_alkol ? 'Mevcut: ' + json.data.menu_alkol.split('/').pop() : 'Henüz yüklenmedi';
-                    document.getElementById('current-menu-tatli-tr').textContent = json.data.menu_tatli ? 'Mevcut: ' + json.data.menu_tatli.split('/').pop() : 'Henüz yüklenmedi';
+
                     
                     // Mevcut dosyalar (EN)
                     document.getElementById('current-menu-yemek-en').textContent = json.data.menu_yemek_en ? 'Mevcut: ' + json.data.menu_yemek_en.split('/').pop() : 'Henüz yüklenmedi';
                     document.getElementById('current-menu-alkol-en').textContent = json.data.menu_alkol_en ? 'Mevcut: ' + json.data.menu_alkol_en.split('/').pop() : 'Henüz yüklenmedi';
-                    document.getElementById('current-menu-tatli-en').textContent = json.data.menu_tatli_en ? 'Mevcut: ' + json.data.menu_tatli_en.split('/').pop() : 'Henüz yüklenmedi';
+
 
                     // Inputları temizle
                     ['tr', 'en'].forEach(lang => {
-                        ['yemek', 'alkol', 'tatli'].forEach(type => {
+                        ['yemek', 'alkol'].forEach(type => {
                             document.getElementById(`menu-${type}-${lang}`).value = '';
                         });
                     });
@@ -2213,14 +2195,14 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                 formData.append('action', 'settings_save');
                 
                 // Menü Dosyaları (TR)
-                const trKeys = { 'menu_yemek': 'menu-yemek-tr', 'menu_alkol': 'menu-alkol-tr', 'menu_tatli': 'menu-tatli-tr' };
+                const trKeys = { 'menu_yemek': 'menu-yemek-tr', 'menu_alkol': 'menu-alkol-tr' };
                 for (const [key, id] of Object.entries(trKeys)) {
                     const file = document.getElementById(id).files[0];
                     if (file) formData.append(key, file);
                 }
 
                 // Menü Dosyaları (EN)
-                const enKeys = { 'menu_yemek_en': 'menu-yemek-en', 'menu_alkol_en': 'menu-alkol-en', 'menu_tatli_en': 'menu-tatli-en' };
+                const enKeys = { 'menu_yemek_en': 'menu-yemek-en', 'menu_alkol_en': 'menu-alkol-en' };
                 for (const [key, id] of Object.entries(enKeys)) {
                     const file = document.getElementById(id).files[0];
                     if (file) formData.append(key, file);
@@ -2758,14 +2740,14 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                     const data = json.data;
                     document.getElementById('current-menu-yemek-tr-main').textContent = data.menu_yemek ? 'Mevcut: ' + data.menu_yemek.split('/').pop() : 'Yüklü değil';
                     document.getElementById('current-menu-alkol-tr-main').textContent = data.menu_alkol ? 'Mevcut: ' + data.menu_alkol.split('/').pop() : 'Yüklü değil';
-                    document.getElementById('current-menu-tatli-tr-main').textContent = data.menu_tatli ? 'Mevcut: ' + data.menu_tatli.split('/').pop() : 'Yüklü değil';
+
                     
                     document.getElementById('current-menu-yemek-en-main').textContent = data.menu_yemek_en ? 'Mevcut: ' + data.menu_yemek_en.split('/').pop() : 'Yüklü değil';
                     document.getElementById('current-menu-alkol-en-main').textContent = data.menu_alkol_en ? 'Mevcut: ' + data.menu_alkol_en.split('/').pop() : 'Yüklü değil';
-                    document.getElementById('current-menu-tatli-en-main').textContent = data.menu_tatli_en ? 'Mevcut: ' + data.menu_tatli_en.split('/').pop() : 'Yüklü değil';
+
                     
                     // Inputları temizle
-                    ['yemek', 'alkol', 'tatli'].forEach(t => {
+                    ['yemek', 'alkol'].forEach(t => {
                         document.getElementById(`menu-${t}-tr-main`).value = '';
                         document.getElementById(`menu-${t}-en-main`).value = '';
                     });

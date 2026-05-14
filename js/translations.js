@@ -53,8 +53,7 @@ const translations = {
         "menu-yemek-desc": "Ana Menü",
         "menu-alkol": "Alkol",
         "menu-alkol-desc": "İçecek Listesi",
-        "menu-tatli": "Tatlı",
-        "menu-tatli-desc": "Lezzetli Kapanışlar",
+
 
         // Catering Page
         "catering-subtitle": "Özel Günleriniz İçin",
@@ -175,8 +174,7 @@ const translations = {
         "menu-yemek-desc": "Main Menu",
         "menu-alkol": "Alcohol",
         "menu-alkol-desc": "Beverage List",
-        "menu-tatli": "Dessert",
-        "menu-tatli-desc": "Delicious Finales",
+
 
         // Catering Page
         "catering-subtitle": "For Your Special Days",
