@@ -750,6 +750,7 @@
                                 <p class="section-label" data-i18n="form-date-pick">Tarih Seçin</p>
                                 <div id="inline-calendar"></div>
                                 <input type="hidden" name="tarih" id="rez-tarih">
+                                <input type="hidden" name="dil" id="rez-dil">
                             </div>
 
                             <!-- Saat Bölümü -->
@@ -1047,6 +1048,9 @@
             btn.textContent = 'İşleniyor...';
 
             try {
+                // Dil bilgisini ekle
+                document.getElementById('rez-dil').value = localStorage.getItem('preferredLanguage') || 'tr';
+                
                 const formData = new FormData(e.target);
                 const res = await fetch('rezervasyon_gonder.php', {
                     method: 'POST',

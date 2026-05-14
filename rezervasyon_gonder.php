@@ -26,6 +26,7 @@ $tarih      = isset($_POST['tarih']) ? htmlspecialchars(strip_tags(trim($_POST['
 $saat       = isset($_POST['saat']) ? htmlspecialchars(strip_tags(trim($_POST['saat']))) : '';
 $kisi       = isset($_POST['kisi_sayisi']) ? intval($_POST['kisi_sayisi']) : 2;
 $ozel       = isset($_POST['ozel_istekler']) ? htmlspecialchars(strip_tags(trim($_POST['ozel_istekler']))) : '';
+$dil        = isset($_POST['dil']) ? htmlspecialchars(strip_tags(trim($_POST['dil']))) : 'tr';
 
 // Doğrulama
 if (empty($ad_soyad) || empty($telefon) || empty($tarih) || empty($saat)) {
@@ -106,10 +107,10 @@ try {
 
     // Veritabanına kaydet
     $stmt = $pdo->prepare("
-        INSERT INTO rezervasyonlar (ad_soyad, email, telefon, tarih, saat, kisi_sayisi, ozel_istekler, durum, iptal_kodu)
-        VALUES (?, ?, ?, ?, ?, ?, ?, 'beklemede', ?)
+        INSERT INTO rezervasyonlar (ad_soyad, email, telefon, tarih, saat, kisi_sayisi, ozel_istekler, durum, iptal_kodu, dil)
+        VALUES (?, ?, ?, ?, ?, ?, ?, 'beklemede', ?, ?)
     ");
-    $stmt->execute([$ad_soyad, $email, $telefon, $tarih, $saat, $kisi, $ozel, $iptal_kodu]);
+    $stmt->execute([$ad_soyad, $email, $telefon, $tarih, $saat, $kisi, $ozel, $iptal_kodu, $dil]);
     
     // E-posta bildirimi gönder (sadece sunucuda, local'de atla)
     if (!local_mi()) {
