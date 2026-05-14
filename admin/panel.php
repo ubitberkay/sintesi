@@ -1451,8 +1451,9 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
 
         let currentPage = 1;
         let currentDeleteId = null;
-        let fpBas, fpSon;
+        let fpBas, fpSon, fpManual;
         let kapaliGunler = {};
+        window.sistemAyarlari = {};
         let charts = { trend: null, status: null, hour: null };
         const gunIsimleri = { "1": "Pazartesi", "2": "Salı", "3": "Çarşamba", "4": "Perşembe", "5": "Cuma", "6": "Cumartesi", "0": "Pazar" };
 
@@ -1481,20 +1482,7 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
 
         document.addEventListener('DOMContentLoaded', () => {
             yukleHerSeyi();
-            
-            // Filtre Tarih Seçicileri
-            fpBas = flatpickr("#filtre-tarih-bas", { locale: "tr", dateFormat: "Y-m-d" });
-            fpSon = flatpickr("#filtre-tarih-son", { locale: "tr", dateFormat: "Y-m-d" });
-            
-            // Manuel Ekle Tarih/Saat
-            flatpickr("#m-tarih", { locale: "tr", dateFormat: "Y-m-d", minDate: "today" });
-            
-            // Arama inputu listener'ı
-            document.getElementById('filtre-arama').addEventListener('input', (e) => {
-                currentPage = 1;
-                clearTimeout(window.searchTimeout);
-                window.searchTimeout = setTimeout(yukleRezervasyonlar, 500);
-            });
+            initFlatpickr();
         });
 
         function initFlatpickr() {
@@ -1509,25 +1497,16 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             
             fpYeniGun = flatpickr("#ayar-yeni-gun", config);
             
-            flatpickr("#m-tarih", {
+            fpManual = flatpickr("#m-tarih", {
                 locale: "tr",
                 dateFormat: "Y-m-d",
                 altInput: true,
-                altFormat: "d F Y"
-            });
-
-            // Saat dropdown'ını doldur
-            const saatSelect = document.getElementById('m-saat');
-            saatSelect.innerHTML = '<option value="" disabled selected>Saat Seçin</option>';
-            for (let h = 10; h <= 23; h++) {
-                for (let m = 0; m < 60; m += 15) {
-                    const hh = String(h).padStart(2, '0');
-                    const mm = String(m).padStart(2, '0');
-                    const val = `${hh}:${mm}`;
-                    saatSelect.innerHTML += `<option value="${val}">${val}</option>`;
+                altFormat: "d F Y",
+                minDate: "today",
+                onChange: function(selectedDates, dateStr) {
+                    populateManualHours(dateStr);
                 }
-            }
-            saatSelect.innerHTML += '<option value="00:00">00:00</option>';
+            });
             
             // Arama inputu listener'ı
             document.getElementById('filtre-arama').addEventListener('input', (e) => {
@@ -1535,6 +1514,51 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                 clearTimeout(window.searchTimeout);
                 window.searchTimeout = setTimeout(yukleRezervasyonlar, 500);
             });
+        }
+
+        function populateManualHours(dateStr) {
+            const saatSelect = document.getElementById('m-saat');
+            saatSelect.innerHTML = '<option value="" disabled selected>Saat Seçin</option>';
+            
+            if (!dateStr || !window.sistemAyarlari.calisma_saatleri) return;
+
+            const date = new Date(dateStr);
+            const gun = String(date.getDay()); // 0-6
+            const s = window.sistemAyarlari.calisma_saatleri[gun];
+
+            if (!s || s.durum === 'kapali') {
+                saatSelect.innerHTML = '<option value="" disabled selected>Bu gün kapalı</option>';
+                return;
+            }
+
+            const [startH, startM] = s.acilis.split(':').map(Number);
+            const [endH, endM] = s.kapanis.split(':').map(Number);
+
+            let currentH = startH;
+            let currentM = startM;
+
+            const endMinutes = endH * 60 + endM;
+            const compareEnd = endMinutes === 0 ? 1440 : endMinutes;
+
+            while (true) {
+                const totalMinutes = currentH * 60 + currentM;
+                if (totalMinutes > compareEnd) break;
+
+                const hh = String(currentH).padStart(2, '0');
+                const mm = String(currentM).padStart(2, '0');
+                const val = `${hh}:${mm}`;
+                
+                const displayVal = val === "24:00" ? "00:00" : val;
+                saatSelect.innerHTML += `<option value="${displayVal}">${displayVal}</option>`;
+
+                currentM += 30; // 30 dakikalık aralıklar
+                if (currentM >= 60) {
+                    currentH++;
+                    currentM = 0;
+                }
+                
+                if (currentH > 24) break;
+            }
         }
 
         // Modal Kontrolleri
@@ -1696,11 +1720,27 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
          */
         async function yukleHerSeyi(btn) {
             if (btn) btn.classList.add('loading');
-            await Promise.all([yukleIstatistikler(), yukleRezervasyonlar()]);
+            await Promise.all([
+                yukleIstatistikler(),
+                yukleRezervasyonlar(),
+                yukleSistemAyarlari()
+            ]);
             if (btn) {
                 setTimeout(() => {
                     btn.classList.remove('loading');
                 }, 500);
+            }
+        }
+
+        async function yukleSistemAyarlari() {
+            try {
+                const res = await fetch('api.php?action=settings_get');
+                const json = await res.json();
+                if (json.success) {
+                    window.sistemAyarlari = json.data;
+                }
+            } catch(e) {
+                console.error('Ayarlar yüklenemedi:', e);
             }
         }
 
