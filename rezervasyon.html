@@ -647,11 +647,57 @@
         }
 
         /* Header linkleri için geri dönüş */
+        .lang-switcher-fixed {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            display: flex;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 8px 15px;
+            border-radius: 20px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .lang-btn {
+            cursor: pointer;
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .lang-btn:hover,
+        .lang-btn.active {
+            color: var(--color-accent);
+        }
+
+        @media (max-width: 900px) {
+            .lang-switcher-fixed {
+                position: relative !important;
+                top: 0 !important;
+                right: 0 !important;
+                display: inline-flex !important;
+                margin-bottom: 20px !important;
+                margin-left: 10px;
+            }
+        }
     </style>
 </head>
 
 <body>
-    <a href="index.html" class="home-link">← Anasayfa</a>
+    <div style="position: fixed; top: 20px; left: 20px; right: 20px; display: flex; justify-content: space-between; z-index: 1000; pointer-events: none;">
+        <a href="index.html" class="home-link" style="pointer-events: auto;" data-i18n="nav-home">← Anasayfa</a>
+        <div class="lang-switcher-fixed" style="pointer-events: auto;">
+            <span class="lang-btn" onclick="setLanguage('tr')" data-lang="tr">TR</span>
+            <span style="color: rgba(255,255,255,0.2)">|</span>
+            <span class="lang-btn" onclick="setLanguage('en')" data-lang="en">EN</span>
+        </div>
+    </div>
 
     <div class="booking-card reveal">
         <!-- Sol Panel -->
@@ -660,7 +706,7 @@
                 <div class="brand-info">
                     <img src="sintesi.webp" alt="Sintesi Logo" class="brand-logo">
                     <h1 class="brand-name">Sintesi</h1>
-                    <p style="opacity: 0.8; font-size: 1.1rem; font-family: var(--font-heading);">Fine Dining &
+                    <p style="opacity: 0.8; font-size: 1.1rem; font-family: var(--font-heading);" data-i18n="res-page-subtitle">Fine Dining &
                         Experience</p>
                 </div>
                 <div class="contact-info">
@@ -685,7 +731,7 @@
                 <!-- Adım 1: Tarih ve Saat -->
                 <div id="selection-step" class="step-container">
                     <div class="step-header">
-                        <h2 class="step-title">Rezervasyon Bilgileri</h2>
+                        <h2 class="step-title" data-i18n="res-form-title">Rezervasyon Bilgileri</h2>
                         <div class="person-counter">
                             <span style="font-size: 0.8rem; font-weight: 600; color: #666;">KİŞİ</span>
                             <div class="counter-btn" onclick="updateCount(-1)">-</div>
@@ -701,17 +747,17 @@
                         <div class="booking-grid">
                             <!-- Takvim Bölümü -->
                             <div class="calendar-section">
-                                <p class="section-label">Tarih Seçin</p>
+                                <p class="section-label" data-i18n="form-date-pick">Tarih Seçin</p>
                                 <div id="inline-calendar"></div>
                                 <input type="hidden" name="tarih" id="rez-tarih">
                             </div>
 
                             <!-- Saat Bölümü -->
                             <div class="time-section">
-                                <p class="section-label">Saat Seçin</p>
+                                <p class="section-label" data-i18n="form-time-pick">Saat Seçin</p>
                                 <div class="time-grid" id="time-slots-container">
                                     <!-- JS ile dolacak -->
-                                    <p style="color:#999; font-size:0.9rem;">Lütfen önce bir tarih seçin.</p>
+                                    <p style="color:#999; font-size:0.9rem;" data-i18n="res-time-warning">Lütfen önce bir tarih seçin.</p>
                                 </div>
                                 <input type="hidden" name="saat" id="rez-saat">
                             </div>
@@ -719,17 +765,17 @@
                     </div>
 
                     <div class="step-footer">
-                        <p style="font-size: 0.8rem; color: #999; max-width: 300px;">
+                        <p style="font-size: 0.8rem; color: #999; max-width: 300px;" data-i18n="res-wait-warning">
                             * Masanız rezervasyon saatinizden itibaren 15 dakika bekletilir.
                         </p>
-                        <button type="button" class="btn-continue" id="next-btn" onclick="goToForm()">Devam Et</button>
+                        <button type="button" class="btn-continue" id="next-btn" onclick="goToForm()" data-i18n="form-submit">Devam Et</button>
                     </div>
                 </div>
 
                 <!-- Adım 2: İletişim Bilgileri -->
                 <div id="form-step" class="step-container">
                     <div class="step-header">
-                        <h2 class="step-title">İletişim Bilgileri</h2>
+                        <h2 class="step-title" data-i18n="contact-form-subtitle">İletişim Bilgileri</h2>
                         <p id="summary-text" style="font-size: 0.85rem; color: var(--color-accent); font-weight: 600;">
                         </p>
                     </div>
@@ -737,28 +783,28 @@
                     <div class="booking-scroll-area">
                         <div class="contact-form">
                             <div class="form-group">
-                                <label>AD SOYAD</label>
-                                <input type="text" name="ad_soyad" id="rez-ad" placeholder="Adınız Soyadınız" required>
+                                <label data-i18n="form-name-label">AD SOYAD</label>
+                                <input type="text" name="ad_soyad" id="rez-ad" placeholder="Adınız Soyadınız" data-i18n="form-name-ph" required>
                             </div>
                             <div class="form-group">
-                                <label>TELEFON</label>
-                                <input type="tel" name="telefon" id="rez-telefon" placeholder="05XX XXX XX XX" required>
+                                <label data-i18n="form-phone-label">TELEFON</label>
+                                <input type="tel" name="telefon" id="rez-telefon" placeholder="05XX XXX XX XX" data-i18n="form-phone-ph" required>
                             </div>
                             <div class="form-group full-width">
-                                <label>E-POSTA (OPSİYONEL)</label>
-                                <input type="email" name="email" id="rez-email" placeholder="orn@mail.com">
+                                <label data-i18n="form-email-label">E-POSTA (OPSİYONEL)</label>
+                                <input type="email" name="email" id="rez-email" placeholder="orn@mail.com" data-i18n="form-email-ph">
                             </div>
                             <div class="form-group full-width">
-                                <label>ÖZEL NOT (OPSİYONEL)</label>
+                                <label data-i18n="form-note-label">ÖZEL NOT (OPSİYONEL)</label>
                                 <textarea name="ozel_istekler" id="rez-ozel" rows="3"
-                                    placeholder="Alerji, kutlama veya masa tercihi..."></textarea>
+                                    placeholder="Alerji, kutlama veya masa tercihi..." data-i18n="form-note-ph"></textarea>
                             </div>
                         </div>
                     </div>
 
                     <div class="step-footer">
-                        <button type="button" class="btn-back" onclick="goToSelection()">← Geri Dön</button>
-                        <button type="submit" class="btn-continue active" id="submit-btn">Rezervasyonu Tamamla</button>
+                        <button type="button" class="btn-back" onclick="goToSelection()" data-i18n="res-back-btn">← Geri Dön</button>
+                        <button type="submit" class="btn-continue active" id="submit-btn" data-i18n="res-btn">Rezervasyonu Tamamla</button>
                     </div>
                 </div>
             </form>
@@ -767,6 +813,7 @@
 
     <div id="toast" class="toast"></div>
 
+    <script src="js/translations.js"></script>
     <script>
         let selectedDate = null;
         let selectedTime = null;
@@ -774,6 +821,16 @@
         let maxKapasite = 16;
         let kapaliGunler = {};
         let calismaSaatleri = {};
+        let fp = null; // Flatpickr instance
+
+        function onLanguageChange(lang) {
+            if (fp) {
+                fp.set("locale", lang === "tr" ? "tr" : "default");
+            }
+            if (selectedDate) {
+                loadTimeSlots(selectedDate);
+            }
+        }
 
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
@@ -798,9 +855,10 @@
 
         // Takvim Başlat
         function initCalendar() {
-            flatpickr("#inline-calendar", {
+            const currentLang = localStorage.getItem('preferredLanguage') || 'tr';
+            fp = flatpickr("#inline-calendar", {
                 inline: true,
-                locale: "tr",
+                locale: currentLang === "tr" ? "tr" : "default",
                 minDate: "today",
                 dateFormat: "Y-m-d",
                 onChange: function (selectedDates, dateStr) {
@@ -810,7 +868,9 @@
 
                     if (isClosed) {
                         const container = document.getElementById('time-slots-container');
-                        container.innerHTML = '<p style="color:var(--color-accent); font-weight:600;">Seçilen tarih rezervasyonlara kapalıdır.</p>';
+                        const currentLang = localStorage.getItem('preferredLanguage') || 'tr';
+                        const closedText = currentLang === 'tr' ? 'Seçilen tarih rezervasyonlara kapalıdır.' : 'The selected date is closed for reservations.';
+                        container.innerHTML = `<p style="color:var(--color-accent); font-weight:600;">${closedText}</p>`;
                         selectedTime = null;
                         document.getElementById('rez-saat').value = '';
                         updateButtonState();
@@ -849,7 +909,8 @@
 
         async function loadTimeSlots(dateStr) {
             const container = document.getElementById('time-slots-container');
-            container.innerHTML = '<p style="color:#999;">Yükleniyor...</p>';
+            const currentLang = localStorage.getItem('preferredLanguage') || 'tr';
+            container.innerHTML = `<p style="color:#999;">${translations[currentLang]['res-loading']}</p>`;
             selectedTime = null;
             document.getElementById('rez-saat').value = '';
             updateButtonState();
@@ -861,7 +922,7 @@
                 const gunAyari = calismaSaatleri[dayOfWeek] || { acilis: "15:00", kapanis: "00:00", durum: "acik" };
 
                 if (gunAyari.durum === 'kapali') {
-                    container.innerHTML = '<div style="grid-column: 1 / -1; padding: 20px; text-align: center; color: var(--color-accent); font-weight: 500; background: rgba(157, 67, 44, 0.05); border-radius: 10px;">Restoranımız bugün kapalıdır.</div>';
+                    container.innerHTML = `<div style="grid-column: 1 / -1; padding: 20px; text-align: center; color: var(--color-accent); font-weight: 500; background: rgba(157, 67, 44, 0.05); border-radius: 10px;">${translations[currentLang]['res-closed-day']}</div>`;
                     return;
                 }
 
@@ -898,7 +959,15 @@
                     const booked = doluluk[time] || 0;
                     const remaining = maxKapasite - booked;
                     const isDisabled = remaining <= 0;
-                    const statusText = isDisabled ? 'Dolu' : (remaining < 5 ? `Son ${remaining} Yer` : 'Müsait');
+                    
+                    let statusText = '';
+                    if (isDisabled) {
+                        statusText = translations[currentLang]['status-full'];
+                    } else if (remaining < 5) {
+                        statusText = translations[currentLang]['status-last'].replace('{n}', remaining);
+                    } else {
+                        statusText = translations[currentLang]['status-available'];
+                    }
 
                     html += `
                         <div class="time-slot ${isDisabled ? 'disabled' : ''}" 
@@ -960,8 +1029,9 @@
             document.getElementById('form-step').style.display = 'flex';
 
             const dateObj = new Date(selectedDate);
-            const formattedDate = dateObj.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long' });
-            document.getElementById('summary-text').textContent = `${formattedDate}, ${selectedTime} - ${personCount} Kişi`;
+            const currentLang = localStorage.getItem('preferredLanguage') || 'tr';
+            const formattedDate = dateObj.toLocaleDateString(currentLang === 'tr' ? 'tr-TR' : 'en-US', { day: 'numeric', month: 'long' });
+            document.getElementById('summary-text').textContent = `${formattedDate}, ${selectedTime} - ${personCount} ${currentLang === 'tr' ? 'Kişi' : 'People'}`;
         }
 
         function goToSelection() {

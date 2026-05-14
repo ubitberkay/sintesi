@@ -72,6 +72,9 @@ try {
         $menu_yemek = $ayarlar['menu_yemek'] ?? '';
         $menu_alkol = $ayarlar['menu_alkol'] ?? '';
         $menu_tatli = $ayarlar['menu_tatli'] ?? '';
+        $menu_yemek_en = $ayarlar['menu_yemek_en'] ?? '';
+        $menu_alkol_en = $ayarlar['menu_alkol_en'] ?? '';
+        $menu_tatli_en = $ayarlar['menu_tatli_en'] ?? '';
     } catch (Exception $e) {}
     
     echo json_encode([
@@ -82,7 +85,10 @@ try {
             'calisma_saatleri' => $calisma_saatleri,
             'menu_yemek' => $menu_yemek ?? '',
             'menu_alkol' => $menu_alkol ?? '',
-            'menu_tatli' => $menu_tatli ?? ''
+            'menu_tatli' => $menu_tatli ?? '',
+            'menu_yemek_en' => $menu_yemek_en ?? '',
+            'menu_alkol_en' => $menu_alkol_en ?? '',
+            'menu_tatli_en' => $menu_tatli_en ?? ''
         ]
     ]);
     

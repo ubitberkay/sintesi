@@ -954,6 +954,7 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
              
                 <div class="top-actions">
                     <button class="btn-primary" onclick="acModal('manuelEkleModal')"><span>+</span> <span class="btn-text">Yeni Ekle</span></button>
+                    <button class="btn-primary" onclick="menuYonetimiAc()" style="background:var(--surface-2);border:1px solid rgba(255,255,255,0.1);"><span>📋</span> <span class="btn-text">Menü Yönetimi</span></button>
                     <button class="btn-primary" onclick="ayarlariAc()" style="background:var(--surface-2);border:1px solid rgba(255,255,255,0.1);"><span>⚙️</span> <span class="btn-text">Ayarlar</span></button>
                     <button class="btn-primary" onclick="mailGonderAc()" style="background:var(--surface-2);border:1px solid rgba(255,255,255,0.1);"><span>📧</span> <span class="btn-text">Mail Gönder</span></button>
                     <button class="btn-primary" onclick="window.location.href='api.php?action=export_excel'" style="background:var(--surface-2);border:1px solid rgba(255,255,255,0.1);"><span>📊</span> <span class="btn-text">Excel İndir</span></button>
@@ -1069,30 +1070,71 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                     <small style="color:var(--muted); font-size:0.75rem; margin-top:5px; display:block;">Bu tarihlerde rezervasyon alınamaz ve açıklama müşteriye gösterilir.</small>
                 </div>
 
-                <div class="modal-form-group">
-                    <label>Menü Dosyaları (PDF)</label>
-                    <div style="background: var(--surface-2); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); padding: 15px; margin-bottom: 20px;">
-                        <div style="margin-bottom: 15px;">
-                            <label style="font-size: 0.8rem; margin-bottom: 5px; display: block; color: var(--muted);">Yemek Menüsü</label>
-                            <input type="file" id="ayar-menu-yemek" accept=".pdf" style="width: 100%; padding: 8px; background: var(--bg); border: 1px solid rgba(255,255,255,0.1); color: var(--text); border-radius: 4px;">
-                            <div id="current-menu-yemek" style="font-size: 0.75rem; color: var(--accent); margin-top: 5px;"></div>
-                        </div>
-                        <div style="margin-bottom: 15px;">
-                            <label style="font-size: 0.8rem; margin-bottom: 5px; display: block; color: var(--muted);">Alkol Menüsü</label>
-                            <input type="file" id="ayar-menu-alkol" accept=".pdf" style="width: 100%; padding: 8px; background: var(--bg); border: 1px solid rgba(255,255,255,0.1); color: var(--text); border-radius: 4px;">
-                            <div id="current-menu-alkol" style="font-size: 0.75rem; color: var(--accent); margin-top: 5px;"></div>
-                        </div>
-                        <div style="margin-bottom: 0;">
-                            <label style="font-size: 0.8rem; margin-bottom: 5px; display: block; color: var(--muted);">Tatlı Menüsü</label>
-                            <input type="file" id="ayar-menu-tatli" accept=".pdf" style="width: 100%; padding: 8px; background: var(--bg); border: 1px solid rgba(255,255,255,0.1); color: var(--text); border-radius: 4px;">
-                            <div id="current-menu-tatli" style="font-size: 0.75rem; color: var(--accent); margin-top: 5px;"></div>
-                        </div>
-                    </div>
-                    <small style="color:var(--muted); font-size:0.75rem; display:block;">Sadece PDF dosyaları kabul edilir. Yeni dosya yüklendiğinde eskisi silinmez ama veritabanında güncellenir.</small>
-                </div>
                 <div class="modal-actions">
                     <button type="button" class="btn-modal btn-cancel" onclick="kapatModal('ayarlarModal')">İptal</button>
                     <button type="submit" class="btn-modal btn-primary">Ayarları Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Menü Yönetimi Modal -->
+    <div id="menuModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 700px;">
+            <h3 class="modal-title">Menü Yönetimi</h3>
+            <p class="modal-text">Yemek, Alkol ve Tatlı menülerini PDF formatında buradan güncelleyebilirsiniz.</p>
+            <form id="menuForm" onsubmit="menuKaydetSubmit(event)">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px; text-align: left; margin-bottom: 25px;">
+                    <!-- Türkçe Menüler -->
+                    <div style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                        <h4 style="color: var(--accent); margin-bottom: 15px; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">🇹🇷 TR Menüler (Türkçe)</h4>
+                        
+                        <div class="modal-form-group">
+                            <label>Yemek Menüsü (TR)</label>
+                            <input type="file" id="menu-yemek-tr" accept=".pdf" style="font-size: 0.8rem;">
+                            <div id="current-menu-yemek-tr" style="font-size: 0.7rem; color: var(--muted); margin-top: 4px;"></div>
+                        </div>
+                        
+                        <div class="modal-form-group">
+                            <label>Alkol Menüsü (TR)</label>
+                            <input type="file" id="menu-alkol-tr" accept=".pdf" style="font-size: 0.8rem;">
+                            <div id="current-menu-alkol-tr" style="font-size: 0.7rem; color: var(--muted); margin-top: 4px;"></div>
+                        </div>
+                        
+                        <div class="modal-form-group">
+                            <label>Tatlı Menüsü (TR)</label>
+                            <input type="file" id="menu-tatli-tr" accept=".pdf" style="font-size: 0.8rem;">
+                            <div id="current-menu-tatli-tr" style="font-size: 0.7rem; color: var(--muted); margin-top: 4px;"></div>
+                        </div>
+                    </div>
+
+                    <!-- İngilizce Menüler -->
+                    <div style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                        <h4 style="color: var(--accent); margin-bottom: 15px; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">🇬🇧 EN Menüler (English)</h4>
+                        
+                        <div class="modal-form-group">
+                            <label>Yemek Menüsü (EN)</label>
+                            <input type="file" id="menu-yemek-en" accept=".pdf" style="font-size: 0.8rem;">
+                            <div id="current-menu-yemek-en" style="font-size: 0.7rem; color: var(--muted); margin-top: 4px;"></div>
+                        </div>
+                        
+                        <div class="modal-form-group">
+                            <label>Alkol Menüsü (EN)</label>
+                            <input type="file" id="menu-alkol-en" accept=".pdf" style="font-size: 0.8rem;">
+                            <div id="current-menu-alkol-en" style="font-size: 0.7rem; color: var(--muted); margin-top: 4px;"></div>
+                        </div>
+                        
+                        <div class="modal-form-group">
+                            <label>Tatlı Menüsü (EN)</label>
+                            <input type="file" id="menu-tatli-en" accept=".pdf" style="font-size: 0.8rem;">
+                            <div id="current-menu-tatli-en" style="font-size: 0.7rem; color: var(--muted); margin-top: 4px;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-modal btn-cancel" onclick="kapatModal('menuModal')">İptal</button>
+                    <button type="submit" class="btn-modal btn-primary">Menüleri Kaydet</button>
                 </div>
             </form>
         </div>
@@ -1574,20 +1616,86 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                     
                     listeleKapaliGunler();
                     renderCalismaSaatleri(json.data.calisma_saatleri || {});
-
-                    // Menü dosyaları
-                    document.getElementById('current-menu-yemek').textContent = json.data.menu_yemek ? 'Mevcut: ' + json.data.menu_yemek.split('/').pop() : 'Henüz yüklenmedi';
-                    document.getElementById('current-menu-alkol').textContent = json.data.menu_alkol ? 'Mevcut: ' + json.data.menu_alkol.split('/').pop() : 'Henüz yüklenmedi';
-                    document.getElementById('current-menu-tatli').textContent = json.data.menu_tatli ? 'Mevcut: ' + json.data.menu_tatli.split('/').pop() : 'Henüz yüklenmedi';
-                    
-                    // Inputları temizle
-                    document.getElementById('ayar-menu-yemek').value = '';
-                    document.getElementById('ayar-menu-alkol').value = '';
-                    document.getElementById('ayar-menu-tatli').value = '';
                 }
             } catch(err) {
                 showToast('Ayarlar yüklenemedi', 'error');
             }
+        }
+
+        /**
+         * Menü Yönetimi Modalını Aç ve Verileri Çek
+         */
+        async function menuYonetimiAc() {
+            acModal('menuModal');
+            try {
+                const res = await fetch('api.php?action=settings_get');
+                const json = await res.json();
+                if (json.success) {
+                    // Mevcut dosyalar (TR)
+                    document.getElementById('current-menu-yemek-tr').textContent = json.data.menu_yemek ? 'Mevcut: ' + json.data.menu_yemek.split('/').pop() : 'Henüz yüklenmedi';
+                    document.getElementById('current-menu-alkol-tr').textContent = json.data.menu_alkol ? 'Mevcut: ' + json.data.menu_alkol.split('/').pop() : 'Henüz yüklenmedi';
+                    document.getElementById('current-menu-tatli-tr').textContent = json.data.menu_tatli ? 'Mevcut: ' + json.data.menu_tatli.split('/').pop() : 'Henüz yüklenmedi';
+                    
+                    // Mevcut dosyalar (EN)
+                    document.getElementById('current-menu-yemek-en').textContent = json.data.menu_yemek_en ? 'Mevcut: ' + json.data.menu_yemek_en.split('/').pop() : 'Henüz yüklenmedi';
+                    document.getElementById('current-menu-alkol-en').textContent = json.data.menu_alkol_en ? 'Mevcut: ' + json.data.menu_alkol_en.split('/').pop() : 'Henüz yüklenmedi';
+                    document.getElementById('current-menu-tatli-en').textContent = json.data.menu_tatli_en ? 'Mevcut: ' + json.data.menu_tatli_en.split('/').pop() : 'Henüz yüklenmedi';
+
+                    // Inputları temizle
+                    ['tr', 'en'].forEach(lang => {
+                        ['yemek', 'alkol', 'tatli'].forEach(type => {
+                            document.getElementById(`menu-${type}-${lang}`).value = '';
+                        });
+                    });
+                }
+            } catch(err) {
+                showToast('Menü bilgileri yüklenemedi', 'error');
+            }
+        }
+
+        /**
+         * Menüleri Kaydet
+         */
+        async function menuKaydetSubmit(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.textContent = "Kaydediliyor...";
+            
+            try {
+                const formData = new FormData();
+                formData.append('action', 'settings_save');
+                
+                // Menü Dosyaları (TR)
+                const trKeys = { 'menu_yemek': 'menu-yemek-tr', 'menu_alkol': 'menu-alkol-tr', 'menu_tatli': 'menu-tatli-tr' };
+                for (const [key, id] of Object.entries(trKeys)) {
+                    const file = document.getElementById(id).files[0];
+                    if (file) formData.append(key, file);
+                }
+
+                // Menü Dosyaları (EN)
+                const enKeys = { 'menu_yemek_en': 'menu-yemek-en', 'menu_alkol_en': 'menu-alkol-en', 'menu_tatli_en': 'menu-tatli-en' };
+                for (const [key, id] of Object.entries(enKeys)) {
+                    const file = document.getElementById(id).files[0];
+                    if (file) formData.append(key, file);
+                }
+
+                formData.append('csrf_token', csrfToken);
+                
+                const res = await fetch('api.php', { method: 'POST', body: formData });
+                const json = await res.json();
+                
+                if (json.success) {
+                    showToast('Menüler başarıyla güncellendi.', 'success');
+                    kapatModal('menuModal');
+                } else {
+                    showToast(json.message, 'error');
+                }
+            } catch(err) {
+                showToast('Bağlantı hatası.', 'error');
+            }
+            btn.disabled = false;
+            btn.textContent = "Menüleri Kaydet";
         }
 
         /**
@@ -1697,15 +1805,6 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                     };
                 });
                 formData.append('calisma_saatleri', JSON.stringify(saatler));
-
-                // Menü Dosyaları
-                const menuYemek = document.getElementById('ayar-menu-yemek').files[0];
-                const menuAlkol = document.getElementById('ayar-menu-alkol').files[0];
-                const menuTatli = document.getElementById('ayar-menu-tatli').files[0];
-                
-                if (menuYemek) formData.append('menu_yemek', menuYemek);
-                if (menuAlkol) formData.append('menu_alkol', menuAlkol);
-                if (menuTatli) formData.append('menu_tatli', menuTatli);
 
                 formData.append('csrf_token', csrfToken);
                 

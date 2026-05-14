@@ -163,6 +163,38 @@
             width: 100%;
         }
 
+        .lang-switcher {
+            display: flex;
+            gap: 10px;
+            margin-left: 2rem;
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            padding-left: 1.5rem;
+        }
+
+        .lang-btn {
+            cursor: pointer;
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .lang-btn:hover,
+        .lang-btn.active {
+            color: var(--color-accent);
+        }
+
+        @media (max-width: 1100px) {
+            .lang-switcher {
+                margin-left: 0;
+                margin-top: 2rem;
+                border-left: none;
+                padding-left: 0;
+            }
+        }
+
         .menu-toggle {
             display: none;
             flex-direction: column;
@@ -646,12 +678,17 @@
         </a>
         <nav>
             <ul id="nav-links">
-                <li><a href="#anasayfa" class="nav-link active">Anasayfa</a></li>
-                <li><a href="#hakkimizda" class="nav-link">Hakkımızda</a></li>
-                <li><a href="#galeri" class="nav-link">Galeri</a></li>
-                <li><a href="menu.html" class="nav-link">Menü</a></li>
-                <li><a href="catering.html" class="nav-link">Caterıng</a></li>
-                <li><a href="#iletisim" class="nav-link">İletişim</a></li>
+                <li><a href="#anasayfa" class="nav-link active" data-i18n="nav-home">Anasayfa</a></li>
+                <li><a href="#hakkimizda" class="nav-link" data-i18n="nav-about">Hakkımızda</a></li>
+                <li><a href="#galeri" class="nav-link" data-i18n="nav-gallery">Galeri</a></li>
+                <li><a href="menu.html" class="nav-link" data-i18n="nav-menu">Menü</a></li>
+                <li><a href="catering.html" class="nav-link" data-i18n="nav-catering">Caterıng</a></li>
+                <li><a href="#iletisim" class="nav-link" data-i18n="nav-contact">İletişim</a></li>
+                <li class="lang-switcher">
+                    <span class="lang-btn" onclick="setLanguage('tr')" data-lang="tr">TR</span>
+                    <span style="color: rgba(255,255,255,0.2)">|</span>
+                    <span class="lang-btn" onclick="setLanguage('en')" data-lang="en">EN</span>
+                </li>
             </ul>
         </nav>
         <div class="menu-toggle" id="mobile-menu">
@@ -668,25 +705,25 @@
         <div class="hero-overlay"></div>
 
         <div class="hero-content">
-            <span class="section-subtitle">Gastronominin Sentezi</span>
-            <h1 class="hero-title">Sintesi</h1>
-            <p>Lezzetin, sanatın ve tutkunun bir araya geldiği unutulmaz bir deneyim. Geleneksel tatların modern
+            <span class="section-subtitle" data-i18n="hero-subtitle">Gastronominin Sentezi</span>
+            <h1 class="hero-title" data-i18n="hero-title">Sintesi</h1>
+            <p data-i18n="hero-desc">Lezzetin, sanatın ve tutkunun bir araya geldiği unutulmaz bir deneyim. Geleneksel tatların modern
                 dokunuşlarla yeniden hayat bulduğu yer.</p>
-            <a href="rezervasyon.html" class="btn">Rezervasyon Yap</a>
+            <a href="rezervasyon.html" class="btn" data-i18n="hero-btn">Rezervasyon Yap</a>
         </div>
     </section>
 
     <!-- Hakkımızda -->
     <section id="hakkimizda" class="reveal">
         <div class="about-text">
-            <span class="section-subtitle">Hikayemiz</span>
-            <h2>Tutkuyla Harmanlanmış Lezzetler</h2>
-            <p>Sintesi, kelime anlamı olarak "sentez" anlamına gelir. Bizim için mutfak, farklı kültürlerin, yerel
+            <span class="section-subtitle" data-i18n="about-subtitle">Hikayemiz</span>
+            <h2 data-i18n="about-title">Tutkuyla Harmanlanmış Lezzetler</h2>
+            <p data-i18n="about-p1">Sintesi, kelime anlamı olarak "sentez" anlamına gelir. Bizim için mutfak, farklı kültürlerin, yerel
                 malzemelerin ve yenilikçi tekniklerin kusursuz bir sentezidir.</p>
-            <p>Her bir tabağımız, en taze malzemelerin özenle seçilmesiyle başlar ve şeflerimizin sanatıyla masanıza
+            <p data-i18n="about-p2">Her bir tabağımız, en taze malzemelerin özenle seçilmesiyle başlar ve şeflerimizin sanatıyla masanıza
                 ulaşır. Amacımız, sadece yemek yemek değil, aynı zamanda duygulara hitap eden bir gastronomi yolculuğu
                 sunmaktır.</p>
-            <a href="hakkimizda.html" class="btn" style="margin-top: 1rem;">Mekanımızı Keşfedin</a>
+            <a href="hakkimizda.html" class="btn" style="margin-top: 1rem;" data-i18n="about-btn">Mekanımızı Keşfedin</a>
         </div>
         <div class="about-image">
             <!-- Hakkımızda Fotoğraf Alanı -->
@@ -696,8 +733,8 @@
 
     <!-- Galeri -->
     <section id="galeri" class="reveal">
-        <span class="section-subtitle">Atmosfer & Sunum</span>
-        <h2>Görsel Bir Şölen</h2>
+        <span class="section-subtitle" data-i18n="gallery-subtitle">Atmosfer & Sunum</span>
+        <h2 data-i18n="gallery-title">Görsel Bir Şölen</h2>
 
         <div class="gallery-grid">
             <!-- Galeri Fotoğraf Alanları -->
@@ -727,7 +764,7 @@
             </div>
         </div>
         <div style="text-align: center; margin-top: 3rem;">
-            <a href="galeri.html" class="btn">Tüm Galeriyi Gör</a>
+            <a href="galeri.html" class="btn" data-i18n="gallery-btn">Tüm Galeriyi Gör</a>
         </div>
     </section>
 
@@ -736,17 +773,17 @@
         <div class="contact-container">
             <div class="contact-info">
 
-                <h3>Sizi Ağırlamaktan Mutluluk Duyarız</h3>
+                <h3 data-i18n="contact-title">Sizi Ağırlamaktan Mutluluk Duyarız</h3>
 
                 <div class="info-block">
-                    <h4>Adres</h4>
-                    <p>Atatürk Mahallesi Ertuğrul Gazi Sokak Metropol İstanbul Alışveriş Merkezi B2 Katı<br>Ataşehir,
+                    <h4 data-i18n="contact-address">Adres</h4>
+                    <p data-i18n="contact-address-detail">Atatürk Mahallesi Ertuğrul Gazi Sokak Metropol İstanbul Alışveriş Merkezi B2 Katı<br>Ataşehir,
                         İstanbul</p>
                 </div>
 
                 <div class="info-block">
-                    <h4>Rezervasyon</h4>
-                    <a href="rezervasyon.html" class="info-accent-link" style="color: #9D432C !important;">Online
+                    <h4 data-i18n="contact-res">Rezervasyon</h4>
+                    <a href="rezervasyon.html" class="info-accent-link" style="color: #9D432C !important;" data-i18n="contact-res-link">Online
                         Rezervasyon
                         Formu</a>
                     <p>+90 (216) XXX XX XX<br>info@sintesi.com.tr</p>
@@ -754,31 +791,31 @@
                 </div>
 
                 <div class="info-block">
-                    <h4>Çalışma Saatleri</h4>
-                    <p>Her Gün: 15:00 - 00:00</p>
+                    <h4 data-i18n="contact-hours">Çalışma Saatleri</h4>
+                    <p data-i18n="contact-hours-detail">Her Gün: 15:00 - 00:00</p>
                 </div>
             </div>
 
             <form class="contact-form" id="contactForm">
-                <span class="section-subtitle">Bize Ulaşın</span>
+                <span class="section-subtitle" data-i18n="contact-form-subtitle">Bize Ulaşın</span>
                 <div id="form-message"
                     style="display: none; margin-bottom: 15px; padding: 15px; border-radius: 5px; text-align: center; width: 100%;">
                 </div>
                 <div class="form-group">
-                    <input type="text" name="ad" id="ad" placeholder="Adınız Soyadınız" required>
+                    <input type="text" name="ad" id="ad" placeholder="Adınız Soyadınız" required data-i18n="form-name">
                 </div>
                 <div class="form-group">
-                    <input type="email" name="eposta" id="eposta" placeholder="E-posta Adresiniz" required>
+                    <input type="email" name="eposta" id="eposta" placeholder="E-posta Adresiniz" required data-i18n="form-email">
                 </div>
                 <div class="form-group">
                     <input type="tel" name="telefon" id="telefon" placeholder="Telefon Numaranız"
-                        oninput="this.value = this.value.replace(/[^0-9]/g, '');" maxlength="15">
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '');" maxlength="15" data-i18n="form-phone">
                 </div>
                 <div class="form-group">
                     <textarea name="mesaj" id="mesaj" placeholder="Mesajınız veya Özel İstekleriniz..."
-                        required></textarea>
+                        required data-i18n="form-message"></textarea>
                 </div>
-                <button type="submit" class="btn" id="submitBtn" style="align-self: flex-start;">Gönder</button>
+                <button type="submit" class="btn" id="submitBtn" style="align-self: flex-start;" data-i18n="form-submit">Gönder</button>
             </form>
 
             <div class="contact-map">
@@ -804,8 +841,10 @@
                 </svg>
             </a>
         </div>
-        <p>&copy; Sintesi Restaurant. Tüm Hakları Saklıdır.</p>
+        <p data-i18n="footer-copy">&copy; Sintesi Restaurant. Tüm Hakları Saklıdır.</p>
     </footer>
+
+    <script src="js/translations.js"></script>
 
     <!-- Lightbox Modal -->
     <div id="lightbox" class="lightbox">

@@ -399,7 +399,36 @@
             }
         }
 
+        .lang-switcher {
+            display: flex;
+            gap: 10px;
+            margin-left: 2rem;
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            padding-left: 1.5rem;
+        }
+
+        .lang-btn {
+            cursor: pointer;
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .lang-btn:hover,
+        .lang-btn.active {
+            color: var(--color-accent);
+        }
+
         @media (max-width: 1100px) {
+            .lang-switcher {
+                margin-left: 0;
+                margin-top: 2rem;
+                border-left: none;
+                padding-left: 0;
+            }
             nav ul {
                 position: fixed;
                 top: 0;
@@ -461,12 +490,17 @@
         </a>
         <nav>
             <ul id="nav-links">
-                <li><a href="index.html" class="nav-link">Anasayfa</a></li>
-                <li><a href="hakkimizda.html" class="nav-link">Hakkımızda</a></li>
-                <li><a href="galeri.html" class="nav-link">Galeri</a></li>
-                <li><a href="menu.html" class="nav-link">Menü</a></li>
-                <li><a href="catering.html" class="nav-link active">Caterıng</a></li>
-                <li><a href="index.html#iletisim" class="nav-link">İletişim</a></li>
+                <li><a href="index.html" class="nav-link" data-i18n="nav-home">Anasayfa</a></li>
+                <li><a href="hakkimizda.html" class="nav-link" data-i18n="nav-about">Hakkımızda</a></li>
+                <li><a href="galeri.html" class="nav-link" data-i18n="nav-gallery">Galeri</a></li>
+                <li><a href="menu.html" class="nav-link" data-i18n="nav-menu">Menü</a></li>
+                <li><a href="catering.html" class="nav-link active" data-i18n="nav-catering">Caterıng</a></li>
+                <li><a href="index.html#iletisim" class="nav-link" data-i18n="nav-contact">İletişim</a></li>
+                <li class="lang-switcher">
+                    <span class="lang-btn" onclick="setLanguage('tr')" data-lang="tr">TR</span>
+                    <span style="color: rgba(255,255,255,0.2)">|</span>
+                    <span class="lang-btn" onclick="setLanguage('en')" data-lang="en">EN</span>
+                </li>
             </ul>
         </nav>
         <div class="menu-toggle" id="mobile-menu">
@@ -479,11 +513,11 @@
     <div class="container">
         <section id="catering-hero" class="reveal">
             <div class="hero-text">
-                <span class="section-subtitle">Sintesi Caterıng</span>
-                <h2>Özel Anlarınıza Şef Dokunuşu</h2>
-                <p>Sintesi kalitesini ve lezzet sentezini istediğiniz mekana taşıyoruz. Profesyonel ekibimiz ve ödüllü
+                <span class="section-subtitle" data-i18n="nav-catering">Sintesi Caterıng</span>
+                <h2 data-i18n="catering-subtitle">Özel Anlarınıza Şef Dokunuşu</h2>
+                <p data-i18n="catering-title">Sintesi kalitesini ve lezzet sentezini istediğiniz mekana taşıyoruz. Profesyonel ekibimiz ve ödüllü
                     şeflerimizin hazırladığı özel menülerle etkinliklerinizi unutulmaz kılıyoruz.</p>
-                <p>Butik davetlerden kurumsal organizasyonlara kadar her detayda kusursuzluğu hedefliyoruz.</p>
+                <p data-i18n="catering-desc">Butik davetlerden kurumsal organizasyonlara kadar her detayda kusursuzluğu hedefliyoruz.</p>
             </div>
             <div class="hero-image">
                 <video src="./assets/catering.mp4" autoplay loop muted playsinline></video>
@@ -493,22 +527,22 @@
 
     <section id="catering-services" class="reveal">
         <div class="container">
-            <span class="section-subtitle">Hizmetlerimiz</span>
-            <h2>Size Özel Çözümler</h2>
+            <span class="section-subtitle" data-i18n="cat-services-subtitle">Hizmetlerimiz</span>
+            <h2 data-i18n="cat-services-title">Size Özel Çözümler</h2>
             <div class="services-grid">
                 <div class="service-card">
-                    <h3>Kurumsal</h3>
-                    <p>İş yemekleri, lansmanlar ve kurumsal toplantılarınız için prestijli ve lezzetli menü seçenekleri
+                    <h3 data-i18n="cat-corp-title">Kurumsal</h3>
+                    <p data-i18n="cat-corp-desc">İş yemekleri, lansmanlar ve kurumsal toplantılarınız için prestijli ve lezzetli menü seçenekleri
                         sunuyoruz.</p>
                 </div>
                 <div class="service-card">
-                    <h3>Özel Davetler</h3>
-                    <p>Doğum günleri, yıldönümleri ve ev partilerinizde misafirlerinize bir gastronomi deneyimi yaşatın.
+                    <h3 data-i18n="cat-special-title">Özel Davetler</h3>
+                    <p data-i18n="cat-special-desc">Doğum günleri, yıldönümleri ve ev partilerinizde misafirlerinize bir gastronomi deneyimi yaşatın.
                     </p>
                 </div>
                 <div class="service-card">
-                    <h3>Düğün & Nişan</h3>
-                    <p>Hayatınızın en özel gününde, konuklarınıza sunacağınız menüyü birlikte tasarlayalım.</p>
+                    <h3 data-i18n="cat-wedding-title">Düğün & Nişan</h3>
+                    <p data-i18n="cat-wedding-desc">Hayatınızın en özel gününde, konuklarınıza sunacağınız menüyü birlikte tasarlayalım.</p>
                 </div>
             </div>
         </div>
@@ -516,9 +550,9 @@
 
     <section id="catering-cta" class="reveal">
         <div class="container cta-content">
-            <h2>Hayalinizdeki Etkinliği Birlikte Planlayalım</h2>
-            <p>Size özel menü teklifi ve detaylı bilgi için bizimle iletişime geçin.</p>
-            <button type="button" class="btn-large" onclick="openInquiry()">Teklif Alın</button>
+            <h2 data-i18n="cat-cta-title">Hayalinizdeki Etkinliği Birlikte Planlayalım</h2>
+            <p data-i18n="cat-cta-desc">Size özel menü teklifi ve detaylı bilgi için bizimle iletişime geçin.</p>
+            <button type="button" class="btn-large" onclick="openInquiry()" data-i18n="cat-cta-btn">Teklif Alın</button>
         </div>
     </section>
 
@@ -596,9 +630,10 @@
                 </svg>
             </a>
         </div>
-        <p>&copy; Sintesi Restaurant. Tüm Hakları Saklıdır.</p>
+        <p data-i18n="footer-copy">&copy; Sintesi Restaurant. Tüm Hakları Saklıdır.</p>
     </footer>
 
+    <script src="js/translations.js"></script>
     <script>
         const mobileMenu = document.getElementById('mobile-menu');
         const navLinks = document.getElementById('nav-links');

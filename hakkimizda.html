@@ -253,7 +253,36 @@
             }
         }
 
+        .lang-switcher {
+            display: flex;
+            gap: 10px;
+            margin-left: 2rem;
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            padding-left: 1.5rem;
+        }
+
+        .lang-btn {
+            cursor: pointer;
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .lang-btn:hover,
+        .lang-btn.active {
+            color: var(--color-accent);
+        }
+
         @media (max-width: 1100px) {
+            .lang-switcher {
+                margin-left: 0;
+                margin-top: 2rem;
+                border-left: none;
+                padding-left: 0;
+            }
             nav ul {
                 position: fixed;
                 top: 0;
@@ -300,12 +329,17 @@
         </a>
         <nav>
             <ul id="nav-links">
-                <li><a href="index.html" class="nav-link">Anasayfa</a></li>
-                <li><a href="hakkimizda.html" class="nav-link active">Hakkımızda</a></li>
-                <li><a href="galeri.html" class="nav-link">Galeri</a></li>
-                <li><a href="menu.html" class="nav-link">Menü</a></li>
-                <li><a href="catering.html" class="nav-link">Caterıng</a></li>
-                <li><a href="index.html#iletisim" class="nav-link">İletişim</a></li>
+                <li><a href="index.html" class="nav-link" data-i18n="nav-home">Anasayfa</a></li>
+                <li><a href="hakkimizda.html" class="nav-link active" data-i18n="nav-about">Hakkımızda</a></li>
+                <li><a href="galeri.html" class="nav-link" data-i18n="nav-gallery">Galeri</a></li>
+                <li><a href="menu.html" class="nav-link" data-i18n="nav-menu">Menü</a></li>
+                <li><a href="catering.html" class="nav-link" data-i18n="nav-catering">Caterıng</a></li>
+                <li><a href="index.html#iletisim" class="nav-link" data-i18n="nav-contact">İletişim</a></li>
+                <li class="lang-switcher">
+                    <span class="lang-btn" onclick="setLanguage('tr')" data-lang="tr">TR</span>
+                    <span style="color: rgba(255,255,255,0.2)">|</span>
+                    <span class="lang-btn" onclick="setLanguage('en')" data-lang="en">EN</span>
+                </li>
             </ul>
         </nav>
         <div class="menu-toggle" id="mobile-menu">
@@ -317,14 +351,14 @@
 
     <section id="hakkimizda">
         <div class="about-text">
-            <span class="section-subtitle">Hikayemiz</span>
-            <h2>Tutkuyla Harmanlanmış Lezzetler</h2>
-            <p>Sintesi, kelime anlamı olarak "sentez" anlamına gelir. Bizim için mutfak, farklı kültürlerin, yerel
+            <span class="section-subtitle" data-i18n="about-subtitle">Hikayemiz</span>
+            <h2 data-i18n="about-title">Tutkuyla Harmanlanmış Lezzetler</h2>
+            <p data-i18n="about-p1">Sintesi, kelime anlamı olarak "sentez" anlamına gelir. Bizim için mutfak, farklı kültürlerin, yerel
                 malzemelerin ve yenilikçi tekniklerin kusursuz bir sentezidir.</p>
-            <p>Her bir tabağımız, en taze malzemelerin özenle seçilmesiyle başlar ve şeflerimizin sanatıyla masanıza
+            <p data-i18n="about-p2">Her bir tabağımız, en taze malzemelerin özenle seçilmesiyle başlar ve şeflerimizin sanatıyla masanıza
                 ulaşır. Amacımız, sadece yemek yemek değil, aynı zamanda duygulara hitap eden bir gastronomi yolculuğu
                 sunmaktır.</p>
-            <p>Yıllar süren araştırmalarımız ve geleneksel yöntemlere olan saygımız, modern pişirme teknikleriyle
+            <p data-i18n="about-p3">Yıllar süren araştırmalarımız ve geleneksel yöntemlere olan saygımız, modern pişirme teknikleriyle
                 birleştiğinde Sintesi'nin karakteristik menüsü ortaya çıkıyor.</p>
         </div>
         <div class="about-image">
@@ -335,13 +369,13 @@
     <section style="padding-top: 2rem;">
         <div class="mission-vision">
             <div class="mv-box">
-                <h3>Misyonumuz</h3>
-                <p>Yerel üreticileri destekleyerek en taze malzemeleri misafirlerimize sunmak ve gastronomi dünyasında
+                <h3 data-i18n="about-mission-title">Misyonumuz</h3>
+                <p data-i18n="about-mission-desc">Yerel üreticileri destekleyerek en taze malzemeleri misafirlerimize sunmak ve gastronomi dünyasında
                     sürdürülebilir, yenilikçi bir değer yaratmak.</p>
             </div>
             <div class="mv-box">
-                <h3>Vizyonumuz</h3>
-                <p>Dünya mutfakları ile yerel mirasımızı harmanlayarak, Sintesi'yi hem lezzet hem de atmosfer açısından
+                <h3 data-i18n="about-vision-title">Vizyonumuz</h3>
+                <p data-i18n="about-vision-desc">Dünya mutfakları ile yerel mirasımızı harmanlayarak, Sintesi'yi hem lezzet hem de atmosfer açısından
                     uluslararası bir destinasyon haline getirmek.</p>
             </div>
         </div>
@@ -361,9 +395,10 @@
                 </svg>
             </a>
         </div>
-        <p>&copy; Sintesi Restaurant. Tüm Hakları Saklıdır.</p>
+        <p data-i18n="footer-copy">&copy; Sintesi Restaurant. Tüm Hakları Saklıdır.</p>
     </footer>
 
+    <script src="js/translations.js"></script>
     <script>
         const mobileMenu = document.getElementById('mobile-menu');
         const navLinks = document.getElementById('nav-links');

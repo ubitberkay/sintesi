@@ -146,7 +146,36 @@
             transition: 0.3s;
         }
 
+        .lang-switcher {
+            display: flex;
+            gap: 10px;
+            margin-left: 2rem;
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            padding-left: 1.5rem;
+        }
+
+        .lang-btn {
+            cursor: pointer;
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .lang-btn:hover,
+        .lang-btn.active {
+            color: var(--color-accent);
+        }
+
         @media (max-width: 1100px) {
+            .lang-switcher {
+                margin-left: 0;
+                margin-top: 2rem;
+                border-left: none;
+                padding-left: 0;
+            }
             nav ul {
                 position: fixed;
                 top: 0;
@@ -370,12 +399,17 @@
         </a>
         <nav>
             <ul id="nav-links">
-                <li><a href="index.html" class="nav-link">Anasayfa</a></li>
-                <li><a href="hakkimizda.html" class="nav-link">Hakkımızda</a></li>
-                <li><a href="galeri.html" class="nav-link">Galeri</a></li>
-                <li><a href="menu.html" class="nav-link active">Menü</a></li>
-                <li><a href="catering.html" class="nav-link">Caterıng</a></li>
-                <li><a href="index.html#iletisim" class="nav-link">İletişim</a></li>
+                <li><a href="index.html" class="nav-link" data-i18n="nav-home">Anasayfa</a></li>
+                <li><a href="hakkimizda.html" class="nav-link" data-i18n="nav-about">Hakkımızda</a></li>
+                <li><a href="galeri.html" class="nav-link" data-i18n="nav-gallery">Galeri</a></li>
+                <li><a href="menu.html" class="nav-link active" data-i18n="nav-menu">Menü</a></li>
+                <li><a href="catering.html" class="nav-link" data-i18n="nav-catering">Caterıng</a></li>
+                <li><a href="index.html#iletisim" class="nav-link" data-i18n="nav-contact">İletişim</a></li>
+                <li class="lang-switcher">
+                    <span class="lang-btn" onclick="setLanguage('tr')" data-lang="tr">TR</span>
+                    <span style="color: rgba(255,255,255,0.2)">|</span>
+                    <span class="lang-btn" onclick="setLanguage('en')" data-lang="en">EN</span>
+                </li>
             </ul>
         </nav>
         <div class="menu-toggle" id="mobile-menu">
@@ -387,8 +421,8 @@
 
     <main>
         <div class="title-area">
-            <span class="section-subtitle">Gastronomi Deneyimi</span>
-            <h1>Menülerimiz</h1>
+            <span class="section-subtitle" data-i18n="menu-title-subtitle">Gastronomi Deneyimi</span>
+            <h1 data-i18n="menu-title">Menülerimiz</h1>
         </div>
 
         <div class="menu-grid">
@@ -401,8 +435,8 @@
                         <path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path>
                     </svg>
                 </div>
-                <h3>Yemek</h3>
-                <p>Ana Menü</p>
+                <h3 data-i18n="menu-yemek">Yemek</h3>
+                <p data-i18n="menu-yemek-desc">Ana Menü</p>
             </a>
             <a href="#" target="_blank" id="menu-alkol" class="menu-card">
                 <div class="icon">
@@ -414,8 +448,8 @@
                         <path d="M12 15a5 5 0 0 0 5-5c0-2-.5-4-2-8H9c-1.5 4-2 6-2 8a5 5 0 0 0 5 5Z"></path>
                     </svg>
                 </div>
-                <h3>Alkol</h3>
-                <p>İçecek Listesi</p>
+                <h3 data-i18n="menu-alkol">Alkol</h3>
+                <p data-i18n="menu-alkol-desc">İçecek Listesi</p>
             </a>
             <a href="#" target="_blank" id="menu-tatli" class="menu-card">
                 <div class="icon">
@@ -432,8 +466,8 @@
                         <path d="M17 4h.01"></path>
                     </svg>
                 </div>
-                <h3>Tatlı</h3>
-                <p>Lezzetli Kapanışlar</p>
+                <h3 data-i18n="menu-tatli">Tatlı</h3>
+                <p data-i18n="menu-tatli-desc">Lezzetli Kapanışlar</p>
             </a>
         </div>
     </main>
@@ -452,9 +486,10 @@
                 </svg>
             </a>
         </div>
-        <p>&copy; Sintesi Restaurant. Tüm Hakları Saklıdır.</p>
+        <p data-i18n="footer-copy">&copy; Sintesi Restaurant. Tüm Hakları Saklıdır.</p>
     </footer>
 
+    <script src="js/translations.js"></script>
     <script>
         async function loadMenuLinks() {
             try {
@@ -462,23 +497,36 @@
                 const json = await res.json();
                 if (json.success) {
                     const data = json.data;
+                    const lang = localStorage.getItem('preferredLanguage') || 'tr';
+                    
+                    const links = {
+                        'yemek': lang === 'tr' ? data.menu_yemek : (data.menu_yemek_en || data.menu_yemek),
+                        'alkol': lang === 'tr' ? data.menu_alkol : (data.menu_alkol_en || data.menu_alkol),
+                        'tatli': lang === 'tr' ? data.menu_tatli : (data.menu_tatli_en || data.menu_tatli)
+                    };
+
                     const menuYemek = document.getElementById('menu-yemek');
                     const menuAlkol = document.getElementById('menu-alkol');
                     const menuTatli = document.getElementById('menu-tatli');
 
-                    if (data.menu_yemek) menuYemek.href = data.menu_yemek;
+                    if (links.yemek) { menuYemek.href = links.yemek; menuYemek.classList.remove('disabled'); }
                     else menuYemek.classList.add('disabled');
 
-                    if (data.menu_alkol) menuAlkol.href = data.menu_alkol;
+                    if (links.alkol) { menuAlkol.href = links.alkol; menuAlkol.classList.remove('disabled'); }
                     else menuAlkol.classList.add('disabled');
 
-                    if (data.menu_tatli) menuTatli.href = data.menu_tatli;
+                    if (links.tatli) { menuTatli.href = links.tatli; menuTatli.classList.remove('disabled'); }
                     else menuTatli.classList.add('disabled');
                 }
             } catch (err) {
                 console.error('Menü linkleri yüklenemedi:', err);
             }
         }
+        
+        function onLanguageChange(lang) {
+            loadMenuLinks();
+        }
+        
         loadMenuLinks();
 
         // Mobil Menü Toggle

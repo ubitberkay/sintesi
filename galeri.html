@@ -331,7 +331,36 @@
             right: 20px;
         }
 
+        .lang-switcher {
+            display: flex;
+            gap: 10px;
+            margin-left: 2rem;
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            padding-left: 1.5rem;
+        }
+
+        .lang-btn {
+            cursor: pointer;
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .lang-btn:hover,
+        .lang-btn.active {
+            color: var(--color-accent);
+        }
+
         @media (max-width: 1100px) {
+            .lang-switcher {
+                margin-left: 0;
+                margin-top: 2rem;
+                border-left: none;
+                padding-left: 0;
+            }
             nav ul {
                 position: fixed;
                 top: 0;
@@ -378,12 +407,17 @@
         </a>
         <nav>
             <ul id="nav-links">
-                <li><a href="index.html" class="nav-link">Anasayfa</a></li>
-                <li><a href="hakkimizda.html" class="nav-link">Hakkımızda</a></li>
-                <li><a href="galeri.html" class="nav-link active">Galeri</a></li>
-                <li><a href="menu.html" class="nav-link">Menü</a></li>
-                <li><a href="catering.html" class="nav-link">Caterıng</a></li>
-                <li><a href="index.html#iletisim" class="nav-link">İletişim</a></li>
+                <li><a href="index.html" class="nav-link" data-i18n="nav-home">Anasayfa</a></li>
+                <li><a href="hakkimizda.html" class="nav-link" data-i18n="nav-about">Hakkımızda</a></li>
+                <li><a href="galeri.html" class="nav-link active" data-i18n="nav-gallery">Galeri</a></li>
+                <li><a href="menu.html" class="nav-link" data-i18n="nav-menu">Menü</a></li>
+                <li><a href="catering.html" class="nav-link" data-i18n="nav-catering">Caterıng</a></li>
+                <li><a href="index.html#iletisim" class="nav-link" data-i18n="nav-contact">İletişim</a></li>
+                <li class="lang-switcher">
+                    <span class="lang-btn" onclick="setLanguage('tr')" data-lang="tr">TR</span>
+                    <span style="color: rgba(255,255,255,0.2)">|</span>
+                    <span class="lang-btn" onclick="setLanguage('en')" data-lang="en">EN</span>
+                </li>
             </ul>
         </nav>
         <div class="menu-toggle" id="mobile-menu">
@@ -394,9 +428,9 @@
     </header>
 
     <section id="galeri">
-        <span class="section-subtitle">Görsel Bir Şölen</span>
-        <h2>Sintesi Galerisi</h2>
-        <p>Restoranımızın atmosferini ve birbirinden özel sunumlarımızı keşfedin.</p>
+        <span class="section-subtitle" data-i18n="gallery-subtitle">Görsel Bir Şölen</span>
+        <h2 data-i18n="gallery-page-title">Sintesi Galerisi</h2>
+        <p data-i18n="gallery-page-desc">Restoranımızın atmosferini ve birbirinden özel sunumlarımızı keşfedin.</p>
 
         <div class="gallery-grid">
             <div class="gallery-item"><img src="./assets/optimized/galeri.webp" loading="lazy" alt="Galeri 1">
@@ -452,8 +486,10 @@
                 </svg>
             </a>
         </div>
-        <p>&copy; Sintesi Restaurant. Tüm Hakları Saklıdır.</p>
+        <p data-i18n="footer-copy">&copy; Sintesi Restaurant. Tüm Hakları Saklıdır.</p>
     </footer>
+
+    <script src="js/translations.js"></script>
 
     <!-- Lightbox Modal -->
     <div id="lightbox" class="lightbox">
