@@ -598,6 +598,141 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             color: var(--muted);
             font-size: 0.85rem;
         }
+
+        /* Toplu Mail Sayfası */
+        .email-list-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 450px;
+            overflow-y: auto;
+            padding-right: 10px;
+            margin-top: 10px;
+        }
+        .email-list-container::-webkit-scrollbar {
+            width: 5px;
+        }
+        .email-list-container::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+        }
+        .email-list-container::-webkit-scrollbar-thumb {
+            background: rgba(157, 67, 44, 0.4);
+            border-radius: 10px;
+        }
+        .email-list-container::-webkit-scrollbar-thumb:hover {
+            background: var(--accent);
+        }
+        .email-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 12px 15px;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            position: relative;
+        }
+        .email-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(157, 67, 44, 0.3);
+            transform: translateX(4px);
+        }
+        .email-item.selected {
+            background: rgba(157, 67, 44, 0.1);
+            border-color: rgba(157, 67, 44, 0.5);
+        }
+        .email-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--accent);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .email-item label {
+            cursor: pointer;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        .email-item .customer-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+        .email-item .customer-email {
+            font-size: 0.75rem;
+            color: var(--muted);
+            letter-spacing: 0.5px;
+        }
+        .email-search {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            color: var(--text);
+            margin-bottom: 5px;
+            outline: none;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        .email-search:focus {
+            border-color: var(--accent);
+            background: rgba(0, 0, 0, 0.5);
+            box-shadow: 0 0 15px rgba(157, 67, 44, 0.1);
+        }
+        .selection-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px 5px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .selected-count {
+            font-size: 0.8rem;
+            color: var(--accent);
+            font-weight: 600;
+            background: rgba(157, 67, 44, 0.1);
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+
+        /* Bulk Mail Responsive */
+        .bulk-mail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 1024px) {
+            .bulk-mail-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            .bulk-mail-grid > div:first-child {
+                border-right: none !important;
+                padding-right: 0 !important;
+                border-bottom: 1px solid rgba(255,255,255,0.05);
+                padding-bottom: 1.5rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .view-section {
+                padding: 15px !important;
+            }
+            .content-header h1 {
+                font-size: 1.5rem !important;
+            }
+            .glass-card {
+                padding: 20px !important;
+            }
+        }
         .modal-form-group input, .modal-form-group select, .modal-form-group textarea {
             width: 100%;
             padding: 10px;
@@ -989,7 +1124,7 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             <div class="nav-item" onclick="switchView('settings', this)">
                 <span>⚙️</span> Ayarlar
             </div>
-            <div class="nav-item" onclick="mailGonderAc()">
+            <div class="nav-item" onclick="switchView('bulk-mail', this)">
                 <span>📧</span> Toplu Mail
             </div>
             <div class="nav-item" onclick="window.location.href='api.php?action=export_excel'">
@@ -1231,26 +1366,64 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             </div>
         </section>
 
+        <!-- BULK MAIL VIEW -->
+        <section id="view-bulk-mail" class="view-section">
+            <div class="content-header">
+                <div class="page-title">
+                    <h1>📧 Toplu Mail Gönder</h1>
+                    <p>Müşterilere özel kampanya veya duyuru e-postaları gönderin</p>
+                </div>
+            </div>
+            
+            <div class="glass-card" style="max-width: 900px; margin: 0 auto;">
+                <form id="mailGonderForm">
+                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                    
+                    <div class="bulk-mail-grid">
+                        <!-- Sol: Alıcı Seçimi -->
+                        <div style="border-right: 1px solid rgba(255,255,255,0.05); padding-right: 1.5rem;">
+                            <div style="margin-bottom: 15px;">
+                                <label style="display: block; margin-bottom: 10px; font-weight: 600; font-size: 0.95rem; color: var(--accent);">👥 Alıcı Seçimi</label>
+                                <input type="text" class="email-search" id="emailSearch" placeholder="İsim veya e-posta ile ara..." onkeyup="filtreleMailler()">
+                            </div>
+                            
+                            <div class="selection-info">
+                                <div class="select-all-container">
+                                    <input type="checkbox" id="selectAllEmails" onclick="toggleSelectAll(this)">
+                                    <label for="selectAllEmails" style="font-weight: 600; font-size: 0.85rem; margin-left: 8px; cursor: pointer;">Tümünü Seç</label>
+                                </div>
+                                <div id="selectedEmailCount" class="selected-count">0 Seçildi</div>
+                            </div>
+                            
+                            <div class="email-list-container" id="customerEmailList">
+                                <!-- Mailler JS ile yüklenecek -->
+                            </div>
+                        </div>
+
+                        <!-- Sağ: Mesaj İçeriği -->
+                        <div>
+                            <div class="filter-group" style="margin-bottom: 20px;">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600;">Konu / Başlık</label>
+                                <input type="text" name="subject" required placeholder="Mail başlığını girin..." style="width: 100%; padding: 12px; background: var(--surface-2); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: var(--text);">
+                            </div>
+                            <div class="filter-group" style="margin-bottom: 25px;">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 600;">Mesaj İçeriği</label>
+                                <textarea name="message" required style="width: 100%; min-height: 250px; padding: 15px; background: var(--surface-2); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: var(--text); resize: vertical; font-family: inherit;" placeholder="Mesajınızı buraya yazın..."></textarea>
+                            </div>
+                            <div style="display: flex; justify-content: flex-end;">
+                                <button type="submit" class="btn-primary" style="width: 100%; padding: 15px; font-weight: 600; font-size: 1rem;">
+                                    Maili Gönder
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+
     </div>
 
     <!-- MODALS (Sadece küçük işlemler için saklıyoruz) -->
-    <div id="mailGonderModal" class="modal-overlay">
-        <div class="modal-content" style="max-width: 600px;">
-            <h3 class="modal-title">📧 Özel Mail Gönder</h3>
-            <form id="mailGonderForm">
-                <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
-                <div class="filter-group" style="margin-bottom: 15px;">
-                    <label>Alıcılar</label>
-                    <input type="text" class="email-search" id="emailSearch" placeholder="Müşteri ara..." onkeyup="filtreleMailler()">
-                    <div class="select-all-container"><input type="checkbox" id="selectAllEmails" onclick="toggleSelectAll(this)"><label for="selectAllEmails" style="font-weight: 600; font-size: 0.85rem;">Tümünü Seç</label></div>
-                    <div class="email-list-container" id="customerEmailList"></div>
-                </div>
-                <div class="filter-group" style="margin-bottom: 15px;"><label>Konu / Başlık</label><input type="text" name="subject" required placeholder="Mail başlığını girin..."></div>
-                <div class="filter-group" style="margin-bottom: 20px;"><label>Mesaj İçeriği</label><textarea name="message" required style="min-height: 150px;" placeholder="Mesajınızı buraya yazın..."></textarea></div>
-                <div class="modal-actions"><button type="button" class="btn-modal btn-cancel" onclick="kapatModal('mailGonderModal')">İptal</button><button type="submit" class="btn-modal btn-confirm" style="background: var(--accent);">Maili Gönder</button></div>
-            </form>
-        </div>
-    </div>
 
     <!-- Toast Mesajı -->
     <div id="toast" class="toast"></div>
@@ -1478,6 +1651,7 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             if (viewId === 'gallery') galeriListeleYukleMain();
             if (viewId === 'menu') menuYonetimiAcMain();
             if (viewId === 'settings') ayarlariAcMain();
+            if (viewId === 'bulk-mail') mailGonderYukle();
         }
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -2352,8 +2526,7 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
         /**
          * Mail Gönder Modalını Aç
          */
-        async function mailGonderAc() {
-            acModal('mailGonderModal');
+        async function mailGonderYukle() {
             const listContainer = document.getElementById('customerEmailList');
             listContainer.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--muted);">Yükleniyor...</div>';
             
@@ -2370,13 +2543,17 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                     let html = '';
                     result.data.forEach((item, index) => {
                         html += `
-                            <div class="email-item" data-search="${item.ad_soyad.toLowerCase()} ${item.email.toLowerCase()}">
-                                <input type="checkbox" name="emails[]" value="${item.email}" id="em_${index}">
-                                <label for="em_${index}"><strong>${item.ad_soyad}</strong> (${item.email})</label>
+                            <div class="email-item" data-search="${item.ad_soyad.toLowerCase()} ${item.email.toLowerCase()}" onclick="toggleEmailRow(this, event)">
+                                <input type="checkbox" name="emails[]" value="${item.email}" id="em_${index}" onclick="event.stopPropagation(); updateSelectedCount();">
+                                <label for="em_${index}">
+                                    <span class="customer-name">${item.ad_soyad}</span>
+                                    <span class="customer-email">${item.email}</span>
+                                </label>
                             </div>
                         `;
                     });
                     listContainer.innerHTML = html;
+                    updateSelectedCount();
                 } else {
                     showToast(result.message, 'error');
                 }
@@ -2409,8 +2586,31 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             checkboxes.forEach(cb => {
                 if (cb.parentElement.style.display !== 'none') {
                     cb.checked = source.checked;
+                    if (source.checked) cb.parentElement.classList.add('selected');
+                    else cb.parentElement.classList.remove('selected');
                 }
             });
+            updateSelectedCount();
+        }
+
+        function toggleEmailRow(row, event) {
+            const cb = row.querySelector('input[type="checkbox"]');
+            if (event.target !== cb) {
+                cb.checked = !cb.checked;
+            }
+            if (cb.checked) row.classList.add('selected');
+            else row.classList.remove('selected');
+            updateSelectedCount();
+        }
+
+        function updateSelectedCount() {
+            const count = document.querySelectorAll('#customerEmailList input[type="checkbox"]:checked').length;
+            document.getElementById('selectedEmailCount').textContent = count + ' Seçildi';
+            
+            // Eğer hepsi seçiliyse ana checkbox'ı işaretle
+            const allVisible = document.querySelectorAll('#customerEmailList .email-item:not([style*="display: none"]) input[type="checkbox"]');
+            const allChecked = document.querySelectorAll('#customerEmailList .email-item:not([style*="display: none"]) input[type="checkbox"]:checked');
+            document.getElementById('selectAllEmails').checked = allVisible.length > 0 && allVisible.length === allChecked.length;
         }
 
         /**
@@ -2445,8 +2645,7 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                 
                 if (result.success) {
                     showToast(result.message, 'success');
-                    kapatModal('mailGonderModal');
-                    this.reset();
+                    e.target.reset();
                 } else {
                     showToast(result.message, 'error');
                 }
