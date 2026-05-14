@@ -92,11 +92,26 @@ try {
     
     $maksimum_kapasite = isset($ayarlar['kapasite']) ? (int)$ayarlar['kapasite'] : 16;
     $kapali_gunler = isset($ayarlar['kapali_gunler']) ? json_decode($ayarlar['kapali_gunler'], true) : [];
+    $calisma_saatleri = isset($ayarlar['calisma_saatleri']) ? json_decode($ayarlar['calisma_saatleri'], true) : [];
     
-    // Kapalı gün kontrolü
-    if (is_array($kapali_gunler) && in_array($tarih, $kapali_gunler)) {
-        echo json_encode(['success' => false, 'message' => 'Seçtiğiniz tarih restoranımız kapalıdır. Lütfen başka bir tarih seçin.']);
+    // 1. Kapalı Gün Kontrolü (Özel tarihler)
+    if (is_array($kapali_gunler) && (isset($kapali_gunler[$tarih]) || in_array($tarih, $kapali_gunler))) {
+        $mesaj = 'Seçtiğiniz tarih restoranımız kapalıdır.';
+        if (isset($kapali_gunler[$tarih]) && !empty($kapali_gunler[$tarih])) {
+            $mesaj .= ' (' . $kapali_gunler[$tarih] . ')';
+        }
+        echo json_encode(['success' => false, 'message' => $mesaj]);
         exit;
+    }
+
+    // 2. Haftalık Çalışma Saatleri Kontrolü
+    $day_of_week = date('w', strtotime($tarih)); // 0: Pazar, 1: Pzt...
+    if (isset($calisma_saatleri[$day_of_week])) {
+        $gun_ayari = $calisma_saatleri[$day_of_week];
+        if (isset($gun_ayari['durum']) && $gun_ayari['durum'] === 'kapali') {
+            echo json_encode(['success' => false, 'message' => 'Restoranımız seçtiğiniz gün kapalıdır.']);
+            exit;
+        }
     }
 
     // Saatlik kapasite kontrolü

@@ -44,6 +44,7 @@ const translations = {
 
         // Footer
         "footer-copy": "© Sintesi Restaurant. Tüm Hakları Saklıdır.",
+        "meta-description": "Sintesi Restaurant: Geleneksel tatların modern dokunuşlarla buluştuğu, Metropol İstanbul'da benzersiz bir gastronomi deneyimi.",
 
         // Menu Page
         "menu-title-subtitle": "Gastronomi Deneyimi",
@@ -223,7 +224,8 @@ const translations = {
 
         // Galeri Page
         "gallery-page-title": "Our Gallery",
-        "gallery-page-desc": "Frames from Sintesi atmosphere and flavors."
+        "gallery-page-desc": "Frames from Sintesi atmosphere and flavors.",
+        "meta-description": "Sintesi Restaurant: A unique gastronomic experience where traditional flavors meet modern touches in Metropol Istanbul."
     }
 };
 
@@ -249,6 +251,12 @@ function setLanguage(lang) {
     document.querySelectorAll('.lang-btn').forEach(btn => {
         btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
     });
+
+    // Update meta description
+    if (translations[lang]["meta-description"]) {
+        const metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc) metaDesc.setAttribute('content', translations[lang]["meta-description"]);
+    }
 
     // Call optional page-specific language change handler
     if (typeof onLanguageChange === 'function') {

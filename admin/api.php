@@ -531,19 +531,12 @@ function ayarlariGetir($pdo) {
         ]);
     } catch (Exception $e) {
         echo json_encode([
-            'success' => true,
+            'success' => false,
+            'message' => $e->getMessage(),
             'data' => [
                 'kapasite' => 16,
                 'kapali_gunler' => new stdClass(),
-                'calisma_saatleri' => [
-                    "1" => ["acilis" => "15:00", "kapanis" => "00:00", "durum" => "acik"],
-                    "2" => ["acilis" => "15:00", "kapanis" => "00:00", "durum" => "acik"],
-                    "3" => ["acilis" => "15:00", "kapanis" => "00:00", "durum" => "acik"],
-                    "4" => ["acilis" => "15:00", "kapanis" => "00:00", "durum" => "acik"],
-                    "5" => ["acilis" => "15:00", "kapanis" => "00:00", "durum" => "acik"],
-                    "6" => ["acilis" => "15:00", "kapanis" => "00:00", "durum" => "acik"],
-                    "0" => ["acilis" => "15:00", "kapanis" => "00:00", "durum" => "acik"]
-                ],
+                'calisma_saatleri' => $varsayilan_saatler,
                 'menu_yemek' => '',
                 'menu_alkol' => '',
                 'menu_tatli' => '',
@@ -564,12 +557,21 @@ function ayarlariKaydet($pdo) {
         $calisma_saatleri = $_POST['calisma_saatleri'] ?? '';
         
         // Güvenlik: JSON geçerli mi kontrol et
+        // Güvenlik: JSON geçerli mi kontrol et
         $decoded = json_decode($kapali_gunler, true);
-        if ($decoded === null) $kapali_gunler = '{}';
-
+        if ($decoded === null) {
+            $kapali_gunler = '{}';
+        } else {
+            $kapali_gunler = json_encode($decoded);
+        }
+    
         if (!empty($calisma_saatleri)) {
             $decoded_saatler = json_decode($calisma_saatleri, true);
-            if ($decoded_saatler === null) $calisma_saatleri = '';
+            if ($decoded_saatler === null) {
+                $calisma_saatleri = '';
+            } else {
+                $calisma_saatleri = json_encode($decoded_saatler);
+            }
         }
     
         try {
