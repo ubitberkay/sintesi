@@ -135,7 +135,7 @@ function gonderIptalBildirimi($rez) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="tr" data-page-id="iptal">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -218,5 +218,6 @@ function gonderIptalBildirimi($rez) {
         
         <a href="index.html" class="btn">Ana Sayfaya Dön</a>
     </div>
+    <script src="js/translations.js"></script>
 </body>
 </html>

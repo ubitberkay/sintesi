@@ -111,7 +111,16 @@ const translations = {
 
         // Galeri Page
         "gallery-page-title": "Galerimiz",
-        "gallery-page-desc": "Sintesi atmosferinden ve lezzetlerinden kareler."
+        "gallery-page-desc": "Sintesi atmosferinden ve lezzetlerinden kareler.",
+
+        // Page Titles (Browser Tab)
+        "title-index": "Sintesi",
+        "title-menu": "Sintesi - Menülerimiz",
+        "title-catering": "Sintesi - Catering Hizmetleri",
+        "title-rezervasyon": "Sintesi - Online Rezervasyon",
+        "title-hakkimizda": "Sintesi - Hakkımızda",
+        "title-galeri": "Sintesi - Galeri",
+        "title-iptal": "Sintesi - Rezervasyon İptali"
     },
     en: {
         // Navbar
@@ -225,7 +234,16 @@ const translations = {
         // Galeri Page
         "gallery-page-title": "Our Gallery",
         "gallery-page-desc": "Frames from Sintesi atmosphere and flavors.",
-        "meta-description": "Sintesi Restaurant: A unique gastronomic experience where traditional flavors meet modern touches in Metropol Istanbul."
+        "meta-description": "Sintesi Restaurant: A unique gastronomic experience where traditional flavors meet modern touches in Metropol Istanbul.",
+
+        // Page Titles (Browser Tab)
+        "title-index": "Sintesi",
+        "title-menu": "Sintesi - Our Menus",
+        "title-catering": "Sintesi - Catering Services",
+        "title-rezervasyon": "Sintesi - Online Reservation",
+        "title-hakkimizda": "Sintesi - About Us",
+        "title-galeri": "Sintesi - Gallery",
+        "title-iptal": "Sintesi - Reservation Cancellation"
     }
 };
 
@@ -239,8 +257,8 @@ function setLanguage(lang) {
             if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
                 el.placeholder = translations[lang][key];
             } else if (el.tagName === 'SELECT') {
-               // Special handling for select options if needed, but usually data-i18n is on option
-               el.textContent = translations[lang][key];
+                // Special handling for select options if needed, but usually data-i18n is on option
+                el.textContent = translations[lang][key];
             } else {
                 el.textContent = translations[lang][key];
             }
@@ -256,6 +274,17 @@ function setLanguage(lang) {
     if (translations[lang]["meta-description"]) {
         const metaDesc = document.querySelector('meta[name="description"]');
         if (metaDesc) metaDesc.setAttribute('content', translations[lang]["meta-description"]);
+    }
+
+    // Update Document Title
+    const pageId = document.documentElement.getAttribute('data-page-id') ||
+        window.location.pathname.split('/').pop().replace('.html', '') ||
+        'index';
+    const titleKey = `title-${pageId}`;
+    if (translations[lang][titleKey]) {
+        document.title = translations[lang][titleKey];
+    } else if (pageId === '' || pageId === '/') {
+        if (translations[lang]['title-index']) document.title = translations[lang]['title-index'];
     }
 
     // Call optional page-specific language change handler

@@ -1,12 +1,14 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="tr" data-page-id="index">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sintesi | Gastronominin Sentezi</title>
-    <meta name="description" content="Sintesi Restaurant: Geleneksel tatların modern dokunuşlarla buluştuğu, Metropol İstanbul'da benzersiz bir gastronomi deneyimi.">
-    <meta name="keywords" content="sintesi, restaurant, gastronomi, modern mutfak, metropol istanbul, ataşehir restoran, akşam yemeği, catering">
+    <title>Sintesi</title>
+    <meta name="description"
+        content="Sintesi Restaurant: Geleneksel tatların modern dokunuşlarla buluştuğu, Metropol İstanbul'da benzersiz bir gastronomi deneyimi.">
+    <meta name="keywords"
+        content="sintesi, restaurant, gastronomi, modern mutfak, metropol istanbul, ataşehir restoran, akşam yemeği, catering">
     <link rel="icon" type="image/webp" href="sintesi.webp">
     <link
         href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Montserrat:wght@300;400;500&display=swap"
@@ -864,9 +866,6 @@
         <button class="nav-btn next-btn">&#10095;</button>
         <div id="lightbox-thumbnails" class="lightbox-thumbnails"></div>
     </div>
-
-    <!-- JavaScript -->
-    <script src="js/translations.js"></script>
     <script>
         // Global variables
         let galleryImages = [];
@@ -920,11 +919,11 @@
         async function loadGallery() {
             const grid = document.querySelector('.gallery-grid');
             if (!grid) return;
-            
+
             try {
                 const res = await fetch('public_api.php?action=gallery_list&limit=6');
                 const json = await res.json();
-                
+
                 if (json.success && json.data.length > 0) {
                     let html = '';
                     json.data.forEach(item => {
@@ -940,7 +939,7 @@
             } catch (err) {
                 console.error('Galeri yüklenirken hata:', err);
             }
-            
+
             // Re-initialize Lightbox after loading items
             initLightbox();
         }
@@ -1059,26 +1058,26 @@
 
                 submitBtn.disabled = true;
                 submitBtn.innerText = 'Gönderiliyor...';
-                
+
                 const formData = new FormData(this);
                 fetch('gonder.php', { method: 'POST', body: formData })
-                .then(res => res.json())
-                .then(data => {
-                    formMessage.style.display = 'block';
-                    formMessage.innerText = data.message;
-                    if (data.success) {
-                        formMessage.style.backgroundColor = 'rgba(76, 175, 80, 0.2)';
-                        formMessage.style.color = '#4CAF50';
-                        contactForm.reset();
-                    } else {
-                        formMessage.style.backgroundColor = 'rgba(244, 67, 54, 0.2)';
-                        formMessage.style.color = '#F44336';
-                    }
-                })
-                .finally(() => {
-                    submitBtn.disabled = false;
-                    submitBtn.innerText = 'Gönder';
-                });
+                    .then(res => res.json())
+                    .then(data => {
+                        formMessage.style.display = 'block';
+                        formMessage.innerText = data.message;
+                        if (data.success) {
+                            formMessage.style.backgroundColor = 'rgba(76, 175, 80, 0.2)';
+                            formMessage.style.color = '#4CAF50';
+                            contactForm.reset();
+                        } else {
+                            formMessage.style.backgroundColor = 'rgba(244, 67, 54, 0.2)';
+                            formMessage.style.color = '#F44336';
+                        }
+                    })
+                    .finally(() => {
+                        submitBtn.disabled = false;
+                        submitBtn.innerText = 'Gönder';
+                    });
             });
         }
 

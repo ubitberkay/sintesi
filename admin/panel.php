@@ -30,6 +30,7 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
         
         :root {
             --bg: #0c0c0c;
+            --sidebar-bg: #111111;
             --surface: #151515;
             --surface-2: #1c1c1c;
             --text: #f5f5f5;
@@ -39,82 +40,118 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             --success: #22c55e;
             --warning: #eab308;
             --danger: #ef4444;
+            --sidebar-width: 260px;
         }
         
-        html, body {
-            overflow-x: hidden;
-            width: 100%;
-        }
         body {
             font-family: 'Montserrat', sans-serif;
             background: var(--bg);
             color: var(--text);
             line-height: 1.6;
             min-height: 100vh;
+            display: flex;
         }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--sidebar-bg);
+            border-right: 1px solid rgba(255,255,255,0.05);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            padding: 2rem 1.5rem;
+            z-index: 1000;
+        }
+        .sidebar-logo {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            color: var(--accent);
+            text-decoration: none;
+            margin-bottom: 3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .sidebar-logo img { height: 35px; }
         
-        /* ===== HEADER ===== */
-        .admin-header {
-            background: var(--surface);
-            border-bottom: 1px solid rgba(157,67,44,0.2);
-            padding: 1rem 2rem;
+        .sidebar-nav {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .nav-item {
+            padding: 12px 15px;
+            border-radius: 8px;
+            color: var(--muted);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        .nav-item:hover {
+            background: rgba(255,255,255,0.03);
+            color: var(--text);
+        }
+        .nav-item.active {
+            background: rgba(157,67,44,0.1);
+            color: var(--accent);
+            border-right: 3px solid var(--accent);
+        }
+        .sidebar-footer {
+            margin-top: auto;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-wrapper {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 2rem 3rem;
+            min-width: 0;
+        }
+        .content-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            margin-bottom: 2.5rem;
         }
-        .admin-header .logo {
+        .page-title h1 {
             font-family: 'Cormorant Garamond', serif;
-            font-size: 1.5rem;
-            color: var(--accent);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            font-size: 2.2rem;
+            font-weight: 400;
+            margin-bottom: 0.3rem;
         }
-        .admin-header .logo img {
-            height: 35px;
-        }
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-        }
-        .admin-user {
-            font-size: 0.85rem;
+        .page-title p {
             color: var(--muted);
+            font-size: 0.85rem;
         }
-        .btn-cikis {
-            padding: 8px 18px;
-            background: transparent;
-            border: 1px solid rgba(239,68,68,0.4);
-            color: var(--danger);
-            border-radius: 6px;
-            cursor: pointer;
-            font-family: inherit;
-            font-size: 0.8rem;
-            text-decoration: none;
-            transition: 0.3s;
+
+        /* Glass Cards */
+        .glass-card {
+            background: var(--surface);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
-        .btn-cikis:hover {
-            background: var(--danger);
-            color: #fff;
-        }
-        
-        /* ===== MAIN ===== */
-        .admin-main {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-            overflow-x: hidden;
-        }
-        
-        /* ===== STAT CARDS ===== */
+
+        .view-section { display: none; }
+        .view-section.active { display: block; }
+
+        /* Existing Styles Adaptations */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 1.5rem;
             margin-bottom: 2.5rem;
         }
@@ -122,31 +159,40 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             background: var(--surface);
             border: 1px solid rgba(255,255,255,0.05);
             border-radius: 12px;
-            padding: 1.8rem;
-            transition: transform 0.3s, border-color 0.3s;
+            padding: 1.5rem;
+            transition: all 0.3s;
+        }
+        .stat-card:hover { transform: translateY(-3px); border-color: var(--accent); }
+        .stat-card .stat-value { font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; color: var(--accent); line-height: 1; margin: 10px 0; }
+        
+        .table-container { background: var(--surface); border-radius: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 1.2rem; background: rgba(255,255,255,0.02); color: var(--muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        td { padding: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 0.9rem; }
+        tr:hover td { background: rgba(255,255,255,0.01); }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
             cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
-        .stat-card:hover {
-            transform: translateY(-3px);
-            border-color: rgba(157,67,44,0.3);
-        }
-        .stat-card .stat-icon {
-            font-size: 1.5rem;
-            margin-bottom: 0.8rem;
-        }
-        .stat-card .stat-value {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 2.5rem;
-            font-weight: 600;
-            color: var(--accent);
-        }
-        .stat-card .stat-label {
-            font-size: 0.8rem;
-            color: var(--muted);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-top: 0.3rem;
-        }
+        .btn-primary:hover { background: var(--accent-hover); transform: translateY(-2px); }
+
+        /* Badges */
+        .badge { padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
+        .badge-onaylandi { background: rgba(34,197,94,0.1); color: var(--success); }
+        .badge-beklemede { background: rgba(234,179,8,0.1); color: var(--warning); }
+        .badge-iptal { background: rgba(239,68,68,0.1); color: var(--danger); }
+
+
 
         /* ===== CHARTS ===== */
         .charts-grid {
@@ -801,244 +847,410 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
         }
 
         /* ============================================================ */
+        /* Settings View */
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        .saat-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 8px;
+        }
+        .gun-adı { width: 100px; font-size: 0.85rem; }
+        .saat-inputs { display: flex; gap: 5px; flex: 1; }
+        .saat-input-main {
+            background: var(--surface-2);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #fff;
+            border-radius: 4px;
+            padding: 2px 5px;
+            font-size: 0.8rem;
+            width: 80px;
+        }
+        .durum-checkbox {
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            min-width: 60px;
+        }
+
         /* RESPONSIVE DESIGN (MOBİL UYUMLULUK) */
         /* ============================================================ */
         
+        .mobile-header {
+            display: none;
+            background: var(--sidebar-bg);
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1001;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .menu-toggle {
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(4px);
+            z-index: 999;
+        }
+
         @media (max-width: 1024px) {
-            .rez-card {
-                grid-template-columns: 1.5fr 1fr 1fr;
-                gap: 1.2rem;
+            body { flex-direction: column; }
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                width: 280px;
+                box-shadow: 20px 0 50px rgba(0,0,0,0.5);
+                z-index: 1002;
             }
-            .rez-special { grid-column: span 3; }
-            .actions { grid-column: span 3; }
+            .sidebar.open { transform: translateX(0); }
+            .mobile-header { display: flex; }
+            .main-wrapper { margin-left: 0; padding: 1.5rem; }
+            .sidebar-overlay.show { display: block; }
+            
+            :root { --sidebar-width: 240px; }
+            .filters > div { grid-template-columns: 1fr 1fr 1fr !important; }
+            .settings-grid { grid-template-columns: 1fr; gap: 2rem; }
+
+            .content-header { flex-direction: column; align-items: stretch; gap: 1rem; }
+            .content-header button { width: 100%; justify-content: center; }
+            
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .charts-grid { grid-template-columns: 1fr; }
+            
+            .rez-card { grid-template-columns: 1fr; }
+            .actions { flex-direction: column; align-items: stretch; }
+            .btn-action { width: 100%; justify-content: center; }
+
+            .saat-row { flex-wrap: wrap; gap: 8px; }
+            .gun-adı { width: 100%; font-weight: 600; margin-bottom: 2px; }
+            .saat-inputs { width: 100%; }
+            .saat-input-main { flex: 1; height: 35px; width: auto; }
+            .durum-checkbox { width: 100%; margin-top: 5px; }
         }
 
         @media (max-width: 768px) {
-            .admin-header { padding: 0.8rem 1.2rem; }
-            .admin-user-name { display: none; }
-            .admin-main { padding: 1.2rem; }
-            
-            .stats-grid { grid-template-columns: 1fr 1fr; gap: 1rem; }
-            .stat-card { padding: 1.2rem; }
-            .stat-value { font-size: 1.8rem; }
-            
-            .charts-grid { grid-template-columns: 1fr; }
-            
-            .filters { flex-direction: column; align-items: stretch; gap: 1rem; padding: 1.2rem; }
-            .filter-group { width: 100%; }
-            .btn-filtrele { width: 100%; padding: 12px; font-weight: 600; }
-            
-            .top-actions {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 0.8rem;
-                width: 100%;
-            }
-            .top-actions .btn-primary, .top-actions .btn-refresh {
-                width: 100%;
-                justify-content: center;
-                padding: 10px;
-            }
-            
-            .rez-card {
-                grid-template-columns: 1fr 1fr;
-                padding: 1rem;
-            }
-            .rez-special { grid-column: span 2; }
-            .actions { grid-column: span 2; }
+            .filters > div { grid-template-columns: 1fr !important; gap: 0.8rem; }
         }
 
         @media (max-width: 480px) {
-            .logo-text { display: none; }
-            .header-right { gap: 0.8rem; }
-            
             .stats-grid { grid-template-columns: 1fr; }
-            
-            .rez-card {
-                grid-template-columns: 1fr;
-                gap: 0.8rem;
-            }
-            .rez-special { grid-column: span 1; }
-            .actions { 
-                grid-column: span 1; 
-                flex-direction: column;
-                align-items: stretch;
-                width: 100%;
-                gap: 6px;
-            }
-            .btn-action { width: 100%; }
-            
-            .modal-content { 
-                width: 95%; 
-                padding: 1.5rem; 
-                margin: 10px;
-                max-height: 90vh;
-                overflow-y: auto;
-            }
-            .chart-container { height: 220px; }
-            
-            .top-actions { grid-template-columns: 1fr; }
+            .kapali-gun-input-group { flex-direction: column; }
         }
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="admin-header">
-        <a href="panel.php" class="logo">
-            <img src="../sintesi.webp" alt="Sintesi">
-            <span class="logo-text">Sintesi Panel</span>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    
+    <header class="mobile-header">
+        <a href="#" class="sidebar-logo" style="margin-bottom:0;">
+            <img src="../sintesi.webp" alt="Sintesi" style="width:30px;">
+            <span>Sintesi</span>
         </a>
-        <div class="header-right">
-            <span class="admin-user" title="<?= htmlspecialchars($_SESSION['admin_kullanici']) ?>">👤 <span class="admin-user-name"><?= htmlspecialchars($_SESSION['admin_kullanici']) ?></span></span>
-            <a href="../" class="btn-cikis" title="Siteye Git" style="color: var(--muted); border-color: rgba(255,255,255,0.2);">🌐 <span class="btn-text">Siteye Git</span></a>
-            <a href="logout.php" class="btn-cikis" title="Çıkış Yap">🚪 <span class="btn-text">Çıkış Yap</span></a>
-        </div>
+        <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
     </header>
 
-    <main class="admin-main">
-        <!-- İstatistik Kartları -->
-        <div class="stats-grid">
-            <div class="stat-card" onclick="hizliFiltre('bugun')">
-                <div class="stat-icon">📅</div>
-                <div class="stat-value" id="stat-bugun">-</div>
-                <div class="stat-label">Bugünkü Rezervasyon</div>
+    <aside class="sidebar" id="sidebar">
+        <a href="panel.php" class="sidebar-logo">
+            <img src="../sintesi.webp" alt="Sintesi">
+            <span>Sintesi</span>
+        </a>
+        
+        <nav class="sidebar-nav">
+            <div class="nav-item active" onclick="switchView('dashboard', this)">
+                <span>📊</span> Dashboard
             </div>
-            <div class="stat-card" onclick="hizliFiltre('hafta')">
-                <div class="stat-icon">📆</div>
-                <div class="stat-value" id="stat-hafta">-</div>
-                <div class="stat-label">Bu Hafta</div>
+            <div class="nav-item" onclick="switchView('reservations', this)">
+                <span>🍽️</span> Rezervasyonlar
             </div>
-            <div class="stat-card" onclick="hizliFiltre('bekleyen')">
-                <div class="stat-icon">⏳</div>
-                <div class="stat-value" id="stat-bekleyen">-</div>
-                <div class="stat-label">Bekleyen Onay</div>
+            <div class="nav-item" onclick="switchView('gallery', this)">
+                <span>🖼️</span> Galeri Yönetimi
             </div>
-            <div class="stat-card" onclick="hizliFiltre('toplam')">
-                <div class="stat-icon">📊</div>
-                <div class="stat-value" id="stat-toplam">-</div>
-                <div class="stat-label">Toplam Kayıt</div>
+            <div class="nav-item" onclick="switchView('menu', this)">
+                <span>🍴</span> Menü Yönetimi
             </div>
-        </div>
+            <div class="nav-item" onclick="switchView('settings', this)">
+                <span>⚙️</span> Ayarlar
+            </div>
+            <div class="nav-item" onclick="mailGonderAc()">
+                <span>📧</span> Toplu Mail
+            </div>
+            <div class="nav-item" onclick="window.location.href='api.php?action=export_excel'">
+                <span>📥</span> Excel Raporu
+            </div>
+        </nav>
 
-        <!-- Gelişmiş İstatistikler - Grafikler -->
-        <div class="charts-grid">
-            <div class="chart-card">
-                <div class="chart-title">
-                    <span>📈 Yıllık Rezervasyon Trendi</span>
-                </div>
-                <div class="chart-container">
-                    <canvas id="trendChart"></canvas>
-                </div>
+        <div class="sidebar-footer">
+            <div class="nav-item" style="color: var(--muted); cursor: default; opacity: 0.7;">
+                👤 <?= htmlspecialchars($_SESSION['admin_kullanici']) ?>
             </div>
-            <div class="chart-card">
-                <div class="chart-title">
-                    <span>📊 Rezervasyon Durumları</span>
-                </div>
-                <div class="chart-container">
-                    <canvas id="statusChart"></canvas>
-                </div>
-            </div>
-            <div class="chart-card" style="grid-column: 1 / -1;">
-                <div class="chart-title">
-                    <span>🕒 En Yoğun Saatler (Popülerlik)</span>
-                </div>
-                <div class="chart-container" style="height: 250px;">
-                    <canvas id="hourChart"></canvas>
-                </div>
-            </div>
+            <a href="logout.php" class="nav-item" style="color: var(--danger);">
+                <span>🚪</span> Çıkış Yap
+            </a>
         </div>
+    </aside>
 
-        <!-- Filtreler -->
-        <div class="filters">
-            <div class="filter-group">
-                <label>Arama</label>
-                <input type="text" id="filtre-arama" class="search-bar" placeholder="Ad Soyad veya Tel...">
+    <!-- Main Content -->
+    <div class="main-wrapper">
+        
+        <!-- DASHBOARD VIEW -->
+        <section id="view-dashboard" class="view-section active">
+            <div class="content-header">
+                <div class="page-title">
+                    <h1>Dashboard</h1>
+                    <p>Restoran genel durumu ve istatistikler</p>
+                </div>
+                <button class="btn-primary" onclick="yukleHerSeyi(this)">🔄 Verileri Yenile</button>
             </div>
-            <div class="filter-group">
-                <label>Durum</label>
-                <select id="filtre-durum">
-                    <option value="">Tümü</option>
-                    <option value="beklemede">⏳ Beklemede</option>
-                    <option value="onaylandi">✅ Onaylandı</option>
-                    <option value="iptal">❌ İptal</option>
-                    <option value="geldi">📍 Geldi</option>
-                    <option value="gelmedi">❓ Gelmedi</option>
-                </select>
-            </div>
-            <div class="filter-group">
-                <label>Başlangıç Tarihi</label>
-                <input type="text" id="filtre-tarih-bas" placeholder="Tarih Seçin" readonly>
-            </div>
-            <div class="filter-group">
-                <label>Bitiş Tarihi</label>
-                <input type="text" id="filtre-tarih-son" placeholder="Tarih Seçin" readonly>
-            </div>
-            <button class="btn-filtrele" onclick="yukleRezervasyonlar()">Filtrele</button>
-        </div>
 
-        <!-- Mail Gönder Modal -->
-        <div id="mailGonderModal" class="modal-overlay">
-            <div class="modal-content" style="max-width: 600px;">
-                <h3 class="modal-title">📧 Özel Mail Gönder</h3>
-                <form id="mailGonderForm">
-                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
-                    
-                    <div class="filter-group" style="margin-bottom: 15px;">
-                        <label>Alıcılar</label>
-                        <input type="text" class="email-search" id="emailSearch" placeholder="Müşteri ara..." onkeyup="filtreleMailler()">
-                        <div class="select-all-container">
-                            <input type="checkbox" id="selectAllEmails" onclick="toggleSelectAll(this)">
-                            <label for="selectAllEmails" style="font-weight: 600; font-size: 0.85rem;">Tümünü Seç</label>
+            <div class="stats-grid">
+                <div class="stat-card" onclick="hizliFiltre('bugun')">
+                    <div class="stat-label">Bugünkü Rezervasyon</div>
+                    <div class="stat-value" id="stat-bugun">-</div>
+                    <div class="stat-icon">📅</div>
+                </div>
+                <div class="stat-card" onclick="hizliFiltre('hafta')">
+                    <div class="stat-label">Bu Hafta</div>
+                    <div class="stat-value" id="stat-hafta">-</div>
+                    <div class="stat-icon">📆</div>
+                </div>
+                <div class="stat-card" onclick="hizliFiltre('bekleyen')">
+                    <div class="stat-label">Bekleyen Onay</div>
+                    <div class="stat-value" id="stat-bekleyen">-</div>
+                    <div class="stat-icon">⏳</div>
+                </div>
+                <div class="stat-card" onclick="hizliFiltre('toplam')">
+                    <div class="stat-label">Toplam Kayıt</div>
+                    <div class="stat-value" id="stat-toplam">-</div>
+                    <div class="stat-icon">📊</div>
+                </div>
+            </div>
+
+            <div class="charts-grid">
+                <div class="chart-card glass-card">
+                    <div class="chart-title">📈 Yıllık Rezervasyon Trendi</div>
+                    <div class="chart-container"><canvas id="trendChart"></canvas></div>
+                </div>
+                <div class="chart-card glass-card">
+                    <div class="chart-title">📊 Rezervasyon Durumları</div>
+                    <div class="chart-container"><canvas id="statusChart"></canvas></div>
+                </div>
+                <div class="chart-card glass-card" style="grid-column: 1 / -1;">
+                    <div class="chart-title">🕒 En Yoğun Saatler</div>
+                    <div class="chart-container" style="height: 250px;"><canvas id="hourChart"></canvas></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RESERVATIONS VIEW -->
+        <section id="view-reservations" class="view-section">
+            <div class="content-header">
+                <div class="page-title">
+                    <h1>Rezervasyonlar</h1>
+                    <p>Tüm kayıtları listeleyin ve yönetin</p>
+                </div>
+                <button class="btn-primary" onclick="acModal('manuelEkleModal')"><span>+</span> Yeni Rezervasyon</button>
+            </div>
+
+            <div class="filters glass-card" style="margin-bottom: 2rem;">
+                <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 1rem; align-items: end;">
+                    <div class="filter-group">
+                        <label>Arama</label>
+                        <input type="text" id="filtre-arama" placeholder="Müşteri Adı, Tel...">
+                    </div>
+                    <div class="filter-group">
+                        <label>Durum</label>
+                        <select id="filtre-durum">
+                            <option value="">Tümü</option>
+                            <option value="beklemede">⏳ Beklemede</option>
+                            <option value="onaylandi">✅ Onaylandı</option>
+                            <option value="iptal">❌ İptal</option>
+                            <option value="geldi">📍 Geldi</option>
+                            <option value="gelmedi">❓ Gelmedi</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Başlangıç</label>
+                        <input type="text" id="filtre-tarih-bas" placeholder="Seç" readonly>
+                    </div>
+                    <div class="filter-group">
+                        <label>Bitiş</label>
+                        <input type="text" id="filtre-tarih-son" placeholder="Seç" readonly>
+                    </div>
+                    <button class="btn-primary" onclick="yukleRezervasyonlar()" style="height: 45px; padding: 0 25px;">Filtrele</button>
+                </div>
+            </div>
+
+            <div class="table-container glass-card">
+                <div id="tablo-icerik"><div class="loading">Yükleniyor...</div></div>
+                <div id="sayfalama" class="pagination"></div>
+            </div>
+        </section>
+
+        <!-- GALLERY VIEW -->
+        <section id="view-gallery" class="view-section">
+            <div class="content-header">
+                <div class="page-title">
+                    <h1>Galeri Yönetimi</h1>
+                    <p>Web sitesindeki fotoğrafları yükleyin ve sıralayın</p>
+                </div>
+            </div>
+            
+            <div class="glass-card">
+                <div style="background: rgba(59, 130, 246, 0.05); padding: 20px; border-radius: 12px; border: 1px solid rgba(59, 130, 246, 0.1); margin-bottom: 25px;">
+                    <label style="display: block; margin-bottom: 12px; font-weight: 600;">Yeni Fotoğraflar Ekle</label>
+                    <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+                        <input type="file" id="galeri-yukle-input-main" accept="image/*" multiple style="flex: 1; min-width: 200px; padding: 10px; background: var(--surface-2); border: 1px dashed rgba(255,255,255,0.1); border-radius: 8px; color: var(--muted);">
+                        <button class="btn-primary" onclick="galeriResimYukleMain()" id="galeri-yukle-btn-main" style="white-space: nowrap;">Resimleri Yükle</button>
+                    </div>
+                    <small style="color: var(--muted); margin-top: 8px; display: block;">Maksimum 1200px genişliğe düşürülür ve WebP formatına dönüştürülür. Çoklu seçim yapabilirsiniz.</small>
+                </div>
+
+                <div id="galeri-liste-main" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; padding: 5px;">
+                    <!-- Galeri öğeleri JS ile gelecek -->
+                </div>
+
+                <div style="margin-top: 30px; display: flex; justify-content: flex-end;">
+                    <button class="btn-primary" onclick="galeriSiralamayiKaydetMain()" id="galeri-sirala-btn-main">Değişiklikleri Kaydet</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- MENU VIEW -->
+        <section id="view-menu" class="view-section">
+            <div class="content-header">
+                <div class="page-title">
+                    <h1>Menü Yönetimi</h1>
+                    <p>Menü linklerini (PDF/Link) güncelleyin</p>
+                </div>
+            </div>
+            
+            <div class="glass-card">
+                <form id="menuFormMain" onsubmit="menuKaydetMain(event)" enctype="multipart/form-data">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+                        <!-- Türkçe Menüler -->
+                        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                            <h3 style="font-family: 'Cormorant Garamond'; color: var(--accent); font-size: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px;">🇹🇷 Türkçe Menüler</h3>
+                            <div class="filter-group">
+                                <label>Yemek Menüsü (PDF)</label>
+                                <div id="current-menu-yemek-tr-main" style="font-size: 0.75rem; color: var(--muted); margin-bottom: 5px;"></div>
+                                <input type="file" name="menu_yemek" id="menu-yemek-tr-main" accept=".pdf">
+                            </div>
+                            <div class="filter-group">
+                                <label>Alkol Menüsü (PDF)</label>
+                                <div id="current-menu-alkol-tr-main" style="font-size: 0.75rem; color: var(--muted); margin-bottom: 5px;"></div>
+                                <input type="file" name="menu_alkol" id="menu-alkol-tr-main" accept=".pdf">
+                            </div>
+                            <div class="filter-group">
+                                <label>Tatlı Menüsü (PDF)</label>
+                                <div id="current-menu-tatli-tr-main" style="font-size: 0.75rem; color: var(--muted); margin-bottom: 5px;"></div>
+                                <input type="file" name="menu_tatli" id="menu-tatli-tr-main" accept=".pdf">
+                            </div>
                         </div>
-                        <div class="email-list-container" id="customerEmailList">
-                            <!-- Mailler JS ile buraya yüklenecek -->
-                            <div style="padding: 20px; text-align: center; color: var(--muted);">Yükleniyor...</div>
+                        <!-- İngilizce Menüler -->
+                        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                            <h3 style="font-family: 'Cormorant Garamond'; color: var(--accent); font-size: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px;">🇬🇧 English Menus</h3>
+                            <div class="filter-group">
+                                <label>Food Menu (PDF)</label>
+                                <div id="current-menu-yemek-en-main" style="font-size: 0.75rem; color: var(--muted); margin-bottom: 5px;"></div>
+                                <input type="file" name="menu_yemek_en" id="menu-yemek-en-main" accept=".pdf">
+                            </div>
+                            <div class="filter-group">
+                                <label>Alcohol Menu (PDF)</label>
+                                <div id="current-menu-alkol-en-main" style="font-size: 0.75rem; color: var(--muted); margin-bottom: 5px;"></div>
+                                <input type="file" name="menu_alkol_en" id="menu-alkol-en-main" accept=".pdf">
+                            </div>
+                            <div class="filter-group">
+                                <label>Dessert Menu (PDF)</label>
+                                <div id="current-menu-tatli-en-main" style="font-size: 0.75rem; color: var(--muted); margin-bottom: 5px;"></div>
+                                <input type="file" name="menu_tatli_en" id="menu-tatli-en-main" accept=".pdf">
+                            </div>
                         </div>
                     </div>
-
-                    <div class="filter-group" style="margin-bottom: 15px;">
-                        <label>Konu / Başlık</label>
-                        <input type="text" name="subject" required placeholder="Mail başlığını girin...">
-                    </div>
-
-                    <div class="filter-group" style="margin-bottom: 20px;">
-                        <label>Mesaj İçeriği</label>
-                        <textarea name="message" required style="min-height: 150px;" placeholder="Mesajınızı buraya yazın..."></textarea>
-                    </div>
-
-                    <div class="modal-actions">
-                        <button type="button" class="btn-modal btn-cancel" onclick="kapatModal('mailGonderModal')">İptal</button>
-                        <button type="submit" class="btn-modal btn-confirm" style="background: var(--accent);">Maili Gönder</button>
+                    <div style="margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1.5rem; display: flex; justify-content: flex-end;">
+                        <button type="submit" id="menu-submit-btn-main" class="btn-primary">💾 Değişiklikleri Yükle ve Kaydet</button>
                     </div>
                 </form>
             </div>
-        </div>
+        </section>
 
-        <!-- Rezervasyonlar Tablosu -->
-        <h2>🍽️ Rezervasyonlar</h2>
-        <div class="table-container">
-             
-            <div class="table-header">
-             
-                <div class="top-actions">
-                    <button class="btn-primary" onclick="acModal('manuelEkleModal')"><span>+</span> <span class="btn-text">Yeni Ekle</span></button>
-                    <button class="btn-primary" onclick="menuYonetimiAc()" style="background:var(--surface-2);border:1px solid rgba(255,255,255,0.1);"><span>🍴</span> <span class="btn-text">Menü</span></button>
-                    <button class="btn-primary" onclick="galeriYonetimiAc()" style="background:var(--surface-2);border:1px solid rgba(255,255,255,0.1);"><span>🖼️</span> <span class="btn-text">Galeri</span></button>
-                    <button class="btn-primary" onclick="ayarlariAc()" style="background:var(--surface-2);border:1px solid rgba(255,255,255,0.1);"><span>⚙️</span> <span class="btn-text">Ayarlar</span></button>
-                    <button class="btn-primary" onclick="mailGonderAc()" style="background:var(--surface-2);border:1px solid rgba(255,255,255,0.1);"><span>📧</span> <span class="btn-text">Mail Gönder</span></button>
-                    <button class="btn-primary" onclick="window.location.href='api.php?action=export_excel'" style="background:var(--surface-2);border:1px solid rgba(255,255,255,0.1);"><span>📊</span> <span class="btn-text">Excel İndir</span></button>
-                    <button class="btn-refresh" onclick="yukleHerSeyi(this)">
-                        <span class="icon">🔄</span>
-                        <span class="btn-text">Yenile</span>
-                    </button>
+        <!-- SETTINGS VIEW -->
+        <section id="view-settings" class="view-section">
+            <div class="content-header">
+                <div class="page-title">
+                    <h1>Genel Ayarlar</h1>
+                    <p>Kapasite, çalışma saatleri ve kapalı günler</p>
                 </div>
             </div>
-            <div id="tablo-icerik">
-                <div class="loading">Yükleniyor...</div>
+            
+            <div class="glass-card">
+                <form id="ayarlarFormMain" onsubmit="ayarlariKaydetMain(event)">
+                    <div class="settings-grid">
+                        <div>
+                            <h3 style="font-family: 'Cormorant Garamond'; color: var(--accent); font-size: 1.4rem; margin-bottom: 1rem;">⚙️ Sistem Ayarları</h3>
+                            <div class="filter-group" style="margin-bottom: 1.5rem;"><label>Saatlik Kişi Kapasitesi</label><input type="number" name="kapasite" id="kapasite_main" min="1" max="100"></div>
+                            
+                            <h3 style="font-family: 'Cormorant Garamond'; color: var(--accent); font-size: 1.4rem; margin-bottom: 1rem;">🔒 Kapalı Günler</h3>
+                            <div id="kapali-gunler-liste-main" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px; min-height: 40px; padding: 10px; background: rgba(255,255,255,0.02); border-radius: 8px;"></div>
+                            <div style="display: flex; flex-direction: column; gap: 10px; background: var(--surface-2); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div class="kapali-gun-input-group" style="display: flex; gap: 10px;">
+                                    <input type="date" id="yeni-kapali-gun-main" style="flex: 1; background: rgba(255,255,255,0.05); border: none; color: #fff; padding: 8px; border-radius: 4px;">
+                                    <input type="text" id="yeni-kapali-gun-not-main" placeholder="Açıklama (Örn: Özel Davet)" style="flex: 2; background: rgba(255,255,255,0.05); border: none; color: #fff; padding: 8px; border-radius: 4px;">
+                                </div>
+                                <button type="button" class="btn-primary" onclick="kapaliGunEkleMain()" style="width: 100%; padding: 10px; font-size: 0.9rem;">+ Kapalı Gün Ekle</button>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 style="font-family: 'Cormorant Garamond'; color: var(--accent); font-size: 1.4rem; margin-bottom: 1rem;">🕒 Çalışma Saatleri</h3>
+                            <div id="calisma-saatleri-konteyner-main" style="display: flex; flex-direction: column; gap: 10px;">
+                                <!-- Dinamik Gelecek -->
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1.5rem; display: flex; justify-content: flex-end;">
+                        <button type="submit" class="btn-primary">✅ Ayarları Kaydet</button>
+                    </div>
+                </form>
             </div>
-            <div id="sayfalama" class="pagination"></div>
+        </section>
+
+    </div>
+
+    <!-- MODALS (Sadece küçük işlemler için saklıyoruz) -->
+    <div id="mailGonderModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 600px;">
+            <h3 class="modal-title">📧 Özel Mail Gönder</h3>
+            <form id="mailGonderForm">
+                <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                <div class="filter-group" style="margin-bottom: 15px;">
+                    <label>Alıcılar</label>
+                    <input type="text" class="email-search" id="emailSearch" placeholder="Müşteri ara..." onkeyup="filtreleMailler()">
+                    <div class="select-all-container"><input type="checkbox" id="selectAllEmails" onclick="toggleSelectAll(this)"><label for="selectAllEmails" style="font-weight: 600; font-size: 0.85rem;">Tümünü Seç</label></div>
+                    <div class="email-list-container" id="customerEmailList"></div>
+                </div>
+                <div class="filter-group" style="margin-bottom: 15px;"><label>Konu / Başlık</label><input type="text" name="subject" required placeholder="Mail başlığını girin..."></div>
+                <div class="filter-group" style="margin-bottom: 20px;"><label>Mesaj İçeriği</label><textarea name="message" required style="min-height: 150px;" placeholder="Mesajınızı buraya yazın..."></textarea></div>
+                <div class="modal-actions"><button type="button" class="btn-modal btn-cancel" onclick="kapatModal('mailGonderModal')">İptal</button><button type="submit" class="btn-modal btn-confirm" style="background: var(--accent);">Maili Gönder</button></div>
+            </form>
         </div>
-    </main>
+    </div>
 
     <!-- Toast Mesajı -->
     <div id="toast" class="toast"></div>
@@ -1237,27 +1449,53 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
     <script>
         const csrfToken = "<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>";
 
-        // Sayfa yüklendiğinde verileri çek
-        document.addEventListener('DOMContentLoaded', () => {
-            yukleIstatistikler();
-            yukleRezervasyonlar();
-            initFlatpickr();
-        });
-
         let currentPage = 1;
         let currentDeleteId = null;
-        let fpBas, fpSon, fpYeniGun;
-        let kapaliGunler = {}; // { "2026-05-10": "Not", ... }
-        let charts = {}; // ChartJS örneklerini tutmak için
-        const gunIsimleri = {
-            "1": "Pazartesi",
-            "2": "Salı",
-            "3": "Çarşamba",
-            "4": "Perşembe",
-            "5": "Cuma",
-            "6": "Cumartesi",
-            "0": "Pazar"
-        };
+        let fpBas, fpSon;
+        let kapaliGunler = {};
+        let charts = { trend: null, status: null, hour: null };
+        const gunIsimleri = { "1": "Pazartesi", "2": "Salı", "3": "Çarşamba", "4": "Perşembe", "5": "Cuma", "6": "Cumartesi", "0": "Pazar" };
+
+        /**
+         * Görünüm Değiştirme (Tab Mantığı)
+         */
+        function switchView(viewId, el) {
+            // Aktif menü öğesini güncelle
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            el.classList.add('active');
+
+            // Aktif bölümü güncelle
+            document.querySelectorAll('.view-section').forEach(section => section.classList.remove('active'));
+            const target = document.getElementById('view-' + viewId);
+            if (target) {
+                target.classList.add('active');
+            }
+
+            // Bölüme göre veri yükle
+            if (viewId === 'dashboard') yukleIstatistikler();
+            if (viewId === 'reservations') yukleRezervasyonlar();
+            if (viewId === 'gallery') galeriListeleYukleMain();
+            if (viewId === 'menu') menuYonetimiAcMain();
+            if (viewId === 'settings') ayarlariAcMain();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            yukleHerSeyi();
+            
+            // Filtre Tarih Seçicileri
+            fpBas = flatpickr("#filtre-tarih-bas", { locale: "tr", dateFormat: "Y-m-d" });
+            fpSon = flatpickr("#filtre-tarih-son", { locale: "tr", dateFormat: "Y-m-d" });
+            
+            // Manuel Ekle Tarih/Saat
+            flatpickr("#m-tarih", { locale: "tr", dateFormat: "Y-m-d", minDate: "today" });
+            
+            // Arama inputu listener'ı
+            document.getElementById('filtre-arama').addEventListener('input', (e) => {
+                currentPage = 1;
+                clearTimeout(window.searchTimeout);
+                window.searchTimeout = setTimeout(yukleRezervasyonlar, 500);
+            });
+        });
 
         function initFlatpickr() {
             const config = {
@@ -2178,6 +2416,273 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                 submitBtn.disabled = false;
                 submitBtn.innerText = originalText;
             }
+        });
+
+        /**
+         * Galeri Ana Görünüm Listeleme
+         */
+        async function galeriListeleYukleMain() {
+            const container = document.getElementById('galeri-liste-main');
+            container.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:40px;">Yükleniyor...</div>';
+            
+            try {
+                const res = await fetch('api.php?action=gallery_list');
+                const json = await res.json();
+                if (json.success) {
+                    galleryData = json.data;
+                    renderGaleriMain();
+                }
+            } catch(err) {
+                showToast('Galeri listesi alınamadı.', 'error');
+            }
+        }
+
+        function renderGaleriMain() {
+            const container = document.getElementById('galeri-liste-main');
+            if (galleryData.length === 0) {
+                container.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:40px; color:var(--muted);">Henüz fotoğraf eklenmedi.</div>';
+                return;
+            }
+
+            container.innerHTML = galleryData.map((item, index) => `
+                <div class="galeri-item-admin glass-card" style="padding:10px; position:relative;">
+                    <img src="../${item.resim_yolu}" style="width:100%; aspect-ratio:1; object-fit:cover; border-radius:8px;">
+                    <div style="display:flex; justify-content:space-between; margin-top:10px;">
+                        <div style="display:flex; gap:5px;">
+                            <button class="move-btn" onclick="galeriSiralaMain(${index}, -1)" style="padding:2px 8px;">←</button>
+                            <button class="move-btn" onclick="galeriSiralaMain(${index}, 1)" style="padding:2px 8px;">→</button>
+                        </div>
+                        <button onclick="galeriResimSilMain(${item.id})" style="background:none; border:none; color:var(--danger); cursor:pointer;">🗑 Sil</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function galeriSiralaMain(index, dir) {
+            const newIndex = index + dir;
+            if (newIndex >= 0 && newIndex < galleryData.length) {
+                const item = galleryData.splice(index, 1)[0];
+                galleryData.splice(newIndex, 0, item);
+                renderGaleriMain();
+            }
+        }
+
+        async function galeriResimYukleMain() {
+            const input = document.getElementById('galeri-yukle-input-main');
+            const btn = document.getElementById('galeri-yukle-btn-main');
+            if (!input.files.length) { showToast('Lütfen resim seçin.', 'error'); return; }
+            btn.disabled = true;
+            const files = Array.from(input.files);
+            for (let i = 0; i < files.length; i++) {
+                btn.textContent = `(${i+1}/${files.length})`;
+                const formData = new FormData();
+                formData.append('image', files[i]);
+                formData.append('csrf_token', csrfToken);
+                await fetch('api.php?action=gallery_upload', { method: 'POST', body: formData });
+            }
+            showToast('Yükleme tamamlandı.', 'success');
+            input.value = '';
+            galeriListeleYukleMain();
+            btn.disabled = false;
+            btn.textContent = "Yükle";
+        }
+
+        async function galeriResimSilMain(id) {
+            if (!confirm('Silmek istediğinize emin misiniz?')) return;
+            const formData = new FormData();
+            formData.append('id', id);
+            formData.append('csrf_token', csrfToken);
+            await fetch('api.php?action=gallery_delete', { method: 'POST', body: formData });
+            galeriListeleYukleMain();
+        }
+
+        async function galeriSiralamayiKaydetMain() {
+            const btn = document.getElementById('galeri-sirala-btn-main');
+            btn.disabled = true;
+            const order = galleryData.map(item => item.id);
+            const formData = new FormData();
+            formData.append('order', JSON.stringify(order));
+            formData.append('csrf_token', csrfToken);
+            await fetch('api.php?action=gallery_reorder', { method: 'POST', body: formData });
+            showToast('Sıralama kaydedildi.', 'success');
+            btn.disabled = false;
+        }
+
+        /**
+         * Menü Yönetimi Ana Görünüm
+         */
+        async function menuYonetimiAcMain() {
+            try {
+                const res = await fetch('api.php?action=settings_get');
+                const json = await res.json();
+                if (json.success) {
+                    const data = json.data;
+                    document.getElementById('current-menu-yemek-tr-main').textContent = data.menu_yemek ? 'Mevcut: ' + data.menu_yemek.split('/').pop() : 'Yüklü değil';
+                    document.getElementById('current-menu-alkol-tr-main').textContent = data.menu_alkol ? 'Mevcut: ' + data.menu_alkol.split('/').pop() : 'Yüklü değil';
+                    document.getElementById('current-menu-tatli-tr-main').textContent = data.menu_tatli ? 'Mevcut: ' + data.menu_tatli.split('/').pop() : 'Yüklü değil';
+                    
+                    document.getElementById('current-menu-yemek-en-main').textContent = data.menu_yemek_en ? 'Mevcut: ' + data.menu_yemek_en.split('/').pop() : 'Yüklü değil';
+                    document.getElementById('current-menu-alkol-en-main').textContent = data.menu_alkol_en ? 'Mevcut: ' + data.menu_alkol_en.split('/').pop() : 'Yüklü değil';
+                    document.getElementById('current-menu-tatli-en-main').textContent = data.menu_tatli_en ? 'Mevcut: ' + data.menu_tatli_en.split('/').pop() : 'Yüklü değil';
+                    
+                    // Inputları temizle
+                    ['yemek', 'alkol', 'tatli'].forEach(t => {
+                        document.getElementById(`menu-${t}-tr-main`).value = '';
+                        document.getElementById(`menu-${t}-en-main`).value = '';
+                    });
+                }
+            } catch(e) {}
+        }
+
+        async function menuKaydetMain(e) {
+            e.preventDefault();
+            const btn = document.getElementById('menu-submit-btn-main');
+            btn.disabled = true;
+            btn.textContent = "Kaydediliyor...";
+
+            const formData = new FormData(e.target);
+            formData.append('action', 'settings_save');
+            formData.append('csrf_token', csrfToken);
+            
+            try {
+                const res = await fetch('api.php', { method: 'POST', body: formData });
+                const json = await res.json();
+                if (json.success) {
+                    showToast('Menüler başarıyla güncellendi.', 'success');
+                    menuYonetimiAcMain(); // İsimleri güncelle
+                } else {
+                    showToast(json.message || 'Hata oluştu.', 'error');
+                }
+            } catch(e) {
+                showToast('Bağlantı hatası.', 'error');
+            }
+            btn.disabled = false;
+            btn.textContent = "💾 Değişiklikleri Yükle ve Kaydet";
+        }
+
+        /**
+         * Ayarlar Ana Görünüm
+         */
+        async function ayarlariAcMain() {
+            try {
+                const res = await fetch('api.php?action=settings_get');
+                const json = await res.json();
+                if (json.success) {
+                    document.getElementById('kapasite_main').value = json.data.kapasite;
+                    kapaliGunler = json.data.kapali_gunler || {};
+                    if (Array.isArray(kapaliGunler)) kapaliGunler = {}; 
+                    listeleKapaliGunlerMain();
+                    renderCalismaSaatleriMain(json.data.calisma_saatleri || {});
+                }
+            } catch(e) {}
+        }
+
+        function listeleKapaliGunlerMain() {
+            const container = document.getElementById('kapali-gunler-liste-main');
+            container.innerHTML = Object.keys(kapaliGunler).map(date => `
+                <div style="background:var(--surface-2); padding:8px 15px; border-radius:8px; font-size:0.85rem; display:flex; justify-content:space-between; align-items:center; border:1px solid rgba(255,255,255,0.05);">
+                    <div>
+                        <strong style="color:var(--accent);">${date}</strong>
+                        <span style="color:var(--muted); margin-left:10px;">${kapaliGunler[date] || ''}</span>
+                    </div>
+                    <span onclick="kapaliGunSilMain('${date}')" style="color:var(--danger); cursor:pointer; font-weight:bold; font-size:1.2rem; padding:0 5px;">×</span>
+                </div>
+            `).join('') || '<div style="color:var(--muted); font-size:0.85rem; text-align:center;">Henüz kapalı gün eklenmedi.</div>';
+        }
+
+        function kapaliGunEkleMain() {
+            const date = document.getElementById('yeni-kapali-gun-main').value;
+            const note = document.getElementById('yeni-kapali-gun-not-main').value;
+            if (!date) {
+                showToast('Lütfen bir tarih seçin.', 'error');
+                return;
+            }
+            kapaliGunler[date] = note || "Kapalı";
+            listeleKapaliGunlerMain();
+            
+            // Temizle
+            document.getElementById('yeni-kapali-gun-main').value = '';
+            document.getElementById('yeni-kapali-gun-not-main').value = '';
+        }
+
+        function kapaliGunSilMain(date) {
+            delete kapaliGunler[date];
+            listeleKapaliGunlerMain();
+        }
+
+        function renderCalismaSaatleriMain(saatler) {
+            const container = document.getElementById('calisma-saatleri-konteyner-main');
+            container.innerHTML = ["1", "2", "3", "4", "5", "6", "0"].map(gun => {
+                const s = saatler[gun] || { acilis: "15:00", kapanis: "00:00", durum: "acik" };
+                return `
+                <div class="saat-row">
+                    <span class="gun-adı">${gunIsimleri[gun]}</span>
+                    <div class="saat-inputs">
+                        <input type="time" class="saat-input-main" data-gun="${gun}" data-type="acilis" value="${s.acilis}">
+                        <input type="time" class="saat-input-main" data-gun="${gun}" data-type="kapanis" value="${s.kapanis}">
+                    </div>
+                    <label class="durum-checkbox">
+                        <input type="checkbox" class="durum-input-main" data-gun="${gun}" ${s.durum === 'acik' ? 'checked' : ''}> Açık
+                    </label>
+                </div>`;
+            }).join('');
+        }
+
+        async function ayarlariKaydetMain(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = "Kaydediliyor...";
+
+            try {
+                const formData = new FormData(e.target);
+                formData.append('action', 'settings_save');
+                formData.append('kapali_gunler', JSON.stringify(kapaliGunler));
+                
+                const saatler = {};
+                document.querySelectorAll('.saat-input-main').forEach(input => {
+                    const gun = input.dataset.gun;
+                    if (!saatler[gun]) saatler[gun] = {};
+                    saatler[gun][input.dataset.type] = input.value;
+                    saatler[gun].durum = document.querySelector(`.durum-input-main[data-gun="${gun}"]`).checked ? 'acik' : 'kapali';
+                });
+                formData.append('calisma_saatleri', JSON.stringify(saatler));
+                formData.append('csrf_token', csrfToken);
+                
+                const res = await fetch('api.php', { method: 'POST', body: formData });
+                const json = await res.json();
+                
+                if (json.success) {
+                    showToast('Ayarlar başarıyla kaydedildi.', 'success');
+                } else {
+                    showToast(json.message || 'Hata oluştu.', 'error');
+                }
+            } catch(err) {
+                showToast('Bağlantı hatası: ' + err.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
+        }
+
+        // Modal Kontrolleri
+        function acModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function kapatModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        // Sidebar Toggle (Mobile)
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('show');
+        }
+
+        // Sidebar linklerine tıklanınca kapat (Mobile)
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                if (window.innerWidth <= 768) toggleSidebar();
+            });
         });
     </script>
 </body>
