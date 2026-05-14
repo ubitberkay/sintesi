@@ -459,8 +459,74 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
         .item-price-admin { color: var(--accent); font-weight: 600; text-align: right; }
         
         @media (max-width: 768px) {
-            .item-row { grid-template-columns: 1fr; gap: 0.5rem; text-align: left; }
-            .item-price-admin { text-align: left; }
+            /* Başlık ve Butonlar Alt Alta */
+            .category-header {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 1rem !important;
+                text-align: center;
+            }
+            .category-title-admin {
+                font-size: 1.4rem !important;
+                width: 100%;
+            }
+            .category-actions {
+                width: 100% !important;
+                display: flex !important;
+                flex-wrap: wrap !important;
+                gap: 8px !important;
+                justify-content: center !important;
+            }
+            .category-actions .btn-action {
+                flex: 1 1 auto;
+                min-width: 80px;
+                padding: 12px 8px !important;
+                font-size: 0.75rem !important;
+                margin: 0 !important;
+            }
+
+            /* Ürün Satırları Kart Görünümü */
+            .item-row { 
+                grid-template-columns: 1fr !important; 
+                gap: 1rem; 
+                padding: 1.5rem 10px !important;
+                border-bottom: 2px solid rgba(255,255,255,0.05) !important;
+            }
+            
+            /* Üst Menü / Filtreler */
+            .content-header {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 1.5rem !important;
+            }
+            .top-actions {
+                width: 100% !important;
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 12px !important;
+            }
+            .top-actions .filter-group {
+                width: 100% !important;
+            }
+            .top-actions select {
+                width: 100% !important;
+                height: 50px !important;
+                font-size: 1rem !important;
+                padding: 0 15px !important;
+                background-color: var(--surface-2) !important;
+                border: 1px solid var(--accent) !important;
+                color: #fff !important;
+                appearance: auto !important; /* Standart ok işaretini göster */
+            }
+            .top-actions .btn-primary {
+                width: 100% !important;
+                height: 50px !important;
+                font-size: 1rem !important;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 !important;
+            }
         }
         
         /* Boş durum */
