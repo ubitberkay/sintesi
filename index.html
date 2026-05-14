@@ -241,7 +241,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(to bottom, rgba(12, 12, 12, 0.3), var(--color-bg));
+            /* background: linear-gradient(to bottom, rgba(12, 12, 12, 0.3), var(--color-bg)); */
             z-index: -1;
         }
 
@@ -707,7 +707,8 @@
         <div class="hero-content">
             <span class="section-subtitle" data-i18n="hero-subtitle">Gastronominin Sentezi</span>
             <h1 class="hero-title" data-i18n="hero-title">Sintesi</h1>
-            <p data-i18n="hero-desc">Lezzetin, sanatın ve tutkunun bir araya geldiği unutulmaz bir deneyim. Geleneksel tatların modern
+            <p data-i18n="hero-desc">Lezzetin, sanatın ve tutkunun bir araya geldiği unutulmaz bir deneyim. Geleneksel
+                tatların modern
                 dokunuşlarla yeniden hayat bulduğu yer.</p>
             <a href="rezervasyon.html" class="btn" data-i18n="hero-btn">Rezervasyon Yap</a>
         </div>
@@ -718,12 +719,15 @@
         <div class="about-text">
             <span class="section-subtitle" data-i18n="about-subtitle">Hikayemiz</span>
             <h2 data-i18n="about-title">Tutkuyla Harmanlanmış Lezzetler</h2>
-            <p data-i18n="about-p1">Sintesi, kelime anlamı olarak "sentez" anlamına gelir. Bizim için mutfak, farklı kültürlerin, yerel
+            <p data-i18n="about-p1">Sintesi, kelime anlamı olarak "sentez" anlamına gelir. Bizim için mutfak, farklı
+                kültürlerin, yerel
                 malzemelerin ve yenilikçi tekniklerin kusursuz bir sentezidir.</p>
-            <p data-i18n="about-p2">Her bir tabağımız, en taze malzemelerin özenle seçilmesiyle başlar ve şeflerimizin sanatıyla masanıza
+            <p data-i18n="about-p2">Her bir tabağımız, en taze malzemelerin özenle seçilmesiyle başlar ve şeflerimizin
+                sanatıyla masanıza
                 ulaşır. Amacımız, sadece yemek yemek değil, aynı zamanda duygulara hitap eden bir gastronomi yolculuğu
                 sunmaktır.</p>
-            <a href="hakkimizda.html" class="btn" style="margin-top: 1rem;" data-i18n="about-btn">Mekanımızı Keşfedin</a>
+            <a href="hakkimizda.html" class="btn" style="margin-top: 1rem;" data-i18n="about-btn">Mekanımızı
+                Keşfedin</a>
         </div>
         <div class="about-image">
             <!-- Hakkımızda Fotoğraf Alanı -->
@@ -777,13 +781,15 @@
 
                 <div class="info-block">
                     <h4 data-i18n="contact-address">Adres</h4>
-                    <p data-i18n="contact-address-detail">Atatürk Mahallesi Ertuğrul Gazi Sokak Metropol İstanbul Alışveriş Merkezi B2 Katı<br>Ataşehir,
+                    <p data-i18n="contact-address-detail">Atatürk Mahallesi Ertuğrul Gazi Sokak Metropol İstanbul
+                        Alışveriş Merkezi B2 Katı<br>Ataşehir,
                         İstanbul</p>
                 </div>
 
                 <div class="info-block">
                     <h4 data-i18n="contact-res">Rezervasyon</h4>
-                    <a href="rezervasyon.html" class="info-accent-link" style="color: #9D432C !important;" data-i18n="contact-res-link">Online
+                    <a href="rezervasyon.html" class="info-accent-link" style="color: #9D432C !important;"
+                        data-i18n="contact-res-link">Online
                         Rezervasyon
                         Formu</a>
                     <p>+90 (216) XXX XX XX<br>info@sintesi.com.tr</p>
@@ -805,17 +811,19 @@
                     <input type="text" name="ad" id="ad" placeholder="Adınız Soyadınız" required data-i18n="form-name">
                 </div>
                 <div class="form-group">
-                    <input type="email" name="eposta" id="eposta" placeholder="E-posta Adresiniz" required data-i18n="form-email">
+                    <input type="email" name="eposta" id="eposta" placeholder="E-posta Adresiniz" required
+                        data-i18n="form-email">
                 </div>
                 <div class="form-group">
                     <input type="tel" name="telefon" id="telefon" placeholder="Telefon Numaranız"
                         oninput="this.value = this.value.replace(/[^0-9]/g, '');" maxlength="15" data-i18n="form-phone">
                 </div>
                 <div class="form-group">
-                    <textarea name="mesaj" id="mesaj" placeholder="Mesajınız veya Özel İstekleriniz..."
-                        required data-i18n="form-message"></textarea>
+                    <textarea name="mesaj" id="mesaj" placeholder="Mesajınız veya Özel İstekleriniz..." required
+                        data-i18n="form-message"></textarea>
                 </div>
-                <button type="submit" class="btn" id="submitBtn" style="align-self: flex-start;" data-i18n="form-submit">Gönder</button>
+                <button type="submit" class="btn" id="submitBtn" style="align-self: flex-start;"
+                    data-i18n="form-submit">Gönder</button>
             </form>
 
             <div class="contact-map">
