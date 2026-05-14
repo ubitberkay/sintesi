@@ -1,17 +1,21 @@
 RewriteEngine On
 
-# 1. "index.html" isteklerini ana dizine (/) yönlendir
-RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ /index\.html\ HTTP/
-RewriteRule ^index\.html$ / [R=301,L]
+# 1. "index.html" veya "index.php" isteklerini ana dizine (/) yönlendir
+RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ /index\.(html|php)\ HTTP/
+RewriteRule ^index\.(html|php)$ / [R=301,L]
 
-# 2. Diğer sayfalardaki ".html" uzantılarını kaldır (Örn: hakkimizda.html -> hakkimizda)
-RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ /([^.]+)\.html\ HTTP
-RewriteRule ^(.*)\.html$ /$1 [R=301,L]
+# 2. Diğer sayfalardaki ".html" veya ".php" uzantılarını kaldır (Örn: panel.php -> panel)
+RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ /([^.]+)\.(html|php)\ HTTP
+RewriteRule ^(.*)\.(html|php)$ /$1 [R=301,L]
 
-# 3. Ziyaretçi uzantısız (hakkimizda) girdiğinde arka planda .html dosyasını çalıştır
+# 3. Ziyaretçi uzantısız girdiğinde arka planda .html veya .php dosyasını çalıştır
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME}.html -f
 RewriteRule ^(.*?)/?$ $1.html [L]
+
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}.php -f
+RewriteRule ^(.*?)/?$ $1.php [L]
 
 # 4. PHP Yükleme Limitlerini Artır
 <IfModule mod_php7.c>
