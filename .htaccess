@@ -6,6 +6,7 @@ RewriteRule ^index\.(html|php)$ / [R=301,L]
 
 # 2. Diğer sayfalardaki ".html" veya ".php" uzantılarını kaldır (Örn: panel.php -> panel)
 RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ /([^.]+)\.(html|php)\ HTTP
+RewriteCond %{REQUEST_METHOD} ^(GET|HEAD)$
 RewriteRule ^(.*)\.(html|php)$ /$1 [R=301,L]
 
 # 3. Ziyaretçi uzantısız girdiğinde arka planda .html veya .php dosyasını çalıştır
