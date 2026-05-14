@@ -4,11 +4,54 @@ require_once __DIR__ . '/config.php';
 $pdo = veritabani_baglantisi();
 
 try {
-    // Önce tabloları temizleyelim (taze bir kurulum için)
+    // 1. TABLOLARI OLUŞTUR
+    echo "Tablolar oluşturuluyor...<br>";
+    
+    if (local_mi()) {
+        $pdo->exec("CREATE TABLE IF NOT EXISTS menu_categories (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            type TEXT NOT NULL,
+            name_tr TEXT NOT NULL,
+            name_en TEXT NOT NULL,
+            order_num INTEGER DEFAULT 0
+        )");
+        $pdo->exec("CREATE TABLE IF NOT EXISTS menu_items (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            category_id INTEGER NOT NULL,
+            name_tr TEXT NOT NULL,
+            name_en TEXT NOT NULL,
+            description_tr TEXT,
+            description_en TEXT,
+            price TEXT,
+            order_num INTEGER DEFAULT 0,
+            status INTEGER DEFAULT 1
+        )");
+    } else {
+        $pdo->exec("CREATE TABLE IF NOT EXISTS menu_categories (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            type VARCHAR(20) NOT NULL,
+            name_tr VARCHAR(255) NOT NULL,
+            name_en VARCHAR(255) NOT NULL,
+            order_num INT DEFAULT 0
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+        
+        $pdo->exec("CREATE TABLE IF NOT EXISTS menu_items (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            category_id INT NOT NULL,
+            name_tr VARCHAR(255) NOT NULL,
+            name_en VARCHAR(255) NOT NULL,
+            description_tr TEXT,
+            description_en TEXT,
+            price VARCHAR(50),
+            order_num INT DEFAULT 0,
+            status TINYINT DEFAULT 1
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+    }
+
+    // 2. TEMİZLİK
     $pdo->exec("DELETE FROM menu_items");
     $pdo->exec("DELETE FROM menu_categories");
     
-    // SQLite için AI sıfırlama
     if (local_mi()) {
         $pdo->exec("DELETE FROM sqlite_sequence WHERE name='menu_items'");
         $pdo->exec("DELETE FROM sqlite_sequence WHERE name='menu_categories'");
@@ -34,7 +77,7 @@ try {
         ['Makarna & Risotto', 'Pasta & Risotto', [
             ['Yabani Mantarlı Risotto', 'Wild Mushroom Risotto', 'Trüf yağı, taze kekik, parmesan', 'Truffle oil, fresh thyme, parmesan', '100 TL'],
             ['Balkabağı Tortellini', 'Pumpkin Tortellini', 'Adaçayı tereyağı, kavrulmuş badem', 'Sage butter, roasted almonds', '100 TL'],
-            ['Deniz Mahsüllü Linguine', 'Seafood Linguine', 'Karides, kalamar, sarımsak, beyaz şarap sos', 'Shrimp, calamari, garlic, white wine sauce', '100 TL']
+            ['Deniz Mahsüllü Linguine', 'Seafood Linguine', 'Karides, kalamar, sarımsak, beyaz şarap sos', 'Shrimp, kalamari, garlic, white wine sauce', '100 TL']
         ]],
         ['Ana Yemekler', 'Main Courses', [
             ['Ağır Ateşte Pişmiş Kuzu İncik', 'Slow Roasted Lamb Shank', 'Kök sebzeler, patates püresi', 'Root vegetables, potato puree', '100 TL'],
