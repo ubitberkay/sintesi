@@ -431,9 +431,11 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             background: rgba(0,0,0,0.85);
             display: none;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             z-index: 2000;
             backdrop-filter: blur(5px);
+            overflow-y: auto;
+            padding: 40px 0;
         }
         .modal-content {
             background: var(--surface);
@@ -444,6 +446,7 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             border: 1px solid rgba(157,67,44,0.3);
             text-align: center;
             animation: modalFadeIn 0.3s ease;
+            margin-bottom: 40px;
         }
         @keyframes modalFadeIn {
             from { opacity: 0; transform: scale(0.9); }
@@ -1065,6 +1068,28 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                     </div>
                     <small style="color:var(--muted); font-size:0.75rem; margin-top:5px; display:block;">Bu tarihlerde rezervasyon alınamaz ve açıklama müşteriye gösterilir.</small>
                 </div>
+
+                <div class="modal-form-group">
+                    <label>Menü Dosyaları (PDF)</label>
+                    <div style="background: var(--surface-2); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); padding: 15px; margin-bottom: 20px;">
+                        <div style="margin-bottom: 15px;">
+                            <label style="font-size: 0.8rem; margin-bottom: 5px; display: block; color: var(--muted);">Yemek Menüsü</label>
+                            <input type="file" id="ayar-menu-yemek" accept=".pdf" style="width: 100%; padding: 8px; background: var(--bg); border: 1px solid rgba(255,255,255,0.1); color: var(--text); border-radius: 4px;">
+                            <div id="current-menu-yemek" style="font-size: 0.75rem; color: var(--accent); margin-top: 5px;"></div>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <label style="font-size: 0.8rem; margin-bottom: 5px; display: block; color: var(--muted);">Alkol Menüsü</label>
+                            <input type="file" id="ayar-menu-alkol" accept=".pdf" style="width: 100%; padding: 8px; background: var(--bg); border: 1px solid rgba(255,255,255,0.1); color: var(--text); border-radius: 4px;">
+                            <div id="current-menu-alkol" style="font-size: 0.75rem; color: var(--accent); margin-top: 5px;"></div>
+                        </div>
+                        <div style="margin-bottom: 0;">
+                            <label style="font-size: 0.8rem; margin-bottom: 5px; display: block; color: var(--muted);">Tatlı Menüsü</label>
+                            <input type="file" id="ayar-menu-tatli" accept=".pdf" style="width: 100%; padding: 8px; background: var(--bg); border: 1px solid rgba(255,255,255,0.1); color: var(--text); border-radius: 4px;">
+                            <div id="current-menu-tatli" style="font-size: 0.75rem; color: var(--accent); margin-top: 5px;"></div>
+                        </div>
+                    </div>
+                    <small style="color:var(--muted); font-size:0.75rem; display:block;">Sadece PDF dosyaları kabul edilir. Yeni dosya yüklendiğinde eskisi silinmez ama veritabanında güncellenir.</small>
+                </div>
                 <div class="modal-actions">
                     <button type="button" class="btn-modal btn-cancel" onclick="kapatModal('ayarlarModal')">İptal</button>
                     <button type="submit" class="btn-modal btn-primary">Ayarları Kaydet</button>
@@ -1549,6 +1574,16 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                     
                     listeleKapaliGunler();
                     renderCalismaSaatleri(json.data.calisma_saatleri || {});
+
+                    // Menü dosyaları
+                    document.getElementById('current-menu-yemek').textContent = json.data.menu_yemek ? 'Mevcut: ' + json.data.menu_yemek.split('/').pop() : 'Henüz yüklenmedi';
+                    document.getElementById('current-menu-alkol').textContent = json.data.menu_alkol ? 'Mevcut: ' + json.data.menu_alkol.split('/').pop() : 'Henüz yüklenmedi';
+                    document.getElementById('current-menu-tatli').textContent = json.data.menu_tatli ? 'Mevcut: ' + json.data.menu_tatli.split('/').pop() : 'Henüz yüklenmedi';
+                    
+                    // Inputları temizle
+                    document.getElementById('ayar-menu-yemek').value = '';
+                    document.getElementById('ayar-menu-alkol').value = '';
+                    document.getElementById('ayar-menu-tatli').value = '';
                 }
             } catch(err) {
                 showToast('Ayarlar yüklenemedi', 'error');
@@ -1662,6 +1697,15 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                     };
                 });
                 formData.append('calisma_saatleri', JSON.stringify(saatler));
+
+                // Menü Dosyaları
+                const menuYemek = document.getElementById('ayar-menu-yemek').files[0];
+                const menuAlkol = document.getElementById('ayar-menu-alkol').files[0];
+                const menuTatli = document.getElementById('ayar-menu-tatli').files[0];
+                
+                if (menuYemek) formData.append('menu_yemek', menuYemek);
+                if (menuAlkol) formData.append('menu_alkol', menuAlkol);
+                if (menuTatli) formData.append('menu_tatli', menuTatli);
 
                 formData.append('csrf_token', csrfToken);
                 

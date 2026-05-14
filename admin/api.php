@@ -456,7 +456,10 @@ function ayarlariGetir($pdo) {
             'data' => [
                 'kapasite' => isset($ayarlar['kapasite']) ? (int)$ayarlar['kapasite'] : 16,
                 'kapali_gunler' => isset($ayarlar['kapali_gunler']) ? json_decode($ayarlar['kapali_gunler'], true) : new stdClass(),
-                'calisma_saatleri' => isset($ayarlar['calisma_saatleri']) ? json_decode($ayarlar['calisma_saatleri'], true) : $varsayilan_saatler
+                'calisma_saatleri' => isset($ayarlar['calisma_saatleri']) ? json_decode($ayarlar['calisma_saatleri'], true) : $varsayilan_saatler,
+                'menu_yemek' => $ayarlar['menu_yemek'] ?? '',
+                'menu_alkol' => $ayarlar['menu_alkol'] ?? '',
+                'menu_tatli' => $ayarlar['menu_tatli'] ?? ''
             ]
         ]);
     } catch (Exception $e) {
@@ -473,7 +476,10 @@ function ayarlariGetir($pdo) {
                     "5" => ["acilis" => "15:00", "kapanis" => "00:00", "durum" => "acik"],
                     "6" => ["acilis" => "15:00", "kapanis" => "00:00", "durum" => "acik"],
                     "0" => ["acilis" => "15:00", "kapanis" => "00:00", "durum" => "acik"]
-                ]
+                ],
+                'menu_yemek' => '',
+                'menu_alkol' => '',
+                'menu_tatli' => ''
             ]
         ]);
     }
@@ -514,6 +520,29 @@ function ayarlariKaydet($pdo) {
             if (!empty($calisma_saatleri)) {
                 $stmt = $pdo->prepare("REPLACE INTO ayarlar (ayar_anahtari, ayar_degeri) VALUES ('calisma_saatleri', ?)");
                 $stmt->execute([$calisma_saatleri]);
+            }
+
+            // Menü PDF Yüklemeleri
+            $menu_keys = ['menu_yemek', 'menu_alkol', 'menu_tatli'];
+            foreach ($menu_keys as $key) {
+                if (isset($_FILES[$key]) && $_FILES[$key]['error'] === UPLOAD_ERR_OK) {
+                    $tmp_name = $_FILES[$key]['tmp_name'];
+                    $name = basename($_FILES[$key]['name']);
+                    $extension = strtolower(pathinfo($name, PATHINFO_EXTENSION));
+                    
+                    if ($extension === 'pdf') {
+                        $new_name = $key . '_' . time() . '.pdf';
+                        $upload_dir = __DIR__ . '/../uploads/menu/';
+                        if (!is_dir($upload_dir)) mkdir($upload_dir, 0755, true);
+                        
+                        $destination = $upload_dir . $new_name;
+                        
+                        if (move_uploaded_file($tmp_name, $destination)) {
+                            $stmt = $pdo->prepare("REPLACE INTO ayarlar (ayar_anahtari, ayar_degeri) VALUES (?, ?)");
+                            $stmt->execute([$key, 'uploads/menu/' . $new_name]);
+                        }
+                    }
+                }
             }
         
         echo json_encode(['success' => true, 'message' => 'Ayarlar başarıyla kaydedildi.']);

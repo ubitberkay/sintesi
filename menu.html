@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sintesi | Menü Seçimi</title>
+    <link rel="icon" type="image/webp" href="sintesi.webp">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Montserrat:wght@300;400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --color-bg: #0c0c0c;
+            --color-surface: #151515;
+            --color-text: #f5f5f5;
+            --color-text-muted: #a0a0a0;
+            --color-accent: #9D432C;
+            --color-accent-hover: #e8c682;
+            --font-heading: 'Cormorant Garamond', serif;
+            --font-body: 'Montserrat', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Background */
+        .page-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('./assets/aiSintesi.png');
+            background-size: cover;
+            background-position: center;
+            z-index: -2;
+            filter: brightness(1) blur(2px);
+        }
+
+        .page-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, transparent, var(--color-bg));
+            z-index: -1;
+        }
+
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 2rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            transition: background-color 0.4s ease, padding 0.4s ease;
+        }
+
+        header.scrolled {
+            background-color: rgba(12, 12, 12, 0.95);
+            padding: 1rem 5%;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .logo {
+            font-family: var(--font-heading);
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--color-text);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo img {
+            height: 1.2em;
+            width: auto;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 3rem;
+        }
+
+        nav ul li a {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-decoration: none;
+            color: var(--color-text);
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        nav ul li a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background-color: var(--color-accent);
+            transition: width 0.3s ease;
+        }
+
+        nav ul li a:hover::after,
+        nav ul li a.active::after {
+            width: 100%;
+        }
+
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .menu-toggle span {
+            width: 30px;
+            height: 1px;
+            background-color: var(--color-text);
+            transition: 0.3s;
+        }
+
+        @media (max-width: 1100px) {
+            nav ul {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 70%;
+                height: 100vh;
+                background-color: var(--color-surface);
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                transition: right 0.4s ease;
+                z-index: 999;
+            }
+
+            nav ul.active {
+                right: 0;
+            }
+
+            .menu-toggle {
+                display: flex;
+                z-index: 1001;
+            }
+
+            .menu-toggle.active span:nth-child(1) {
+                transform: translateY(7px) rotate(45deg);
+            }
+
+            .menu-toggle.active span:nth-child(2) {
+                opacity: 0;
+            }
+
+            .menu-toggle.active span:nth-child(3) {
+                transform: translateY(-7px) rotate(-45deg);
+            }
+        }
+
+        /* Menu Content */
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 8rem 2rem 4rem;
+            text-align: center;
+        }
+
+        .title-area {
+            margin-bottom: 4rem;
+            animation: fadeInDown 1s ease;
+        }
+
+        .section-subtitle {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: var(--color-accent);
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        h1 {
+            font-family: var(--font-heading);
+            font-size: 4rem;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            font-weight: 400;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.8rem;
+            color: var(--color-text-muted);
+            letter-spacing: 1px;
+            z-index: 100;
+        }
+
+        .menu-grid {
+            display: flex;
+            gap: 2rem;
+            max-width: 1200px;
+            width: 100%;
+            justify-content: center;
+            animation: fadeInUp 1s ease 0.3s both;
+        }
+
+        .menu-card {
+            flex: 1;
+            aspect-ratio: 4/5;
+            max-width: 320px;
+            background: rgba(21, 21, 21, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            color: var(--color-text);
+            transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+            position: relative;
+            overflow: hidden;
+            border-radius: 4px;
+            padding: 2rem;
+        }
+
+        .menu-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent, rgba(157, 67, 44, 0.2));
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .menu-card:hover {
+            transform: translateY(-15px);
+            border-color: var(--color-accent);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .menu-card:hover::before {
+            opacity: 1;
+        }
+
+        .menu-card .icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            transition: transform 0.5s ease;
+        }
+
+        .menu-card:hover .icon {
+            transform: scale(1.1);
+        }
+
+        .menu-card h3 {
+            font-family: var(--font-heading);
+            font-size: 2.2rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 0.5rem;
+        }
+
+        .menu-card p {
+            font-size: 0.8rem;
+            color: var(--color-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .menu-card.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            main {
+                padding: 10rem 1rem 4rem;
+            }
+
+            .menu-grid {
+                flex-direction: column;
+                align-items: center;
+                gap: 2rem;
+            }
+
+            .menu-card {
+                width: 100%;
+                max-width: 400px;
+                aspect-ratio: auto;
+                min-height: 250px;
+            }
+
+            h1 {
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page-bg"></div>
+    <div class="page-overlay"></div>
+
+    <header id="header">
+        <a href="index.html" class="logo">
+            <img src="sintesi.webp" alt="Sintesi Logo">
+            Sintesi
+        </a>
+        <nav>
+            <ul id="nav-links">
+                <li><a href="index.html" class="nav-link">Anasayfa</a></li>
+                <li><a href="hakkimizda.html" class="nav-link">Hakkımızda</a></li>
+                <li><a href="galeri.html" class="nav-link">Galeri</a></li>
+                <li><a href="menu.html" class="nav-link active">Menü</a></li>
+                <li><a href="catering.html" class="nav-link">Caterıng</a></li>
+                <li><a href="index.html#iletisim" class="nav-link">İletişim</a></li>
+            </ul>
+        </nav>
+        <div class="menu-toggle" id="mobile-menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </header>
+
+    <main>
+        <div class="title-area">
+            <span class="section-subtitle">Gastronomi Deneyimi</span>
+            <h1>Menülerimiz</h1>
+        </div>
+
+        <div class="menu-grid">
+            <a href="#" target="_blank" id="menu-yemek" class="menu-card">
+                <div class="icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path>
+                        <path d="M7 2v20"></path>
+                        <path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path>
+                    </svg>
+                </div>
+                <h3>Yemek</h3>
+                <p>Ana Menü</p>
+            </a>
+            <a href="#" target="_blank" id="menu-alkol" class="menu-card">
+                <div class="icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M8 22h8"></path>
+                        <path d="M7 10h10"></path>
+                        <path d="M12 15v7"></path>
+                        <path d="M12 15a5 5 0 0 0 5-5c0-2-.5-4-2-8H9c-1.5 4-2 6-2 8a5 5 0 0 0 5 5Z"></path>
+                    </svg>
+                </div>
+                <h3>Alkol</h3>
+                <p>İçecek Listesi</p>
+            </a>
+            <a href="#" target="_blank" id="menu-tatli" class="menu-card">
+                <div class="icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8"></path>
+                        <path d="M4 16s.5-1 2-1 2.5 2 4 2 2.5-2 4-2 2.5 2 4 2 2-1 2-1"></path>
+                        <path d="M2 21h20"></path>
+                        <path d="M7 8v3"></path>
+                        <path d="M12 8v3"></path>
+                        <path d="M17 8v3"></path>
+                        <path d="M7 4h.01"></path>
+                        <path d="M12 4h.01"></path>
+                        <path d="M17 4h.01"></path>
+                    </svg>
+                </div>
+                <h3>Tatlı</h3>
+                <p>Lezzetli Kapanışlar</p>
+            </a>
+        </div>
+    </main>
+
+    <footer>
+        <div style="margin-bottom: 1rem;">
+            <a href="https://www.instagram.com/sintesirestaurant/" target="_blank" rel="noopener noreferrer"
+                style="color: var(--color-text-muted); transition: color 0.3s ease;"
+                onmouseover="this.style.color='var(--color-accent)'"
+                onmouseout="this.style.color='var(--color-text-muted)'" title="Instagram">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                </svg>
+            </a>
+        </div>
+        <p>&copy; Sintesi Restaurant. Tüm Hakları Saklıdır.</p>
+    </footer>
+
+    <script>
+        async function loadMenuLinks() {
+            try {
+                const res = await fetch('public_api.php?action=settings');
+                const json = await res.json();
+                if (json.success) {
+                    const data = json.data;
+                    const menuYemek = document.getElementById('menu-yemek');
+                    const menuAlkol = document.getElementById('menu-alkol');
+                    const menuTatli = document.getElementById('menu-tatli');
+
+                    if (data.menu_yemek) menuYemek.href = data.menu_yemek;
+                    else menuYemek.classList.add('disabled');
+
+                    if (data.menu_alkol) menuAlkol.href = data.menu_alkol;
+                    else menuAlkol.classList.add('disabled');
+
+                    if (data.menu_tatli) menuTatli.href = data.menu_tatli;
+                    else menuTatli.classList.add('disabled');
+                }
+            } catch (err) {
+                console.error('Menü linkleri yüklenemedi:', err);
+            }
+        }
+        loadMenuLinks();
+
+        // Mobil Menü Toggle
+        const mobileMenu = document.getElementById('mobile-menu');
+        const navLinks = document.getElementById('nav-links');
+        if (mobileMenu) {
+            mobileMenu.addEventListener('click', () => {
+                mobileMenu.classList.toggle('active');
+                navLinks.classList.toggle('active');
+            });
+        }
+
+        // Header scroll efekti
+        window.addEventListener('scroll', () => {
+            const header = document.getElementById('header');
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+    </script>
+</body>
+
+</html>

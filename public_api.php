@@ -68,6 +68,10 @@ try {
         if (isset($ayarlar['calisma_saatleri'])) {
             $calisma_saatleri = json_decode($ayarlar['calisma_saatleri'], true) ?: $calisma_saatleri;
         }
+
+        $menu_yemek = $ayarlar['menu_yemek'] ?? '';
+        $menu_alkol = $ayarlar['menu_alkol'] ?? '';
+        $menu_tatli = $ayarlar['menu_tatli'] ?? '';
     } catch (Exception $e) {}
     
     echo json_encode([
@@ -75,7 +79,10 @@ try {
         'data' => [
             'kapasite' => $kapasite,
             'kapali_gunler' => $kapali_gunler,
-            'calisma_saatleri' => $calisma_saatleri
+            'calisma_saatleri' => $calisma_saatleri,
+            'menu_yemek' => $menu_yemek ?? '',
+            'menu_alkol' => $menu_alkol ?? '',
+            'menu_tatli' => $menu_tatli ?? ''
         ]
     ]);
     
