@@ -74,6 +74,17 @@ if ($kisi < 1 || $kisi > 20) {
 try {
     $pdo = veritabani_baglantisi();
     
+    // Eksik sütun kontrolü (Canlıya geçişte dil desteği için)
+    try {
+        $pdo->query("SELECT dil FROM rezervasyonlar LIMIT 1");
+    } catch (Exception $e) {
+        try {
+            $pdo->exec("ALTER TABLE rezervasyonlar ADD COLUMN dil VARCHAR(10) DEFAULT 'tr'");
+        } catch (Exception $e2) {
+            // Sütun zaten eklenmiş olabilir veya başka bir hata, sessizce devam et
+        }
+    }
+    
     // Ayarları çek
     $stmt_ayarlar = $pdo->prepare("SELECT ayar_anahtari, ayar_degeri FROM ayarlar");
     $stmt_ayarlar->execute();
@@ -123,6 +134,9 @@ try {
     ]);
     
 } catch (Exception $e) {
+    // Hatanın detayını loglara kaydet
+    error_log("Rezervasyon Hatası: " . $e->getMessage());
+    
     echo json_encode([
         'success' => false, 
         'message' => 'Bir hata oluştu. Lütfen daha sonra tekrar deneyin.'
