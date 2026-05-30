@@ -5,7 +5,7 @@ const translations = {
         "nav-about": "Hakkımızda",
         "nav-gallery": "Galeri",
         "nav-menu": "Menü",
-        "nav-catering": "Caterıng",
+        "nav-catering": "Caterıng ve Events",
         "nav-contact": "İletişim",
         "nav-reservation": "Rezervasyon",
 
@@ -57,9 +57,9 @@ const translations = {
 
         // Catering Page
         "catering-subtitle": "Özel Günleriniz İçin",
-        "catering-title": "Catering Hizmetleri",
-        "catering-desc": "Sintesi lezzetlerini özel etkinliklerinize taşıyoruz. Kurumsal davetler, doğum günleri ve özel kutlamalarınız için profesyonel catering çözümleri sunuyoruz.",
-        "catering-form-title": "Catering Talep Formu",
+        "catering-title": "Catering ve Events Hizmetleri",
+        "catering-desc": "Sintesi lezzetlerini özel etkinliklerinize taşıyoruz. Kurumsal davetler, doğum günleri ve özel kutlamalarınız için profesyonel catering ve events çözümleri sunuyoruz.",
+        "catering-form-title": "Catering ve Events Talep Formu",
         "cat-services-subtitle": "Hizmetlerimiz",
         "cat-services-title": "Size Özel Çözümler",
         "cat-corp-title": "Kurumsal",
@@ -115,7 +115,7 @@ const translations = {
         // Page Titles (Browser Tab)
         "title-index": "Sintesi",
         "title-menu": "Sintesi - Menülerimiz",
-        "title-catering": "Sintesi - Catering Hizmetleri",
+        "title-catering": "Sintesi - Catering ve Events Hizmetleri",
         "title-rezervasyon": "Sintesi - Online Rezervasyon",
         "title-hakkimizda": "Sintesi - Hakkımızda",
         "title-galeri": "Sintesi - Galeri",
@@ -127,7 +127,7 @@ const translations = {
         "nav-about": "About Us",
         "nav-gallery": "Gallery",
         "nav-menu": "Menu",
-        "nav-catering": "Catering",
+        "nav-catering": "Catering & Events",
         "nav-contact": "Contact",
         "nav-reservation": "Reservation",
 
@@ -178,9 +178,9 @@ const translations = {
 
         // Catering Page
         "catering-subtitle": "For Your Special Days",
-        "catering-title": "Catering Services",
-        "catering-desc": "We bring Sintesi flavors to your special events. We offer professional catering solutions for corporate invitations, birthdays, and special celebrations.",
-        "catering-form-title": "Catering Request Form",
+        "catering-title": "Catering & Events Services",
+        "catering-desc": "We bring Sintesi flavors to your special events. We offer professional catering and events solutions for corporate invitations, birthdays, and special celebrations.",
+        "catering-form-title": "Catering & Events Request Form",
         "cat-services-subtitle": "Our Services",
         "cat-services-title": "Tailored Solutions for You",
         "cat-corp-title": "Corporate",
@@ -237,7 +237,7 @@ const translations = {
         // Page Titles (Browser Tab)
         "title-index": "Sintesi",
         "title-menu": "Sintesi - Our Menus",
-        "title-catering": "Sintesi - Catering Services",
+        "title-catering": "Sintesi - Catering & Events Services",
         "title-rezervasyon": "Sintesi - Online Reservation",
         "title-hakkimizda": "Sintesi - About Us",
         "title-galeri": "Sintesi - Gallery",

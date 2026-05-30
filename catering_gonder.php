@@ -1,6 +1,6 @@
 <?php
 /**
- * Sintesi - Catering Form İşleyici
+ * Sintesi - Catering ve Events Form İşleyici
  */
 
 header('Content-Type: application/json; charset=utf-8');
@@ -46,7 +46,7 @@ try {
     $mail->Port       = SMTP_PORT;
     $mail->CharSet    = 'UTF-8';
 
-    $mail->setFrom('info@sintesi.com.tr', 'Sintesi Catering');
+    $mail->setFrom('info@sintesi.com.tr', 'Sintesi Catering ve Events');
     $mail->addAddress('bugra@sintesi.com.tr');
     $mail->addAddress('cagla@sintesi.com.tr');
     $mail->addAddress('ersinavsar@sintesi.com.tr');
@@ -58,13 +58,13 @@ try {
     }
 
     $mail->isHTML(true);
-    $mail->Subject = "🥂 Yeni Catering Teklif Talebi - {$ad_soyad}";
+    $mail->Subject = "🥂 Yeni Catering ve Events Teklif Talebi - {$ad_soyad}";
     
     $mail->Body = "
         <div style=\"font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; border-radius: 15px; overflow: hidden; background: #000 url('https://sintesi.com.tr/background.png') no-repeat center center; background-size: cover; color: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.5);\">
             <div style='padding: 40px 20px; text-align: center;'>
                 <img src='https://sintesi.com.tr/sintesi.webp' alt='Sintesi' style='max-width: 180px; margin-bottom: 20px;'>
-                <h1 style='margin: 0; font-size: 26px; font-family: Georgia, serif; color: #fff;'>Catering Teklif Talebi</h1>
+                <h1 style='margin: 0; font-size: 26px; font-family: Georgia, serif; color: #fff;'>Catering ve Events Teklif Talebi</h1>
                 <div style='width: 50px; height: 2px; background: #9D432C; margin: 20px auto;'></div>
             </div>
             <div style='padding: 0 40px 40px 40px;'>
