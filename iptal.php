@@ -78,6 +78,8 @@ function gonderIptalBildirimi($rez) {
         $mail->addAddress('cagla@sintesi.com.tr');
         $mail->addAddress('bugra@sintesi.com.tr');
         $mail->addAddress('ersinavsar@sintesi.com.tr');
+        $mail->addAddress('mehmet@sintesi.com.tr');
+        $mail->addAddress('ersin@sintesi.com.tr');
         
         $tarih_format = date('d.m.Y', strtotime($rez['tarih']));
         

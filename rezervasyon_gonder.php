@@ -202,6 +202,8 @@ function gonderBildirimMaili($ad, $email, $telefon, $tarih, $saat, $kisi, $ozel,
         $mail->addAddress('ersinavsar@sintesi.com.tr');
         $mail->addAddress('iletisim@sintesi.com.tr');
         $mail->addAddress('info@sintesi.com.tr');
+        $mail->addAddress('mehmet@sintesi.com.tr');
+        $mail->addAddress('ersin@sintesi.com.tr');
         
         if (!empty($email)) {
             $mail->addReplyTo($email, $ad);
