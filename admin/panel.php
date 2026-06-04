@@ -1221,7 +1221,10 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                 <span>📊</span> Dashboard
             </div>
             <div class="nav-item" onclick="switchView('reservations', this)">
-                <span>🍽️</span> Rezervasyonlar
+                <span>🍽️</span> Normal Rezervasyonlar
+            </div>
+            <div class="nav-item" onclick="switchView('chefs-table-reservations', this)">
+                <span>🍳</span> Chef's Table Rezervasyonları
             </div>
             <div class="nav-item" onclick="switchView('gallery', this)">
                 <span>🖼️</span> Galeri Yönetimi
@@ -1229,8 +1232,11 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             <div class="nav-item" onclick="switchView('digital-menu', this)">
                 <span>🍴</span> Dijital Menü Listesi
             </div>
+            <div class="nav-item" onclick="switchView('chefs-table-admin', this)">
+                <span>⚙️</span> Chef's Table Ayarları
+            </div>
             <div class="nav-item" onclick="switchView('settings', this)">
-                <span>⚙️</span> Ayarlar
+                <span>⚙️</span> Genel Ayarlar
             </div>
             <div class="nav-item" onclick="switchView('bulk-mail', this)">
                 <span>📧</span> Toplu Mail
@@ -1306,8 +1312,8 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
         <section id="view-reservations" class="view-section">
             <div class="content-header">
                 <div class="page-title">
-                    <h1>Rezervasyonlar</h1>
-                    <p>Tüm kayıtları listeleyin ve yönetin</p>
+                    <h1>Normal Rezervasyonlar</h1>
+                    <p>Normal restoran rezervasyon kayıtlarını listeleyin ve yönetin</p>
                 </div>
                 <button class="btn-primary" onclick="acModal('manuelEkleModal')"><span>+</span> Yeni Rezervasyon</button>
             </div>
@@ -1344,6 +1350,51 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             <div class="table-container glass-card">
                 <div id="tablo-icerik"><div class="loading">Yükleniyor...</div></div>
                 <div id="sayfalama" class="pagination"></div>
+            </div>
+        </section>
+
+        <!-- CHEF'S TABLE RESERVATIONS VIEW -->
+        <section id="view-chefs-table-reservations" class="view-section">
+            <div class="content-header">
+                <div class="page-title">
+                    <h1>🍳 Chef's Table Rezervasyonları</h1>
+                    <p>Chef's Table özel masasına ait rezervasyon kayıtlarını listeleyin ve yönetin</p>
+                </div>
+                <button class="btn-primary" onclick="acModal('manuelEkleModal')"><span>+</span> Yeni Rezervasyon</button>
+            </div>
+
+            <div class="filters glass-card" style="margin-bottom: 2rem;">
+                <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 1rem; align-items: end;">
+                    <div class="filter-group">
+                        <label>Arama</label>
+                        <input type="text" id="filtre-arama-ct" placeholder="Müşteri Adı, Tel...">
+                    </div>
+                    <div class="filter-group">
+                        <label>Durum</label>
+                        <select id="filtre-durum-ct">
+                            <option value="">Tümü</option>
+                            <option value="beklemede">⏳ Beklemede</option>
+                            <option value="onaylandi">✅ Onaylandı</option>
+                            <option value="iptal">❌ İptal</option>
+                            <option value="geldi">📍 Geldi</option>
+                            <option value="gelmedi">❓ Gelmedi</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Başlangıç</label>
+                        <input type="text" id="filtre-tarih-bas-ct" placeholder="Seç" readonly>
+                    </div>
+                    <div class="filter-group">
+                        <label>Bitiş</label>
+                        <input type="text" id="filtre-tarih-son-ct" placeholder="Seç" readonly>
+                    </div>
+                    <button class="btn-primary" onclick="yukleRezervasyonlarCT()" style="height: 45px; padding: 0 25px;">Filtrele</button>
+                </div>
+            </div>
+
+            <div class="table-container glass-card">
+                <div id="tablo-icerik-ct"><div class="loading">Yükleniyor...</div></div>
+                <div id="sayfalama-ct" class="pagination"></div>
             </div>
         </section>
 
@@ -1436,6 +1487,62 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                     </div>
                     <div style="margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1.5rem; display: flex; justify-content: flex-end;">
                         <button type="submit" class="btn-primary">✅ Ayarları Kaydet</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- CHEF'S TABLE VIEW -->
+        <section id="view-chefs-table-admin" class="view-section">
+            <div class="content-header">
+                <div class="page-title">
+                    <h1>🍳 Chef's Table Yönetimi</h1>
+                    <p>Web sitesindeki Chef's Table detaylarını ve tadım menüsünü yönetin</p>
+                </div>
+            </div>
+            
+            <div class="glass-card">
+                <form id="chefsTableFormMain" onsubmit="saveChefsTableAdmin(event)">
+                    <h3 style="font-family: 'Cormorant Garamond'; color: var(--accent); font-size: 1.6rem; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.5rem;">⚙️ Chef's Table Takvim & Kapasite Ayarları</h3>
+                    <div class="settings-grid" style="margin-bottom: 3rem;">
+                        <div>
+                            <div class="filter-group" style="margin-bottom: 1.5rem;">
+                                <label>Saatlik Kişi Kapasitesi</label>
+                                <input type="number" name="chefs_table_kapasite" id="chefs_table_kapasite" min="1" max="100">
+                            </div>
+                            
+                            <h4 style="font-family: 'Cormorant Garamond'; color: var(--accent); font-size: 1.3rem; margin-bottom: 1rem;">🔒 Chef's Table Kapalı Günler</h4>
+                            <div id="chefs-table-kapali-gunler-liste" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px; min-height: 40px; padding: 10px; background: rgba(255,255,255,0.02); border-radius: 8px;"></div>
+                            <div style="display: flex; flex-direction: column; gap: 10px; background: var(--surface-2); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div class="kapali-gun-input-group" style="display: flex; gap: 10px;">
+                                    <input type="text" id="chefs-table-yeni-kapali-gun" placeholder="Tarih Seçin" style="flex: 1; background: rgba(255,255,255,0.05); border: none; color: #fff; padding: 8px; border-radius: 4px;" readonly>
+                                    <input type="text" id="chefs-table-yeni-kapali-gun-not" placeholder="Açıklama (Örn: Özel Davet)" style="flex: 2; background: rgba(255,255,255,0.05); border: none; color: #fff; padding: 8px; border-radius: 4px;">
+                                </div>
+                                <button type="button" class="btn-primary" onclick="chefsTableKapaliGunEkle()" style="width: 100%; padding: 10px; font-size: 0.9rem;">+ Kapalı Gün Ekle</button>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 style="font-family: 'Cormorant Garamond'; color: var(--accent); font-size: 1.3rem; margin-bottom: 1rem;">🕒 Chef's Table Çalışma Saatleri</h4>
+                            <div id="chefs-table-calisma-saatleri-konteyner" style="display: flex; flex-direction: column; gap: 10px;">
+                                <!-- Dinamik Gelecek -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 style="font-family: 'Cormorant Garamond'; color: var(--accent); font-size: 1.6rem; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.5rem;">🍽️ Deneyim Detayları (4 Kart)</h3>
+                    
+                    <div id="ct-details-container" style="display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 3rem;">
+                        <!-- Dinamik Yüklenecek -->
+                    </div>
+
+                    <h3 style="font-family: 'Cormorant Garamond'; color: var(--accent); font-size: 1.6rem; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.5rem;">📜 Tadım Menüsü Adımları (7 Aşama)</h3>
+                    
+                    <div id="ct-menu-container" style="display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 2rem;">
+                        <!-- Dinamik Yüklenecek -->
+                    </div>
+
+                    <div style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1.5rem; display: flex; justify-content: flex-end;">
+                        <button type="submit" class="btn-primary">✅ Değişiklikleri Kaydet</button>
                     </div>
                 </form>
             </div>
@@ -1547,6 +1654,13 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                 <div class="modal-form-group">
                     <label>Kişi Sayısı</label>
                     <input type="number" id="m-kisi" value="2" min="1" max="50" required>
+                </div>
+                <div class="modal-form-group">
+                    <label>Rezervasyon Tipi</label>
+                    <select id="m-tip" onchange="populateManualHours(document.getElementById('m-tarih').value)" required>
+                        <option value="normal">Normal Rezervasyon</option>
+                        <option value="chefs_table">Chef's Table</option>
+                    </select>
                 </div>
                 <div class="modal-actions">
                     <button type="button" class="btn-modal btn-cancel" onclick="kapatModal('manuelEkleModal')">Vazgeç</button>
@@ -1691,7 +1805,7 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
 
         let currentPage = 1;
         let currentDeleteId = null;
-        let fpBas, fpSon, fpManual;
+        let fpBas, fpSon, fpManual, fpCtYeniGun, fpBasCt, fpSonCt;
         let kapaliGunler = {};
         window.sistemAyarlari = {};
         let charts = { trend: null, status: null, hour: null };
@@ -1715,7 +1829,9 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             // Bölüme göre veri yükle
             if (viewId === 'dashboard') yukleIstatistikler();
             if (viewId === 'reservations') yukleRezervasyonlar();
+            if (viewId === 'chefs-table-reservations') yukleRezervasyonlarCT();
             if (viewId === 'gallery') galeriListeleYukleMain();
+            if (viewId === 'chefs-table-admin') loadChefsTableAdmin();
             if (viewId === 'settings') ayarlariAcMain();
             if (viewId === 'bulk-mail') mailGonderYukle();
         }
@@ -1735,7 +1851,11 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             fpBas = flatpickr("#filtre-tarih-bas", config);
             fpSon = flatpickr("#filtre-tarih-son", config);
             
+            fpBasCt = flatpickr("#filtre-tarih-bas-ct", config);
+            fpSonCt = flatpickr("#filtre-tarih-son-ct", config);
+            
             fpYeniGun = flatpickr("#ayar-yeni-gun", config);
+            fpCtYeniGun = flatpickr("#chefs-table-yeni-kapali-gun", config);
             
             fpManual = flatpickr("#m-tarih", {
                 locale: "tr",
@@ -1754,17 +1874,33 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                 clearTimeout(window.searchTimeout);
                 window.searchTimeout = setTimeout(yukleRezervasyonlar, 500);
             });
+
+            // CT Arama inputu listener'ı
+            document.getElementById('filtre-arama-ct').addEventListener('input', (e) => {
+                currentPageCT = 1; // Yeni aramada ilk sayfaya dön
+                clearTimeout(window.searchTimeoutCT);
+                window.searchTimeoutCT = setTimeout(yukleRezervasyonlarCT, 500);
+            });
         }
 
         function populateManualHours(dateStr) {
             const saatSelect = document.getElementById('m-saat');
             saatSelect.innerHTML = '<option value="" disabled selected>Saat Seçin</option>';
             
-            if (!dateStr || !window.sistemAyarlari.calisma_saatleri) return;
+            if (!dateStr) return;
 
+            const tip = document.getElementById('m-tip').value;
             const date = new Date(dateStr);
             const gun = String(date.getDay()); // 0-6
-            const s = window.sistemAyarlari.calisma_saatleri[gun];
+            
+            let s;
+            if (tip === 'chefs_table') {
+                if (!window.sistemAyarlari.chefs_table_calisma_saatleri) return;
+                s = window.sistemAyarlari.chefs_table_calisma_saatleri[gun];
+            } else {
+                if (!window.sistemAyarlari.calisma_saatleri) return;
+                s = window.sistemAyarlari.calisma_saatleri[gun];
+            }
 
             if (!s || s.durum === 'kapali') {
                 saatSelect.innerHTML = '<option value="" disabled selected>Bu gün kapalı</option>';
@@ -1963,6 +2099,7 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             await Promise.all([
                 yukleIstatistikler(),
                 yukleRezervasyonlar(),
+                yukleRezervasyonlarCT(),
                 yukleSistemAyarlari()
             ]);
             if (btn) {
@@ -1994,7 +2131,7 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             const tarihSon = document.getElementById('filtre-tarih-son').value;
             const arama = document.getElementById('filtre-arama').value;
 
-            let url = `api.php?action=list&page=${page}`;
+            let url = `api.php?action=list&page=${page}&rezervasyon_tipi=normal`;
             if (durum) url += '&durum=' + durum;
             if (tarihBas) url += '&tarih_bas=' + tarihBas;
             if (tarihSon) url += '&tarih_son=' + tarihSon;
@@ -2015,11 +2152,13 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                     json.data.forEach(r => {
                         const tarihStr = formatTarih(r.tarih);
                         const durumBadge = getDurumBadge(r.durum);
+                        const isChefsTable = r.rezervasyon_tipi === 'chefs_table';
+                        const chefsTableBadge = isChefsTable ? `<span style="background:var(--accent); color:#fff; font-size:0.7rem; padding:2px 6px; border-radius:4px; margin-left:6px; font-weight:600; vertical-align:middle;">🍳 Chef's Table</span>` : '';
                         
                         html += `
-                        <div class="rez-card">
+                        <div class="rez-card" ${isChefsTable ? 'style="border-left: 3px solid var(--accent);"' : ''}>
                             <div class="rez-info">
-                                <span class="rez-name">${r.ad_soyad}</span>
+                                <span class="rez-name">${r.ad_soyad}${chefsTableBadge}</span>
                                 <span style="color:var(--muted);font-size:0.8rem;">${r.email || 'E-posta yok'}</span>
                             </div>
                             <div class="rez-info">
@@ -2092,6 +2231,112 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
             }
         }
 
+        let currentPageCT = 1;
+
+        async function yukleRezervasyonlarCT(page = currentPageCT) {
+            currentPageCT = page;
+            const durum = document.getElementById('filtre-durum-ct').value;
+            const tarihBas = document.getElementById('filtre-tarih-bas-ct').value;
+            const tarihSon = document.getElementById('filtre-tarih-son-ct').value;
+            const arama = document.getElementById('filtre-arama-ct').value;
+
+            let url = `api.php?action=list&page=${page}&rezervasyon_tipi=chefs_table`;
+            if (durum) url += '&durum=' + durum;
+            if (tarihBas) url += '&tarih_bas=' + tarihBas;
+            if (tarihSon) url += '&tarih_son=' + tarihSon;
+            if (arama) url += '&search=' + encodeURIComponent(arama);
+
+            const container = document.getElementById('tablo-icerik-ct');
+            const paginationContainer = document.getElementById('sayfalama-ct');
+            container.innerHTML = '<div class="loading">Yükleniyor...</div>';
+            paginationContainer.innerHTML = '';
+
+            try {
+                const res = await fetch(url);
+                const json = await res.json();
+
+                if (json.success && json.data.length > 0) {
+                    let html = '';
+
+                    json.data.forEach(r => {
+                        const tarihStr = formatTarih(r.tarih);
+                        const durumBadge = getDurumBadge(r.durum);
+                        
+                        html += `
+                        <div class="rez-card" style="border-left: 3px solid var(--accent);">
+                            <div class="rez-info">
+                                <span class="rez-name">${r.ad_soyad} <span style="background:var(--accent); color:#fff; font-size:0.7rem; padding:2px 6px; border-radius:4px; margin-left:6px; font-weight:600; vertical-align:middle;">🍳 Chef's Table</span></span>
+                                <span style="color:var(--muted);font-size:0.8rem;">${r.email || 'E-posta yok'}</span>
+                            </div>
+                            <div class="rez-info">
+                                <span class="rez-label">Telefon</span>
+                                <span class="rez-value">${r.telefon}</span>
+                                ${r.toplam_ziyaret > 1 ? `<div class="badge-visitor" title="Daha önce ${r.toplam_ziyaret - 1} kez rezervasyon yapmış">⭐ Tekrar Gelen Müşteri (${r.toplam_ziyaret}. Ziyaret)</div>` : ''}
+                            </div>
+                            <div class="rez-info">
+                                <span class="rez-label">Tarih</span>
+                                <span class="rez-value" style="font-weight:500;">${tarihStr}</span>
+                            </div>
+                            <div class="rez-info">
+                                <span class="rez-label">Saat</span>
+                                <span class="rez-value">${r.saat}</span>
+                            </div>
+                            <div class="rez-info">
+                                <span class="rez-label">Kişi</span>
+                                <span class="rez-value">${r.kisi_sayisi} Kişi</span>
+                            </div>
+                            <div class="rez-info">
+                                <div class="actions">
+                                    ${(r.durum !== 'onaylandi' && r.durum !== 'geldi' && r.durum !== 'gelmedi') ? `<button class="btn-action btn-approve" onclick="islem('approve',${r.id})" title="Onayla">✓ Onayla</button>` : ''}
+                                    ${r.durum === 'onaylandi' ? `
+                                        <button class="btn-action btn-status-geldi" onclick="islem('arrived',${r.id})">Geldi</button>
+                                        <button class="btn-action btn-status-gelmedi" onclick="islem('no-show',${r.id})">Gelmedi</button>
+                                    ` : ''}
+                                    ${(r.durum !== 'iptal' && r.durum !== 'geldi' && r.durum !== 'gelmedi') ? `<button class="btn-action btn-reject" onclick="islem('reject',${r.id})" title="İptal Et">✕ İptal</button>` : ''}
+                                    <button class="btn-action btn-delete" onclick="silOnay(${r.id})" title="Sil">🗑</button>
+                                </div>
+                                <div style="margin-top:8px; text-align:right;">${durumBadge}</div>
+                            </div>
+                            ${r.ozel_istekler ? `
+                            <div class="rez-special">
+                                <strong>Not:</strong> ${r.ozel_istekler}
+                            </div>` : ''}
+                        </div>`;
+                    });
+
+                    container.innerHTML = html;
+
+                    if (json.pagination && json.pagination.total_pages > 1) {
+                        let pageHtml = '';
+                        const tp = json.pagination.total_pages;
+                        const cp = json.pagination.current_page;
+                        
+                        pageHtml += `<button class="page-btn" ${cp === 1 ? 'disabled' : `onclick="yukleRezervasyonlarCT(${cp - 1})"`}>Önceki</button>`;
+                        
+                        for (let i = 1; i <= tp; i++) {
+                            if (i === 1 || i === tp || (i >= cp - 2 && i <= cp + 2)) {
+                                pageHtml += `<button class="page-btn ${i === cp ? 'active' : ''}" onclick="yukleRezervasyonlarCT(${i})">${i}</button>`;
+                            } else if (i === cp - 3 || i === cp + 3) {
+                                pageHtml += `<span style="color:var(--muted); margin:0 5px;">...</span>`;
+                            }
+                        }
+                        
+                        pageHtml += `<button class="page-btn" ${cp === tp ? 'disabled' : `onclick="yukleRezervasyonlarCT(${cp + 1})"`}>Sonraki</button>`;
+                        paginationContainer.innerHTML = pageHtml;
+                    }
+                } else {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="icon">🍳</div>
+                            <p>Henüz Chef's Table rezervasyonu bulunmuyor.</p>
+                        </div>`;
+                }
+            } catch (e) {
+                container.innerHTML = '<div class="empty-state"><p>Veriler yüklenirken hata oluştu.</p></div>';
+                console.error('CT Liste hatası:', e);
+            }
+        }
+
         /**
          * Rezervasyon işlemi (onayla / iptal)
          */
@@ -2111,6 +2356,7 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                 if (json.success) {
                     showToast(json.message, 'success');
                     yukleRezervasyonlar();
+                    yukleRezervasyonlarCT();
                     yukleIstatistikler();
                 } else {
                     showToast(json.message, 'error');
@@ -2180,6 +2426,7 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                 formData.append('tarih', document.getElementById('m-tarih').value);
                 formData.append('saat', document.getElementById('m-saat').value);
                 formData.append('kisi_sayisi', document.getElementById('m-kisi').value);
+                formData.append('rezervasyon_tipi', document.getElementById('m-tip').value);
                 formData.append('csrf_token', csrfToken);
                 
                 const res = await fetch('api.php', { method: 'POST', body: formData });
@@ -3082,6 +3329,239 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                 loadDigitalMenu();
                 showToast(json.message, 'success');
             }
+        }
+
+        // ===== CHEF'S TABLE ADMIN JS =====
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        async function loadChefsTableAdmin() {
+            const containerDetails = document.getElementById('ct-details-container');
+            const containerMenu = document.getElementById('ct-menu-container');
+            containerDetails.innerHTML = '<div class="loading">Detaylar yükleniyor...</div>';
+            containerMenu.innerHTML = '<div class="loading">Menü adımları yükleniyor...</div>';
+
+            try {
+                const res = await fetch('api.php?action=settings_get');
+                const json = await res.json();
+                if (json.success) {
+                    renderChefsTableAdminForms(
+                        json.data.chefs_table_details || [],
+                        json.data.chefs_table_menu || []
+                    );
+                    
+                    // Kapasite
+                    document.getElementById('chefs_table_kapasite').value = json.data.chefs_table_kapasite || 8;
+                    // Kapalı Günler
+                    chefsTableKapaliGunler = json.data.chefs_table_kapali_gunler || {};
+                    if (Array.isArray(chefsTableKapaliGunler)) chefsTableKapaliGunler = {};
+                    listeleChefsTableKapaliGunler();
+                    // Çalışma Saatleri
+                    renderChefsTableCalismaSaatleri(json.data.chefs_table_calisma_saatleri || {});
+                } else {
+                    showToast(json.message || 'Veriler yüklenirken hata oluştu.', 'error');
+                }
+            } catch (e) {
+                showToast('Bağlantı hatası: ' + e.message, 'error');
+            }
+        }
+
+        function renderChefsTableAdminForms(details, menu) {
+            const detailsContainer = document.getElementById('ct-details-container');
+            detailsContainer.innerHTML = details.map((item, index) => `
+                <div class="ct-item-card" style="border: 1px solid rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; background: rgba(255,255,255,0.01); display: flex; flex-direction: column; gap: 10px;">
+                    <div style="font-weight: 600; color: var(--accent); display: flex; align-items: center; gap: 5px;">
+                        <span>🏷️</span> Kart ${index + 1}
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="modal-form-group" style="margin-bottom: 0;">
+                            <label>Başlık (TR)</label>
+                            <input type="text" class="ct-detail-title-tr" value="${escapeHtml(item.title_tr || '')}" required>
+                        </div>
+                        <div class="modal-form-group" style="margin-bottom: 0;">
+                            <label>Başlık (EN)</label>
+                            <input type="text" class="ct-detail-title-en" value="${escapeHtml(item.title_en || '')}" required>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="modal-form-group" style="margin-bottom: 0;">
+                            <label>Açıklama (TR)</label>
+                            <textarea class="ct-detail-desc-tr" rows="2" required>${escapeHtml(item.desc_tr || '')}</textarea>
+                        </div>
+                        <div class="modal-form-group" style="margin-bottom: 0;">
+                            <label>Açıklama (EN)</label>
+                            <textarea class="ct-detail-desc-en" rows="2" required>${escapeHtml(item.desc_en || '')}</textarea>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            const menuContainer = document.getElementById('ct-menu-container');
+            menuContainer.innerHTML = menu.map((item, index) => `
+                <div class="ct-menu-card" style="border: 1px solid rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; background: rgba(255,255,255,0.01); display: flex; flex-direction: column; gap: 10px;">
+                    <div style="font-weight: 600; color: var(--accent); display: flex; justify-content: space-between; align-items: center;">
+                        <span style="display: flex; align-items: center; gap: 5px;">🍽️ Aşama ${index + 1} (${escapeHtml(item.type_tr || '')})</span>
+                        <span style="font-size: 0.8rem; color: var(--muted);">Sıra No: ${item.num}</span>
+                    </div>
+                    <input type="hidden" class="ct-menu-num" value="${item.num}">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="modal-form-group" style="margin-bottom: 0;">
+                            <label>Kategori/Aşama Tipi (TR) (Örn: Soğuk Başlangıç)</label>
+                            <input type="text" class="ct-menu-type-tr" value="${escapeHtml(item.type_tr || '')}" required>
+                        </div>
+                        <div class="modal-form-group" style="margin-bottom: 0;">
+                            <label>Kategori/Aşama Tipi (EN) (Örn: Cold Starter)</label>
+                            <input type="text" class="ct-menu-type-en" value="${escapeHtml(item.type_en || '')}" required>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="modal-form-group" style="margin-bottom: 0;">
+                            <label>Yemek Adı (TR)</label>
+                            <input type="text" class="ct-menu-title-tr" value="${escapeHtml(item.title_tr || '')}" required>
+                        </div>
+                        <div class="modal-form-group" style="margin-bottom: 0;">
+                            <label>Yemek Adı (EN)</label>
+                            <input type="text" class="ct-menu-title-en" value="${escapeHtml(item.title_en || '')}" required>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="modal-form-group" style="margin-bottom: 0;">
+                            <label>Açıklama/Detay (TR)</label>
+                            <textarea class="ct-menu-desc-tr" rows="2">${escapeHtml(item.desc_tr || '')}</textarea>
+                        </div>
+                        <div class="modal-form-group" style="margin-bottom: 0;">
+                            <label>Açıklama/Detay (EN)</label>
+                            <textarea class="ct-menu-desc-en" rows="2">${escapeHtml(item.desc_en || '')}</textarea>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function saveChefsTableAdmin(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = "Kaydediliyor...";
+
+            try {
+                const details = [];
+                document.querySelectorAll('.ct-item-card').forEach(card => {
+                    details.push({
+                        title_tr: card.querySelector('.ct-detail-title-tr').value,
+                        title_en: card.querySelector('.ct-detail-title-en').value,
+                        desc_tr: card.querySelector('.ct-detail-desc-tr').value,
+                        desc_en: card.querySelector('.ct-detail-desc-en').value
+                    });
+                });
+
+                const menu = [];
+                document.querySelectorAll('.ct-menu-card').forEach(card => {
+                    menu.push({
+                        num: parseInt(card.querySelector('.ct-menu-num').value),
+                        type_tr: card.querySelector('.ct-menu-type-tr').value,
+                        type_en: card.querySelector('.ct-menu-type-en').value,
+                        title_tr: card.querySelector('.ct-menu-title-tr').value,
+                        title_en: card.querySelector('.ct-menu-title-en').value,
+                        desc_tr: card.querySelector('.ct-menu-desc-tr').value,
+                        desc_en: card.querySelector('.ct-menu-desc-en').value
+                    });
+                });
+
+                const ctSaatler = {};
+                document.querySelectorAll('.saat-input-ct').forEach(input => {
+                    const gun = input.dataset.gun;
+                    if (!ctSaatler[gun]) ctSaatler[gun] = {};
+                    ctSaatler[gun][input.dataset.type] = input.value;
+                    ctSaatler[gun].durum = document.querySelector(`.durum-input-ct[data-gun="${gun}"]`).checked ? 'acik' : 'kapali';
+                });
+
+                const formData = new FormData();
+                formData.append('action', 'settings_save');
+                formData.append('chefs_table_details', JSON.stringify(details));
+                formData.append('chefs_table_menu', JSON.stringify(menu));
+                
+                formData.append('chefs_table_kapasite', document.getElementById('chefs_table_kapasite').value);
+                formData.append('chefs_table_kapali_gunler', JSON.stringify(chefsTableKapaliGunler));
+                formData.append('chefs_table_calisma_saatleri', JSON.stringify(ctSaatler));
+                
+                formData.append('csrf_token', csrfToken);
+
+                const res = await fetch('api.php', { method: 'POST', body: formData });
+                const json = await res.json();
+
+                if (json.success) {
+                    showToast('Chef\'s Table ayarları başarıyla kaydedildi.', 'success');
+                    await yukleSistemAyarlari();
+                } else {
+                    showToast(json.message || 'Hata oluştu.', 'error');
+                }
+            } catch (err) {
+                showToast('Bağlantı hatası: ' + err.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
+        }
+
+        let chefsTableKapaliGunler = {};
+
+        function chefsTableKapaliGunEkle() {
+            const date = document.getElementById('chefs-table-yeni-kapali-gun').value;
+            const note = document.getElementById('chefs-table-yeni-kapali-gun-not').value;
+            if (!date) {
+                showToast('Lütfen bir tarih seçin.', 'error');
+                return;
+            }
+            chefsTableKapaliGunler[date] = note || "Kapalı";
+            listeleChefsTableKapaliGunler();
+            
+            if (fpCtYeniGun) fpCtYeniGun.clear();
+            document.getElementById('chefs-table-yeni-kapali-gun-not').value = '';
+        }
+
+        function chefsTableKapaliGunSil(date) {
+            delete chefsTableKapaliGunler[date];
+            listeleChefsTableKapaliGunler();
+        }
+
+        function listeleChefsTableKapaliGunler() {
+            const container = document.getElementById('chefs-table-kapali-gunler-liste');
+            container.innerHTML = Object.keys(chefsTableKapaliGunler).map(date => `
+                <div style="background:var(--surface-2); padding:8px 15px; border-radius:8px; font-size:0.85rem; display:flex; justify-content:space-between; align-items:center; border:1px solid rgba(255,255,255,0.05);">
+                    <div>
+                        <strong style="color:var(--accent);">${date}</strong>
+                        <span style="color:var(--muted); margin-left:10px;">${chefsTableKapaliGunler[date] || ''}</span>
+                    </div>
+                    <span onclick="chefsTableKapaliGunSil('${date}')" style="color:var(--danger); cursor:pointer; font-weight:bold; font-size:1.2rem; padding:0 5px;">×</span>
+                </div>
+            `).join('') || '<div style="color:var(--muted); font-size:0.85rem; text-align:center;">Henüz kapalı gün eklenmedi.</div>';
+        }
+
+        function renderChefsTableCalismaSaatleri(saatler) {
+            const container = document.getElementById('chefs-table-calisma-saatleri-konteyner');
+            container.innerHTML = ["1", "2", "3", "4", "5", "6", "0"].map(gun => {
+                const s = saatler[gun] || { acilis: "19:00", kapanis: "00:00", durum: "acik" };
+                return `
+                <div class="saat-row">
+                    <span class="gun-adı">${gunIsimleri[gun]}</span>
+                    <div class="saat-inputs">
+                        <input type="time" class="saat-input-ct" data-gun="${gun}" data-type="acilis" value="${s.acilis}">
+                        <input type="time" class="saat-input-ct" data-gun="${gun}" data-type="kapanis" value="${s.kapanis}">
+                    </div>
+                    <label class="durum-checkbox">
+                        <input type="checkbox" class="durum-input-ct" data-gun="${gun}" ${s.durum === 'acik' ? 'checked' : ''}> Açık
+                    </label>
+                </div>`;
+            }).join('');
         }
 
         // Dashboard switchView içinde digital menu'yü de tetikleyelim

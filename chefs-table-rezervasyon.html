@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="tr" data-page-id="rezervasyon">
+<html lang="tr" data-page-id="chefs-table-rezervasyon">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sintesi | Online Rezervasyon</title>
-    <meta name="description" content="Sintesi'de unutulmaz bir akşam için masanızı şimdiden ayırtın. Hızlı ve kolay online rezervasyon sistemi.">
+    <title>Sintesi | Chef's Table Rezervasyon</title>
+    <meta name="description" content="Şef Ersin Avşar ile gastronomi yolculuğu için yerinizi şimdiden ayırtın. Sınırlı kapasitedeki Chef's Table online rezervasyon sistemi.">
     <link rel="icon" type="image/webp" href="sintesi.webp">
     <link
         href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Montserrat:wght@300;400;500;600&display=swap"
@@ -54,7 +54,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: url('/assets/aiSintesi.png');
+            background-image: url('./assets/optimized/ersin.webp');
             background-size: cover;
             background-position: center;
             filter: blur(4px) brightness(0.3);
@@ -96,12 +96,11 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: url('assets/optimized/galeri9.webp');
+            background-image: url('./assets/optimized/ersin.webp');
             background-size: cover;
             background-position: center;
-            filter: blur(2px);
-            transform: scale(1.1);
-            /* Kenarlardaki beyazlığı önlemek için */
+            filter: blur(1px);
+            transform: scale(1.05);
             z-index: 0;
         }
 
@@ -112,7 +111,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.8) 100%);
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.75) 100%);
             z-index: 1;
         }
 
@@ -196,7 +195,6 @@
             flex-direction: column;
             height: 100%;
             min-height: 0;
-            /* Flexbox scroll fix */
         }
 
         .step-header {
@@ -265,7 +263,6 @@
             padding-right: 10px;
             margin-right: -10px;
             min-height: 0;
-            /* ÖNEMLİ: Flex child scroll fix */
         }
 
         /* Custom Scrollbar */
@@ -707,8 +704,7 @@
                 <div class="brand-info">
                     <img src="sintesi.webp" alt="Sintesi Logo" class="brand-logo">
                     <h1 class="brand-name">Sintesi</h1>
-                    <p style="opacity: 0.8; font-size: 1.1rem; font-family: var(--font-heading);" data-i18n="res-page-subtitle">Fine Dining &
-                        Experience</p>
+                    <p style="opacity: 0.8; font-size: 1.1rem; font-family: var(--font-heading);" data-i18n="nav-chefs-table">Chef's Table</p>
                 </div>
                 <div class="contact-info">
                     <div class="contact-item">
@@ -729,6 +725,9 @@
         <!-- Sağ Panel -->
         <div class="card-right">
             <form id="bookingForm">
+                <!-- Rezervasyon Tipi (ÖNEMLİ) -->
+                <input type="hidden" name="rezervasyon_tipi" value="chefs_table">
+
                 <!-- Adım 1: Tarih ve Saat -->
                 <div id="selection-step" class="step-container">
                     <div class="step-header">
@@ -848,9 +847,9 @@
             .then(res => res.json())
             .then(json => {
                 if (json.success) {
-                    maxKapasite = json.data.kapasite;
-                    kapaliGunler = json.data.kapali_gunler || {};
-                    calismaSaatleri = json.data.calisma_saatleri || {};
+                    maxKapasite = json.data.chefs_table_kapasite || 8;
+                    kapaliGunler = json.data.chefs_table_kapali_gunler || {};
+                    calismaSaatleri = json.data.chefs_table_calisma_saatleri || {};
                 }
                 initCalendar();
             });
@@ -940,7 +939,7 @@
                     if (m >= 60) { m = 0; h++; }
                 }
 
-                const res = await fetch(`public_api.php?action=check_availability&date=${dateStr}&type=normal`);
+                const res = await fetch(`public_api.php?action=check_availability&date=${dateStr}&type=chefs_table`);
                 const json = await res.json();
                 const doluluk = json.data || {};
 
@@ -1036,11 +1035,6 @@
             document.getElementById('summary-text').textContent = `${formattedDate}, ${selectedTime} - ${personCount} ${currentLang === 'tr' ? 'Kişi' : 'People'}`;
         }
 
-        function goToSelection() {
-            document.getElementById('form-step').style.display = 'none';
-            document.getElementById('selection-step').style.display = 'flex';
-        }
-
         // Form Gönderimi
         document.getElementById('bookingForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -1060,9 +1054,9 @@
                 const json = await res.json();
 
                 if (json.success) {
-                    showToast('Rezervasyon talebiniz başarıyla alındı! Yönlendiriliyorsunuz...', 'success');
+                    showToast('Chef\'s Table rezervasyon talebiniz başarıyla alındı! Yönlendiriliyorsunuz...', 'success');
                     setTimeout(() => {
-                        window.location.href = 'index.html';
+                        window.location.href = 'chefs-table.html';
                     }, 2000);
                 } else {
                     showToast('Hata: ' + json.message, 'error');

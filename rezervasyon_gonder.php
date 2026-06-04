@@ -27,6 +27,7 @@ $saat       = isset($_POST['saat']) ? htmlspecialchars(strip_tags(trim($_POST['s
 $kisi       = isset($_POST['kisi_sayisi']) ? intval($_POST['kisi_sayisi']) : 2;
 $ozel       = isset($_POST['ozel_istekler']) ? htmlspecialchars(strip_tags(trim($_POST['ozel_istekler']))) : '';
 $dil        = isset($_POST['dil']) ? htmlspecialchars(strip_tags(trim($_POST['dil']))) : 'tr';
+$rezervasyon_tipi = isset($_POST['rezervasyon_tipi']) ? htmlspecialchars(strip_tags(trim($_POST['rezervasyon_tipi']))) : 'normal';
 
 // Doğrulama
 if (empty($ad_soyad) || empty($telefon) || empty($tarih) || empty($saat)) {
@@ -90,13 +91,32 @@ try {
     $stmt_ayarlar->execute();
     $ayarlar = $stmt_ayarlar->fetchAll(PDO::FETCH_KEY_PAIR);
     
-    $maksimum_kapasite = isset($ayarlar['kapasite']) ? (int)$ayarlar['kapasite'] : 16;
-    $kapali_gunler = isset($ayarlar['kapali_gunler']) ? json_decode($ayarlar['kapali_gunler'], true) : [];
-    $calisma_saatleri = isset($ayarlar['calisma_saatleri']) ? json_decode($ayarlar['calisma_saatleri'], true) : [];
+    if ($rezervasyon_tipi === 'chefs_table') {
+        $maksimum_kapasite = isset($ayarlar['chefs_table_kapasite']) ? (int)$ayarlar['chefs_table_kapasite'] : 8;
+        $kapali_gunler = isset($ayarlar['chefs_table_kapali_gunler']) ? json_decode($ayarlar['chefs_table_kapali_gunler'], true) : [];
+        $calisma_saatleri = isset($ayarlar['chefs_table_calisma_saatleri']) ? json_decode($ayarlar['chefs_table_calisma_saatleri'], true) : [];
+        if (empty($calisma_saatleri)) {
+            $calisma_saatleri = [
+                "1" => ["acilis" => "19:00", "kapanis" => "00:00", "durum" => "acik"],
+                "2" => ["acilis" => "19:00", "kapanis" => "00:00", "durum" => "acik"],
+                "3" => ["acilis" => "19:00", "kapanis" => "00:00", "durum" => "acik"],
+                "4" => ["acilis" => "19:00", "kapanis" => "00:00", "durum" => "acik"],
+                "5" => ["acilis" => "19:00", "kapanis" => "00:00", "durum" => "acik"],
+                "6" => ["acilis" => "19:00", "kapanis" => "00:00", "durum" => "acik"],
+                "0" => ["acilis" => "19:00", "kapanis" => "00:00", "durum" => "acik"]
+            ];
+        }
+        $stmt_check = $pdo->prepare("SELECT SUM(kisi_sayisi) FROM rezervasyonlar WHERE tarih = ? AND saat = ? AND rezervasyon_tipi = 'chefs_table' AND durum != 'iptal'");
+    } else {
+        $maksimum_kapasite = isset($ayarlar['kapasite']) ? (int)$ayarlar['kapasite'] : 16;
+        $kapali_gunler = isset($ayarlar['kapali_gunler']) ? json_decode($ayarlar['kapali_gunler'], true) : [];
+        $calisma_saatleri = isset($ayarlar['calisma_saatleri']) ? json_decode($ayarlar['calisma_saatleri'], true) : [];
+        $stmt_check = $pdo->prepare("SELECT SUM(kisi_sayisi) FROM rezervasyonlar WHERE tarih = ? AND saat = ? AND (rezervasyon_tipi = 'normal' OR rezervasyon_tipi IS NULL OR rezervasyon_tipi = '') AND durum != 'iptal'");
+    }
     
     // 1. Kapalı Gün Kontrolü (Özel tarihler)
     if (is_array($kapali_gunler) && (isset($kapali_gunler[$tarih]) || in_array($tarih, $kapali_gunler))) {
-        $mesaj = 'Seçtiğiniz tarih restoranımız kapalıdır.';
+        $mesaj = 'Seçtiğiniz tarih rezervasyonlara kapalıdır.';
         if (isset($kapali_gunler[$tarih]) && !empty($kapali_gunler[$tarih])) {
             $mesaj .= ' (' . $kapali_gunler[$tarih] . ')';
         }
@@ -115,9 +135,8 @@ try {
     }
 
     // Saatlik kapasite kontrolü
-    $stmt = $pdo->prepare("SELECT SUM(kisi_sayisi) FROM rezervasyonlar WHERE tarih = ? AND saat = ? AND durum != 'iptal'");
-    $stmt->execute([$tarih, $saat]);
-    $mevcut_kisi = (int)$stmt->fetchColumn();
+    $stmt_check->execute([$tarih, $saat]);
+    $mevcut_kisi = (int)$stmt_check->fetchColumn();
     
     if (($mevcut_kisi + $kisi) > $maksimum_kapasite) {
         $kalan_yer = $maksimum_kapasite - $mevcut_kisi;
@@ -133,14 +152,14 @@ try {
 
     // Veritabanına kaydet
     $stmt = $pdo->prepare("
-        INSERT INTO rezervasyonlar (ad_soyad, email, telefon, tarih, saat, kisi_sayisi, ozel_istekler, durum, iptal_kodu, dil)
-        VALUES (?, ?, ?, ?, ?, ?, ?, 'beklemede', ?, ?)
+        INSERT INTO rezervasyonlar (ad_soyad, email, telefon, tarih, saat, kisi_sayisi, ozel_istekler, durum, iptal_kodu, dil, rezervasyon_tipi)
+        VALUES (?, ?, ?, ?, ?, ?, ?, 'beklemede', ?, ?, ?)
     ");
-    $stmt->execute([$ad_soyad, $email, $telefon, $tarih, $saat, $kisi, $ozel, $iptal_kodu, $dil]);
+    $stmt->execute([$ad_soyad, $email, $telefon, $tarih, $saat, $kisi, $ozel, $iptal_kodu, $dil, $rezervasyon_tipi]);
     
     // E-posta bildirimi gönder (sadece sunucuda, local'de atla)
     if (!local_mi()) {
-        gonderBildirimMaili($ad_soyad, $email, $telefon, $tarih, $saat, $kisi, $ozel);
+        gonderBildirimMaili($ad_soyad, $email, $telefon, $tarih, $saat, $kisi, $ozel, $rezervasyon_tipi);
     }
     
     echo json_encode([
@@ -161,7 +180,7 @@ try {
 /**
  * Rezervasyon bildirim e-postası gönderir
  */
-function gonderBildirimMaili($ad, $email, $telefon, $tarih, $saat, $kisi, $ozel) {
+function gonderBildirimMaili($ad, $email, $telefon, $tarih, $saat, $kisi, $ozel, $rezervasyon_tipi = 'normal') {
     require_once __DIR__ . '/phpmailer/Exception.php';
     require_once __DIR__ . '/phpmailer/PHPMailer.php';
     require_once __DIR__ . '/phpmailer/SMTP.php';
@@ -191,13 +210,16 @@ function gonderBildirimMaili($ad, $email, $telefon, $tarih, $saat, $kisi, $ozel)
         // Tarih formatla
         $tarih_format = date('d.m.Y', strtotime($tarih));
         
+        $tip_str = ($rezervasyon_tipi === 'chefs_table') ? "Chef's Table " : "";
+        $baslik = ($rezervasyon_tipi === 'chefs_table') ? "Yeni Chef's Table Rezervasyonu" : "Yeni Rezervasyon Talebi";
+        
         $mail->isHTML(true);
-        $mail->Subject = "🍽️ Yeni Rezervasyon Talebi - {$ad} ({$tarih_format})";
+        $mail->Subject = "🍽️ Yeni {$tip_str}Rezervasyon Talebi - {$ad} ({$tarih_format})";
         $mail->Body = "
             <div style=\"font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; border-radius: 15px; overflow: hidden; background: #000 url('https://sintesi.com.tr/background.png') no-repeat center center; background-size: cover; color: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.5);\">
                 <div style='padding: 40px 20px; text-align: center;'>
                     <img src='https://sintesi.com.tr/sintesi.webp' alt='Sintesi' style='max-width: 180px; margin-bottom: 20px;'>
-                    <h1 style='margin: 0; font-size: 26px; font-family: Georgia, serif; color: #fff;'>Yeni Rezervasyon Talebi</h1>
+                    <h1 style='margin: 0; font-size: 26px; font-family: Georgia, serif; color: #fff;'>{$baslik}</h1>
                     <div style='width: 50px; height: 2px; background: #9D432C; margin: 20px auto;'></div>
                 </div>
                 <div style='padding: 0 40px 40px 40px;'>
@@ -205,6 +227,7 @@ function gonderBildirimMaili($ad, $email, $telefon, $tarih, $saat, $kisi, $ozel)
                     
                     <div style='background: rgba(255,255,255,0.05); padding: 25px; border-radius: 12px; margin: 30px 0; border: 1px solid rgba(255,255,255,0.1);'>
                         <table style='width: 100%; border-collapse: collapse;'>
+                            <tr><td style='padding: 8px 0; color: #888; font-size: 14px;'>Rezervasyon Tipi</td><td style='padding: 8px 0; color: #fff; font-size: 16px; text-align: right;'><strong>" . ($rezervasyon_tipi === 'chefs_table' ? '🍳 Chef\'s Table' : '🍽️ Normal') . "</strong></td></tr>
                             <tr><td style='padding: 8px 0; color: #888; font-size: 14px;'>Müşteri</td><td style='padding: 8px 0; color: #fff; font-size: 16px; text-align: right;'><strong>{$ad}</strong></td></tr>
                             <tr><td style='padding: 8px 0; color: #888; font-size: 14px;'>Telefon</td><td style='padding: 8px 0; color: #fff; font-size: 16px; text-align: right;'><strong>{$telefon}</strong></td></tr>
                             <tr><td style='padding: 8px 0; color: #888; font-size: 14px;'>E-posta</td><td style='padding: 8px 0; color: #fff; font-size: 16px; text-align: right;'><strong>" . ($email ?: 'Belirtilmedi') . "</strong></td></tr>
@@ -226,7 +249,7 @@ function gonderBildirimMaili($ad, $email, $telefon, $tarih, $saat, $kisi, $ozel)
             </div>
         ";
         
-        $mail->AltBody = "Yeni Rezervasyon: {$ad}, {$tarih_format} {$saat}, {$kisi} kişi, Tel: {$telefon}";
+        $mail->AltBody = "Yeni Rezervasyon: {$ad}, {$tarih_format} {$saat}, {$kisi} kişi, Tel: {$telefon}, Tip: " . ($rezervasyon_tipi === 'chefs_table' ? 'Chef\'s Table' : 'Normal');
         $mail->send();
     } catch (Exception $e) {
         // E-posta hatası rezervasyonu engellemez, sessizce devam et

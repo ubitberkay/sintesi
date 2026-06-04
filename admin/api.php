@@ -142,10 +142,22 @@ switch ($action) {
  * Rezervasyonları listele
  */
 function listeleRezervasyonlar($pdo) {
+    // Eksik sütun kontrolü (Canlıya geçişte rezervasyon_tipi için)
+    try {
+        $pdo->query("SELECT rezervasyon_tipi FROM rezervasyonlar LIMIT 1");
+    } catch (Exception $e) {
+        try {
+            $pdo->exec("ALTER TABLE rezervasyonlar ADD COLUMN rezervasyon_tipi VARCHAR(30) DEFAULT 'normal'");
+        } catch (Exception $e2) {
+            // Sessizce devam et
+        }
+    }
+
     $durum = $_GET['durum'] ?? '';
     $tarih_bas = $_GET['tarih_bas'] ?? '';
     $tarih_son = $_GET['tarih_son'] ?? '';
     $search = $_GET['search'] ?? '';
+    $tip = $_GET['rezervasyon_tipi'] ?? '';
     $page = max(1, intval($_GET['page'] ?? 1));
     $limit = 50;
     $offset = ($page - 1) * $limit;
@@ -155,6 +167,14 @@ function listeleRezervasyonlar($pdo) {
             FROM rezervasyonlar r WHERE 1=1";
     $count_sql = "SELECT COUNT(*) FROM rezervasyonlar WHERE 1=1";
     $params = [];
+    
+    if ($tip === 'normal') {
+        $sql .= " AND (r.rezervasyon_tipi = 'normal' OR r.rezervasyon_tipi IS NULL OR r.rezervasyon_tipi = '')";
+        $count_sql .= " AND (rezervasyon_tipi = 'normal' OR rezervasyon_tipi IS NULL OR rezervasyon_tipi = '')";
+    } elseif ($tip === 'chefs_table') {
+        $sql .= " AND r.rezervasyon_tipi = 'chefs_table'";
+        $count_sql .= " AND rezervasyon_tipi = 'chefs_table'";
+    }
     
     if (!empty($durum) && in_array($durum, ['beklemede', 'onaylandi', 'iptal'])) {
         $sql .= " AND r.durum = ?";
@@ -270,25 +290,39 @@ function gonderOnayMaili($rez) {
         $mail->addAddress($rez['email'], $rez['ad_soyad']);
         
         $is_en = (isset($rez['dil']) && $rez['dil'] === 'en');
+        $is_ct = (isset($rez['rezervasyon_tipi']) && $rez['rezervasyon_tipi'] === 'chefs_table');
         $tarih_format = $is_en ? date('F d, Y', strtotime($rez['tarih'])) : date('d.m.Y', strtotime($rez['tarih']));
         
         $mail->isHTML(true);
-        $mail->Subject = $is_en ? "✅ Your Reservation is Confirmed - Sintesi" : "✅ Rezervasyonunuz Onaylandı - Sintesi";
+        if ($is_ct) {
+            $mail->Subject = $is_en ? "✅ Your Chef's Table Reservation is Confirmed - Sintesi" : "✅ Chef's Table Rezervasyonunuz Onaylandı - Sintesi";
+        } else {
+            $mail->Subject = $is_en ? "✅ Your Reservation is Confirmed - Sintesi" : "✅ Rezervasyonunuz Onaylandı - Sintesi";
+        }
         
         if ($is_en) {
+            $title_en = $is_ct ? "Chef's Table Confirmed" : "Reservation Confirmed";
+            $body_en = $is_ct 
+                ? "Your Chef's Table reservation request has been confirmed. We look forward to welcoming you to the Sintesi Chef's Table experience."
+                : "Your reservation request has been confirmed. We look forward to welcoming you to the Sintesi atmosphere.";
+            
             $mail->Body = "
                 <div style=\"font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; border-radius: 15px; overflow: hidden; background: #000 url('https://sintesi.com.tr/background.png') no-repeat center center; background-size: cover; color: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.5);\">
                     <div style='padding: 40px 20px; text-align: center;'>
                         <img src='https://sintesi.com.tr/sintesi.webp' alt='Sintesi' style='max-width: 180px; margin-bottom: 20px;'>
-                        <h1 style='margin: 0; font-size: 26px; font-family: Georgia, serif; color: #fff;'>Reservation Confirmed</h1>
+                        <h1 style='margin: 0; font-size: 26px; font-family: Georgia, serif; color: #fff;'>{$title_en}</h1>
                         <div style='width: 50px; height: 2px; background: #9D432C; margin: 20px auto;'></div>
                     </div>
                     <div style='padding: 0 40px 40px 40px;'>
                         <p style='font-size: 16px; line-height: 1.6; color: #e0e0e0;'>Dear <strong>{$rez['ad_soyad']}</strong>,</p>
-                        <p style='font-size: 16px; line-height: 1.6; color: #e0e0e0;'>Your reservation request has been confirmed. We look forward to welcoming you to the Sintesi atmosphere.</p>
+                        <p style='font-size: 16px; line-height: 1.6; color: #e0e0e0;'>{$body_en}</p>
                         
                         <div style='background: rgba(255,255,255,0.05); padding: 25px; border-radius: 12px; margin: 30px 0; border: 1px solid rgba(255,255,255,0.1);'>
                             <table style='width: 100%; border-collapse: collapse;'>
+                                <tr>
+                                    <td style='padding: 8px 0; color: #888; font-size: 14px;'>Reservation Type</td>
+                                    <td style='padding: 8px 0; color: #fff; font-size: 16px; text-align: right;'><strong>" . ($is_ct ? "🍳 Chef's Table" : "🍽️ Normal") . "</strong></td>
+                                </tr>
                                 <tr>
                                     <td style='padding: 8px 0; color: #888; font-size: 14px;'>Date</td>
                                     <td style='padding: 8px 0; color: #fff; font-size: 16px; text-align: right;'><strong>{$tarih_format}</strong></td>
@@ -317,19 +351,28 @@ function gonderOnayMaili($rez) {
                 </div>
             ";
         } else {
+            $title_tr = $is_ct ? "Chef's Table Onaylandı" : "Rezervasyonunuz Onaylandı";
+            $body_tr = $is_ct 
+                ? "Chef's Table rezervasyon talebiniz onaylanmıştır. Sizi Sintesi Chef's Table deneyiminde ağırlamak için sabırsızlanıyoruz."
+                : "Rezervasyon talebiniz onaylanmıştır. Sizi Sintesi atmosferinde ağırlamak için sabırsızlanıyoruz.";
+
             $mail->Body = "
                 <div style=\"font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; border-radius: 15px; overflow: hidden; background: #000 url('https://sintesi.com.tr/background.png') no-repeat center center; background-size: cover; color: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.5);\">
                     <div style='padding: 40px 20px; text-align: center;'>
                         <img src='https://sintesi.com.tr/sintesi.webp' alt='Sintesi' style='max-width: 180px; margin-bottom: 20px;'>
-                        <h1 style='margin: 0; font-size: 26px; font-family: Georgia, serif; color: #fff;'>Rezervasyonunuz Onaylandı</h1>
+                        <h1 style='margin: 0; font-size: 26px; font-family: Georgia, serif; color: #fff;'>{$title_tr}</h1>
                         <div style='width: 50px; height: 2px; background: #9D432C; margin: 20px auto;'></div>
                     </div>
                     <div style='padding: 0 40px 40px 40px;'>
                         <p style='font-size: 16px; line-height: 1.6; color: #e0e0e0;'>Sayın <strong>{$rez['ad_soyad']}</strong>,</p>
-                        <p style='font-size: 16px; line-height: 1.6; color: #e0e0e0;'>Rezervasyon talebiniz onaylanmıştır. Sizi Sintesi atmosferinde ağırlamak için sabırsızlanıyoruz.</p>
+                        <p style='font-size: 16px; line-height: 1.6; color: #e0e0e0;'>{$body_tr}</p>
                         
                         <div style='background: rgba(255,255,255,0.05); padding: 25px; border-radius: 12px; margin: 30px 0; border: 1px solid rgba(255,255,255,0.1);'>
                             <table style='width: 100%; border-collapse: collapse;'>
+                                <tr>
+                                    <td style='padding: 8px 0; color: #888; font-size: 14px;'>Rezervasyon Tipi</td>
+                                    <td style='padding: 8px 0; color: #fff; font-size: 16px; text-align: right;'><strong>" . ($is_ct ? "🍳 Chef's Table" : "🍽️ Normal") . "</strong></td>
+                                </tr>
                                 <tr>
                                     <td style='padding: 8px 0; color: #888; font-size: 14px;'>Tarih</td>
                                     <td style='padding: 8px 0; color: #fff; font-size: 16px; text-align: right;'><strong>{$tarih_format}</strong></td>
@@ -516,6 +559,17 @@ function istatistikler($pdo) {
  * Manuel rezervasyon ekle
  */
 function manuelEkle($pdo) {
+    // Eksik sütun kontrolü (Canlıya geçişte rezervasyon_tipi için)
+    try {
+        $pdo->query("SELECT rezervasyon_tipi FROM rezervasyonlar LIMIT 1");
+    } catch (Exception $e) {
+        try {
+            $pdo->exec("ALTER TABLE rezervasyonlar ADD COLUMN rezervasyon_tipi VARCHAR(30) DEFAULT 'normal'");
+        } catch (Exception $e2) {
+            // Sessizce devam et
+        }
+    }
+
     $ad_soyad = $_POST['ad_soyad'] ?? '';
     $telefon = $_POST['telefon'] ?? '';
     $email = $_POST['email'] ?? '';
@@ -523,6 +577,7 @@ function manuelEkle($pdo) {
     $saat = $_POST['saat'] ?? '';
     $kisi = intval($_POST['kisi_sayisi'] ?? 2);
     $ozel = $_POST['ozel_istekler'] ?? '';
+    $tip = $_POST['rezervasyon_tipi'] ?? 'normal';
     
     if (empty($ad_soyad) || empty($telefon) || empty($tarih) || empty($saat)) {
         echo json_encode(['success' => false, 'message' => 'Lütfen zorunlu alanları doldurun.']);
@@ -532,10 +587,10 @@ function manuelEkle($pdo) {
     $iptal_kodu = bin2hex(random_bytes(16));
     
     $stmt = $pdo->prepare("
-        INSERT INTO rezervasyonlar (ad_soyad, telefon, email, tarih, saat, kisi_sayisi, ozel_istekler, durum, iptal_kodu)
-        VALUES (?, ?, ?, ?, ?, ?, ?, 'onaylandi', ?)
+        INSERT INTO rezervasyonlar (ad_soyad, telefon, email, tarih, saat, kisi_sayisi, ozel_istekler, durum, iptal_kodu, rezervasyon_tipi)
+        VALUES (?, ?, ?, ?, ?, ?, ?, 'onaylandi', ?, ?)
     ");
-    $stmt->execute([$ad_soyad, $telefon, $email, $tarih, $saat, $kisi, $ozel, $iptal_kodu]);
+    $stmt->execute([$ad_soyad, $telefon, $email, $tarih, $saat, $kisi, $ozel, $iptal_kodu, $tip]);
     
     // Onay maili gönder (Eğer e-posta adresi varsa)
     if (!empty($email)) {
@@ -545,7 +600,8 @@ function manuelEkle($pdo) {
             'tarih' => $tarih,
             'saat' => $saat,
             'kisi_sayisi' => $kisi,
-            'iptal_kodu' => $iptal_kodu
+            'iptal_kodu' => $iptal_kodu,
+            'rezervasyon_tipi' => $tip
         ]);
     }
     
@@ -578,6 +634,109 @@ function ayarlariGetir($pdo) {
             "0" => ["acilis" => "15:00", "kapanis" => "00:00", "durum" => "acik"]
         ];
 
+        $varsayilan_chefs_table_saatler = [
+            "1" => ["acilis" => "19:00", "kapanis" => "00:00", "durum" => "acik"],
+            "2" => ["acilis" => "19:00", "kapanis" => "00:00", "durum" => "acik"],
+            "3" => ["acilis" => "19:00", "kapanis" => "00:00", "durum" => "acik"],
+            "4" => ["acilis" => "19:00", "kapanis" => "00:00", "durum" => "acik"],
+            "5" => ["acilis" => "19:00", "kapanis" => "00:00", "durum" => "acik"],
+            "6" => ["acilis" => "19:00", "kapanis" => "00:00", "durum" => "acik"],
+            "0" => ["acilis" => "19:00", "kapanis" => "00:00", "durum" => "acik"]
+        ];
+
+        $varsayilan_chefs_table_details = [
+            [
+                'title_tr' => 'Kapasite',
+                'title_en' => 'Capacity',
+                'desc_tr' => 'En fazla 8 kişilik özel masa düzeni',
+                'desc_en' => 'Private seating for up to 8 guests'
+            ],
+            [
+                'title_tr' => 'Menü',
+                'title_en' => 'Menu',
+                'desc_tr' => 'Şefin o güne özel hazırladığı 7 aşamalı tadım menüsü',
+                'desc_en' => '7-course tasting menu curated specially for the evening'
+            ],
+            [
+                'title_tr' => 'Eşleşme',
+                'title_en' => 'Pairing',
+                'desc_tr' => 'Opsiyonel sommelier eşliğinde şarap uyumu',
+                'desc_en' => 'Optional sommelier-guided wine pairing'
+            ],
+            [
+                'title_tr' => 'Rezervasyon',
+                'title_en' => 'Reservation',
+                'desc_tr' => 'En az 48 saat önceden rezervasyon gereklidir',
+                'desc_en' => 'At least 48 hours advance booking required'
+            ]
+        ];
+
+        $varsayilan_chefs_table_menu = [
+            [
+                'num' => 1,
+                'type_tr' => 'Soğuk Başlangıç',
+                'type_en' => 'Cold Starter',
+                'title_tr' => 'Ege Otları Jeli ve Marine Levrek',
+                'title_en' => 'Aegean Herbs Jelly and Marinated Sea Bass',
+                'desc_tr' => 'Limon otu yağı ve kurutulmuş havyar ile.',
+                'desc_en' => 'With lemongrass oil and cured bottarga.'
+            ],
+            [
+                'num' => 2,
+                'type_tr' => 'Sıcak Başlangıç',
+                'type_en' => 'Warm Starter',
+                'title_tr' => 'Çıtır Kabak Çiçeği',
+                'title_en' => 'Crispy Zucchini Flower',
+                'desc_tr' => 'Köz patlıcan dolgulu kabak çiçeği, naneli süzme yoğurt sos ile.',
+                'desc_en' => 'Zucchini flower filled with roasted eggplant, served with mint strained yogurt sauce.'
+            ],
+            [
+                'num' => 3,
+                'type_tr' => 'Şefin Makarnası',
+                'type_en' => 'Chef\'s Pasta',
+                'title_tr' => 'Adaçaylı Tagliolini',
+                'title_en' => 'Sage Tagliolini',
+                'desc_tr' => 'Taze trüf mantarı ve ev yapımı adaçaylı tereyağlı tagliolini.',
+                'desc_en' => 'Fresh truffle and homemade tagliolini with sage butter.'
+            ],
+            [
+                'num' => 4,
+                'type_tr' => 'Deniz Mahsulü',
+                'type_en' => 'Seafood',
+                'title_tr' => 'Tava Fener Balığı',
+                'title_en' => 'Pan-Seared Monkfish',
+                'desc_tr' => 'Safranlı patates püresi ve yaban mersini sos eşliğinde.',
+                'desc_en' => 'With saffron potato purée and wild berry sauce.'
+            ],
+            [
+                'num' => 5,
+                'type_tr' => 'Ana Yemek',
+                'type_en' => 'Main Course',
+                'title_tr' => 'Ağır Ateşte Pişmiş Dana Yanağı',
+                'title_en' => 'Slow-Braised Beef Cheek',
+                'desc_tr' => 'Fırınlanmış kök sebzeler ve kemik iliği sosu ile.',
+                'desc_en' => 'With roasted root vegetables and bone marrow reduction.'
+            ],
+            [
+                'num' => 6,
+                'type_tr' => 'Damak Temizleyici',
+                'type_en' => 'Pre-Dessert',
+                'title_tr' => 'Fesleğenli ve Limonlu Sorbe',
+                'title_en' => 'Basil and Lemon Sorbet',
+                'desc_tr' => 'Ev yapımı ferahlatıcı sorbe.',
+                'desc_en' => 'Refreshing homemade sorbet.'
+            ],
+            [
+                'num' => 7,
+                'type_tr' => 'İmza Tatlı',
+                'type_en' => 'Signature Dessert',
+                'title_tr' => 'Çikolatalı ve İncirli Ganaj',
+                'title_en' => 'Chocolate and Fig Ganache',
+                'desc_tr' => 'Bitter çikolata ganaj, karamelize incir ve kakule esanslı dondurma ile.',
+                'desc_en' => 'Dark chocolate ganache, caramelized figs, and cardamom-infused ice cream.'
+            ]
+        ];
+
         echo json_encode([
             'success' => true,
             'data' => [
@@ -587,10 +746,108 @@ function ayarlariGetir($pdo) {
                 'menu_yemek' => $ayarlar['menu_yemek'] ?? '',
                 'menu_alkol' => $ayarlar['menu_alkol'] ?? '',
                 'menu_yemek_en' => $ayarlar['menu_yemek_en'] ?? '',
-                'menu_alkol_en' => $ayarlar['menu_alkol_en'] ?? ''
+                'menu_alkol_en' => $ayarlar['menu_alkol_en'] ?? '',
+                'chefs_table_details' => isset($ayarlar['chefs_table_details']) ? json_decode($ayarlar['chefs_table_details'], true) : $varsayilan_chefs_table_details,
+                'chefs_table_menu' => isset($ayarlar['chefs_table_menu']) ? json_decode($ayarlar['chefs_table_menu'], true) : $varsayilan_chefs_table_menu,
+                'chefs_table_kapasite' => isset($ayarlar['chefs_table_kapasite']) ? (int)$ayarlar['chefs_table_kapasite'] : 8,
+                'chefs_table_kapali_gunler' => isset($ayarlar['chefs_table_kapali_gunler']) ? json_decode($ayarlar['chefs_table_kapali_gunler'], true) : new stdClass(),
+                'chefs_table_calisma_saatleri' => isset($ayarlar['chefs_table_calisma_saatleri']) ? json_decode($ayarlar['chefs_table_calisma_saatleri'], true) : $varsayilan_chefs_table_saatler
             ]
         ]);
     } catch (Exception $e) {
+        $varsayilan_chefs_table_details = [
+            [
+                'title_tr' => 'Kapasite',
+                'title_en' => 'Capacity',
+                'desc_tr' => 'En fazla 8 kişilik özel masa düzeni',
+                'desc_en' => 'Private seating for up to 8 guests'
+            ],
+            [
+                'title_tr' => 'Menü',
+                'title_en' => 'Menu',
+                'desc_tr' => 'Şefin o güne özel hazırladığı 7 aşamalı tadım menüsü',
+                'desc_en' => '7-course tasting menu curated specially for the evening'
+            ],
+            [
+                'title_tr' => 'Eşleşme',
+                'title_en' => 'Pairing',
+                'desc_tr' => 'Opsiyonel sommelier eşliğinde şarap uyumu',
+                'desc_en' => 'Optional sommelier-guided wine pairing'
+            ],
+            [
+                'title_tr' => 'Rezervasyon',
+                'title_en' => 'Reservation',
+                'desc_tr' => 'En az 48 saat önceden rezervasyon gereklidir',
+                'desc_en' => 'At least 48 hours advance booking required'
+            ]
+        ];
+
+        $varsayilan_chefs_table_menu = [
+            [
+                'num' => 1,
+                'type_tr' => 'Soğuk Başlangıç',
+                'type_en' => 'Cold Starter',
+                'title_tr' => 'Ege Otları Jeli ve Marine Levrek',
+                'title_en' => 'Aegean Herbs Jelly and Marinated Sea Bass',
+                'desc_tr' => 'Limon otu yağı ve kurutulmuş havyar ile.',
+                'desc_en' => 'With lemongrass oil and cured bottarga.'
+            ],
+            [
+                'num' => 2,
+                'type_tr' => 'Sıcak Başlangıç',
+                'type_en' => 'Warm Starter',
+                'title_tr' => 'Çıtır Kabak Çiçeği',
+                'title_en' => 'Crispy Zucchini Flower',
+                'desc_tr' => 'Köz patlıcan dolgulu kabak çiçeği, naneli süzme yoğurt sos ile.',
+                'desc_en' => 'Zucchini flower filled with roasted eggplant, served with mint strained yogurt sauce.'
+            ],
+            [
+                'num' => 3,
+                'type_tr' => 'Şefin Makarnası',
+                'type_en' => 'Chef\'s Pasta',
+                'title_tr' => 'Adaçaylı Tagliolini',
+                'title_en' => 'Sage Tagliolini',
+                'desc_tr' => 'Taze trüf mantarı ve ev yapımı adaçaylı tereyağlı tagliolini.',
+                'desc_en' => 'Fresh truffle and homemade tagliolini with sage butter.'
+            ],
+            [
+                'num' => 4,
+                'type_tr' => 'Deniz Mahsulü',
+                'type_en' => 'Seafood',
+                'title_tr' => 'Tava Fener Balığı',
+                'title_en' => 'Pan-Seared Monkfish',
+                'desc_tr' => 'Safranlı patates püresi ve yaban mersini sos eşliğinde.',
+                'desc_en' => 'With saffron potato purée and wild berry sauce.'
+            ],
+            [
+                'num' => 5,
+                'type_tr' => 'Ana Yemek',
+                'type_en' => 'Main Course',
+                'title_tr' => 'Ağır Ateşte Pişmiş Dana Yanağı',
+                'title_en' => 'Slow-Braised Beef Cheek',
+                'desc_tr' => 'Fırınlanmış kök sebzeler ve kemik iliği sosu ile.',
+                'desc_en' => 'With roasted root vegetables and bone marrow reduction.'
+            ],
+            [
+                'num' => 6,
+                'type_tr' => 'Damak Temizleyici',
+                'type_en' => 'Pre-Dessert',
+                'title_tr' => 'Fesleğenli ve Limonlu Sorbe',
+                'title_en' => 'Basil and Lemon Sorbet',
+                'desc_tr' => 'Ev yapımı ferahlatıcı sorbe.',
+                'desc_en' => 'Refreshing homemade sorbet.'
+            ],
+            [
+                'num' => 7,
+                'type_tr' => 'İmza Tatlı',
+                'type_en' => 'Signature Dessert',
+                'title_tr' => 'Çikolatalı ve İncirli Ganaj',
+                'title_en' => 'Chocolate and Fig Ganache',
+                'desc_tr' => 'Bitter çikolata ganaj, karamelize incir ve kakule esanslı dondurma ile.',
+                'desc_en' => 'Dark chocolate ganache, caramelized figs, and cardamom-infused ice cream.'
+            ]
+        ];
+
         echo json_encode([
             'success' => false,
             'message' => $e->getMessage(),
@@ -601,7 +858,12 @@ function ayarlariGetir($pdo) {
                 'menu_yemek' => '',
                 'menu_alkol' => '',
                 'menu_yemek_en' => '',
-                'menu_alkol_en' => ''
+                'menu_alkol_en' => '',
+                'chefs_table_details' => $varsayilan_chefs_table_details,
+                'chefs_table_menu' => $varsayilan_chefs_table_menu,
+                'chefs_table_kapasite' => 8,
+                'chefs_table_kapali_gunler' => new stdClass(),
+                'chefs_table_calisma_saatleri' => isset($varsayilan_chefs_table_saatler) ? $varsayilan_chefs_table_saatler : []
             ]
         ]);
     }
@@ -611,71 +873,104 @@ function ayarlariGetir($pdo) {
  * Ayarları kaydet
  */
 function ayarlariKaydet($pdo) {
-        $kapasite = intval($_POST['kapasite'] ?? 16);
-        $kapali_gunler = $_POST['kapali_gunler'] ?? '{}';
-        $calisma_saatleri = $_POST['calisma_saatleri'] ?? '';
-        
-        // Güvenlik: JSON geçerli mi kontrol et
-        // Güvenlik: JSON geçerli mi kontrol et
-        $decoded = json_decode($kapali_gunler, true);
-        if ($decoded === null) {
-            $kapali_gunler = '{}';
+    try {
+        // Tablonun varlığından emin ol (SQLite/MySQL uyumlu)
+        if (local_mi()) {
+            $pdo->exec("CREATE TABLE IF NOT EXISTS ayarlar (ayar_anahtari TEXT PRIMARY KEY, ayar_degeri TEXT)");
         } else {
-            $kapali_gunler = json_encode($decoded);
+            $pdo->exec("CREATE TABLE IF NOT EXISTS ayarlar (ayar_anahtari VARCHAR(50) PRIMARY KEY, ayar_degeri TEXT) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
         }
-    
-        if (!empty($calisma_saatleri)) {
-            $decoded_saatler = json_decode($calisma_saatleri, true);
-            if ($decoded_saatler === null) {
-                $calisma_saatleri = '';
-            } else {
-                $calisma_saatleri = json_encode($decoded_saatler);
-            }
-        }
-    
-        try {
-            // Tablonun varlığından emin ol (SQLite/MySQL uyumlu)
-            if (local_mi()) {
-                $pdo->exec("CREATE TABLE IF NOT EXISTS ayarlar (ayar_anahtari TEXT PRIMARY KEY, ayar_degeri TEXT)");
-            } else {
-                $pdo->exec("CREATE TABLE IF NOT EXISTS ayarlar (ayar_anahtari VARCHAR(50) PRIMARY KEY, ayar_degeri TEXT) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
-            }
-    
-            // Ayarları Kaydet
+
+        // Ayarları Koşullu Kaydet
+        if (isset($_POST['kapasite'])) {
+            $kapasite = intval($_POST['kapasite']);
             $stmt = $pdo->prepare("REPLACE INTO ayarlar (ayar_anahtari, ayar_degeri) VALUES ('kapasite', ?)");
             $stmt->execute([(string)$kapasite]);
-            
-            $stmt = $pdo->prepare("REPLACE INTO ayarlar (ayar_anahtari, ayar_degeri) VALUES ('kapali_gunler', ?)");
-            $stmt->execute([$kapali_gunler]);
-
-            if (!empty($calisma_saatleri)) {
-                $stmt = $pdo->prepare("REPLACE INTO ayarlar (ayar_anahtari, ayar_degeri) VALUES ('calisma_saatleri', ?)");
-                $stmt->execute([$calisma_saatleri]);
+        }
+        
+        if (isset($_POST['kapali_gunler'])) {
+            $kapali_gunler = $_POST['kapali_gunler'];
+            $decoded = json_decode($kapali_gunler, true);
+            if ($decoded !== null) {
+                $stmt = $pdo->prepare("REPLACE INTO ayarlar (ayar_anahtari, ayar_degeri) VALUES ('kapali_gunler', ?)");
+                $stmt->execute([json_encode($decoded)]);
             }
+        }
 
-            // Menü PDF Yüklemeleri
-            $menu_keys = ['menu_yemek', 'menu_alkol', 'menu_yemek_en', 'menu_alkol_en'];
-            foreach ($menu_keys as $key) {
-                if (isset($_FILES[$key]) && $_FILES[$key]['error'] === UPLOAD_ERR_OK) {
-                    $tmp_name = $_FILES[$key]['tmp_name'];
-                    $name = basename($_FILES[$key]['name']);
-                    $extension = strtolower(pathinfo($name, PATHINFO_EXTENSION));
+        if (isset($_POST['calisma_saatleri'])) {
+            $calisma_saatleri = $_POST['calisma_saatleri'];
+            $decoded_saatler = json_decode($calisma_saatleri, true);
+            if ($decoded_saatler !== null) {
+                $stmt = $pdo->prepare("REPLACE INTO ayarlar (ayar_anahtari, ayar_degeri) VALUES ('calisma_saatleri', ?)");
+                $stmt->execute([json_encode($decoded_saatler)]);
+            }
+        }
+
+        if (isset($_POST['chefs_table_details'])) {
+            $chefs_table_details = $_POST['chefs_table_details'];
+            $decoded_details = json_decode($chefs_table_details, true);
+            if ($decoded_details !== null) {
+                $stmt = $pdo->prepare("REPLACE INTO ayarlar (ayar_anahtari, ayar_degeri) VALUES ('chefs_table_details', ?)");
+                $stmt->execute([json_encode($decoded_details)]);
+            }
+        }
+
+        if (isset($_POST['chefs_table_menu'])) {
+            $chefs_table_menu = $_POST['chefs_table_menu'];
+            $decoded_menu = json_decode($chefs_table_menu, true);
+            if ($decoded_menu !== null) {
+                $stmt = $pdo->prepare("REPLACE INTO ayarlar (ayar_anahtari, ayar_degeri) VALUES ('chefs_table_menu', ?)");
+                $stmt->execute([json_encode($decoded_menu)]);
+            }
+        }
+
+        if (isset($_POST['chefs_table_kapasite'])) {
+            $ct_kapasite = intval($_POST['chefs_table_kapasite']);
+            $stmt = $pdo->prepare("REPLACE INTO ayarlar (ayar_anahtari, ayar_degeri) VALUES ('chefs_table_kapasite', ?)");
+            $stmt->execute([(string)$ct_kapasite]);
+        }
+
+        if (isset($_POST['chefs_table_kapali_gunler'])) {
+            $ct_kapali_gunler = $_POST['chefs_table_kapali_gunler'];
+            $decoded_ct = json_decode($ct_kapali_gunler, true);
+            if ($decoded_ct !== null) {
+                $stmt = $pdo->prepare("REPLACE INTO ayarlar (ayar_anahtari, ayar_degeri) VALUES ('chefs_table_kapali_gunler', ?)");
+                $stmt->execute([json_encode($decoded_ct)]);
+            }
+        }
+
+        if (isset($_POST['chefs_table_calisma_saatleri'])) {
+            $ct_calisma_saatleri = $_POST['chefs_table_calisma_saatleri'];
+            $decoded_ct_saatler = json_decode($ct_calisma_saatleri, true);
+            if ($decoded_ct_saatler !== null) {
+                $stmt = $pdo->prepare("REPLACE INTO ayarlar (ayar_anahtari, ayar_degeri) VALUES ('chefs_table_calisma_saatleri', ?)");
+                $stmt->execute([json_encode($decoded_ct_saatler)]);
+            }
+        }
+
+        // Menü PDF Yüklemeleri
+        $menu_keys = ['menu_yemek', 'menu_alkol', 'menu_yemek_en', 'menu_alkol_en'];
+        foreach ($menu_keys as $key) {
+            if (isset($_FILES[$key]) && $_FILES[$key]['error'] === UPLOAD_ERR_OK) {
+                $tmp_name = $_FILES[$key]['tmp_name'];
+                $name = basename($_FILES[$key]['name']);
+                $extension = strtolower(pathinfo($name, PATHINFO_EXTENSION));
+                
+                if ($extension === 'pdf') {
+                    $new_name = $key . '_' . time() . '.pdf';
+                    $upload_dir = __DIR__ . '/../uploads/menu/';
+                    if (!is_dir($upload_dir)) mkdir($upload_dir, 0755, true);
                     
-                    if ($extension === 'pdf') {
-                        $new_name = $key . '_' . time() . '.pdf';
-                        $upload_dir = __DIR__ . '/../uploads/menu/';
-                        if (!is_dir($upload_dir)) mkdir($upload_dir, 0755, true);
-                        
-                        $destination = $upload_dir . $new_name;
-                        
-                        if (move_uploaded_file($tmp_name, $destination)) {
-                            $stmt = $pdo->prepare("REPLACE INTO ayarlar (ayar_anahtari, ayar_degeri) VALUES (?, ?)");
-                            $stmt->execute([$key, 'uploads/menu/' . $new_name]);
-                        }
+                    $destination = $upload_dir . $new_name;
+                    
+                    if (move_uploaded_file($tmp_name, $destination)) {
+                        $stmt = $pdo->prepare("REPLACE INTO ayarlar (ayar_anahtari, ayar_degeri) VALUES (?, ?)");
+                        $stmt->execute([$key, 'uploads/menu/' . $new_name]);
                     }
                 }
             }
-        
+        }
+    
         echo json_encode(['success' => true, 'message' => 'Ayarlar başarıyla kaydedildi.']);
     } catch (Exception $e) {
         echo json_encode(['success' => false, 'message' => 'Veritabanı hatası: ' . $e->getMessage()]);

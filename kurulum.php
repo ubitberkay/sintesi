@@ -30,6 +30,7 @@ try {
                 kisi_sayisi INTEGER NOT NULL DEFAULT 2,
                 ozel_istekler TEXT,
                 durum TEXT DEFAULT 'beklemede',
+                rezervasyon_tipi TEXT DEFAULT 'normal',
                 olusturma_tarihi DATETIME DEFAULT (datetime('now','localtime'))
             )
         ");
@@ -54,6 +55,7 @@ try {
                 kisi_sayisi INT NOT NULL DEFAULT 2,
                 ozel_istekler TEXT,
                 durum ENUM('beklemede','onaylandi','iptal') DEFAULT 'beklemede',
+                rezervasyon_tipi VARCHAR(30) DEFAULT 'normal',
                 olusturma_tarihi DATETIME DEFAULT CURRENT_TIMESTAMP
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
         ");

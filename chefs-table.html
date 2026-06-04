@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="tr" data-page-id="chefs-table">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sintesi | Chef's Table</title>
+    <meta name="description" content="Sintesi Chef's Table: Şef Ersin Avşar'ın açık mutfakta hazırladığı eşsiz 7 aşamalı tadım menüsü ile gastronomi yolculuğu.">
+    <link rel="icon" type="image/webp" href="sintesi.webp">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Montserrat:ital,wght@0,300;0,400;0,500;1,300&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --color-bg: #0c0c0c;
+            --color-surface: #151515;
+            --color-surface-2: #1e1e1e;
+            --color-text: #f5f5f5;
+            --color-text-muted: #a0a0a0;
+            --color-accent: #9D432C;
+            --color-accent-hover: #e8c682;
+
+            --font-heading: 'Cormorant Garamond', serif;
+            --font-body: 'Montserrat', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* Typography */
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--font-heading);
+            font-weight: 400;
+        }
+
+        h2 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            color: var(--color-accent);
+            letter-spacing: 2px;
+        }
+
+        .section-subtitle {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--color-text-muted);
+            margin-bottom: 1.5rem;
+            display: block;
+        }
+
+        p {
+            font-size: 1rem;
+            font-weight: 300;
+            color: var(--color-text-muted);
+            margin-bottom: 1.5rem;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+            transition: color 0.3s ease;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 5%;
+        }
+
+        /* Button */
+        .btn {
+            display: inline-block;
+            padding: 12px 32px;
+            border: 1px solid var(--color-accent);
+            color: var(--color-accent);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: var(--color-accent);
+            color: var(--color-bg);
+        }
+
+        /* Header & Navbar */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 2rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            background-color: rgba(12, 12, 12, 0.95);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: background-color 0.4s ease, padding 0.4s ease;
+        }
+
+        header.scrolled {
+            background-color: rgba(12, 12, 12, 0.98);
+            padding: 1rem 5%;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-family: var(--font-heading);
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--color-text);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo img {
+            height: 1.2em;
+            width: auto;
+            object-fit: contain;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 3rem;
+        }
+
+        nav ul li a {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+        }
+
+        nav ul li a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background-color: var(--color-accent);
+            transition: width 0.3s ease;
+        }
+
+        nav ul li a:hover::after,
+        nav ul li a.active::after {
+            width: 100%;
+        }
+
+        .lang-switcher {
+            display: flex;
+            gap: 10px;
+            margin-left: 2rem;
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            padding-left: 1.5rem;
+        }
+
+        .lang-btn {
+            cursor: pointer;
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .lang-btn:hover,
+        .lang-btn.active {
+            color: var(--color-accent);
+        }
+
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .menu-toggle span {
+            width: 30px;
+            height: 1px;
+            background-color: var(--color-text);
+            transition: 0.3s;
+        }
+
+        /* Hero Section */
+        #hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            text-align: center;
+            max-width: 100%;
+            padding: 0;
+        }
+
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('./assets/optimized/galeri12.webp');
+            background-size: cover;
+            background-position: center;
+            z-index: -2;
+            filter: brightness(0.4) blur(1px);
+        }
+
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(12, 12, 12, 0.2), var(--color-bg));
+            z-index: -1;
+        }
+
+        .hero-content {
+            max-width: 900px;
+            padding: 0 20px;
+            animation: fadeInUp 1.5s ease;
+        }
+
+        .hero-title {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            color: var(--color-text);
+        }
+
+        .hero-desc {
+            font-size: 1.5rem;
+            font-family: var(--font-heading);
+            color: var(--color-accent);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 2rem;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Section General */
+        section {
+            padding: 8rem 0;
+        }
+
+        /* About Chef's Table */
+        .responsive-flex {
+            display: flex;
+            align-items: center;
+            gap: 5rem;
+        }
+
+        .concept-text {
+            flex: 1.2;
+        }
+
+        .concept-image {
+            flex: 1;
+            position: relative;
+        }
+
+        .concept-image::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: -20px;
+            width: 100%;
+            height: 100%;
+            border: 1px solid var(--color-accent);
+            z-index: -1;
+        }
+
+        .concept-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: cover;
+            aspect-ratio: 3/4;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+            border-radius: 2px;
+        }
+
+        /* Details Grid */
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .detail-card {
+            background: var(--color-surface);
+            padding: 2.5rem 2rem;
+            border-left: 3px solid var(--color-accent);
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .detail-card:hover {
+            transform: translateY(-5px);
+            background: var(--color-surface-2);
+            border-left-color: var(--color-accent-hover);
+        }
+
+        .detail-card h3 {
+            color: var(--color-accent);
+            font-size: 1.6rem;
+            margin-bottom: 0.5rem;
+            letter-spacing: 1px;
+        }
+
+        .detail-card p {
+            margin-bottom: 0;
+            font-size: 0.9rem;
+            color: var(--color-text-muted);
+        }
+
+        /* Tasting Menu Section */
+        #tasting-menu {
+            background-color: var(--color-surface);
+            position: relative;
+        }
+
+        .menu-title-area {
+            text-align: center;
+            margin-bottom: 5rem;
+        }
+
+        .menu-timeline {
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            padding-left: 3rem;
+        }
+
+        /* Line down the middle */
+        .menu-timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background: rgba(255,255,255,0.08);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 4rem;
+            opacity: 0;
+            transform: translateX(30px);
+            transition: all 0.8s ease;
+        }
+
+        .timeline-item.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .timeline-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .timeline-marker {
+            position: absolute;
+            left: -3rem;
+            top: 5px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--color-bg);
+            border: 2px solid var(--color-accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-heading);
+            font-size: 1rem;
+            color: var(--color-accent);
+            font-weight: 600;
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+
+        .timeline-item:hover .timeline-marker {
+            background: var(--color-accent);
+            color: var(--color-bg);
+            transform: scale(1.1);
+        }
+
+        .timeline-content {
+            background: rgba(12, 12, 12, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            padding: 2.5rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .timeline-item:hover .timeline-content {
+            border-color: rgba(157, 67, 44, 0.3);
+            background: rgba(12, 12, 12, 0.8);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .course-title {
+            font-size: 2.2rem;
+            color: var(--color-text);
+            margin-bottom: 0.5rem;
+            letter-spacing: 1px;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+
+        .course-type {
+            font-size: 0.8rem;
+            font-family: var(--font-body);
+            color: var(--color-accent);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .course-desc {
+            font-size: 0.95rem;
+            font-style: italic;
+            color: var(--color-text-muted);
+            margin-bottom: 0;
+        }
+
+        /* CTA Section */
+        #cta {
+            text-align: center;
+            background: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.85)), url('background.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            padding: 10rem 0;
+        }
+
+        .cta-content h2 {
+            color: #fff;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn-large {
+            display: inline-block;
+            padding: 18px 45px;
+            background-color: var(--color-accent);
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            margin-top: 2rem;
+            border: 1px solid var(--color-accent);
+        }
+
+        .btn-large:hover {
+            background-color: transparent;
+            color: var(--color-accent);
+            transform: scale(1.03);
+            border-color: var(--color-accent);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.8rem;
+            color: var(--color-text-muted);
+            letter-spacing: 1px;
+        }
+
+        /* Scroll Reveal */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            section {
+                padding: 5rem 0;
+            }
+
+            .responsive-flex {
+                flex-direction: column;
+                text-align: center;
+                gap: 3rem;
+            }
+
+            .concept-image {
+                width: 100%;
+                max-width: 320px;
+                margin: 2.5rem auto 0 auto;
+            }
+
+            .concept-image::before {
+                top: -15px;
+                left: -15px;
+            }
+
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+
+            h2 {
+                font-size: 2.8rem;
+            }
+
+            .hero-title {
+                font-size: 3.5rem;
+            }
+        }
+
+        @media (max-width: 1100px) {
+            nav ul {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 70%;
+                height: 100vh;
+                background-color: var(--color-surface);
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                transition: right 0.4s ease;
+            }
+
+            nav ul.active {
+                right: 0;
+            }
+
+            .menu-toggle {
+                display: flex;
+                z-index: 1001;
+            }
+
+            .menu-toggle.active span:nth-child(1) {
+                transform: translateY(7px) rotate(45deg);
+            }
+
+            .menu-toggle.active span:nth-child(2) {
+                opacity: 0;
+            }
+
+            .menu-toggle.active span:nth-child(3) {
+                transform: translateY(-7px) rotate(-45deg);
+            }
+
+            .lang-switcher {
+                margin-left: 0;
+                margin-top: 2rem;
+                border-left: none;
+                padding-left: 0;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .hero-title {
+                font-size: 2.4rem;
+            }
+            .hero-desc {
+                font-size: 1.1rem;
+            }
+            h2 {
+                font-size: 2rem;
+            }
+            .details-grid {
+                gap: 1.2rem;
+            }
+            .detail-card {
+                padding: 1.8rem 1.5rem;
+            }
+            .course-title {
+                flex-direction: column;
+                gap: 5px;
+                font-size: 1.8rem;
+            }
+            .timeline-content {
+                padding: 1.5rem;
+            }
+            .menu-timeline {
+                padding-left: 2rem;
+            }
+            .timeline-marker {
+                left: -2rem;
+                width: 28px;
+                height: 28px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header / Navbar -->
+    <header id="header">
+        <a href="index.html" class="logo">
+            <img src="sintesi.webp" alt="Sintesi Logo">
+            Sintesi
+        </a>
+        <nav>
+            <ul id="nav-links">
+                <li><a href="index.html" class="nav-link" data-i18n="nav-home">Anasayfa</a></li>
+                <li><a href="hakkimizda.html" class="nav-link" data-i18n="nav-about">Hakkımızda</a></li>
+                <li><a href="galeri.html" class="nav-link" data-i18n="nav-gallery">Galeri</a></li>
+                <li><a href="menu.html" class="nav-link" data-i18n="nav-menu">Menü</a></li>
+                <li><a href="catering.html" class="nav-link" data-i18n="nav-catering">Caterıng ve Events</a></li>
+                <li><a href="chefs-table.html" class="nav-link active" data-i18n="nav-chefs-table">Chef's Table</a></li>
+                <li><a href="index.html#iletisim" class="nav-link" data-i18n="nav-contact">İletişim</a></li>
+                <li class="lang-switcher">
+                    <span class="lang-btn" onclick="setLanguage('tr')" data-lang="tr">TR</span>
+                    <span style="color: rgba(255,255,255,0.2)">|</span>
+                    <span class="lang-btn" onclick="setLanguage('en')" data-lang="en">EN</span>
+                </li>
+            </ul>
+        </nav>
+        <div class="menu-toggle" id="mobile-menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <span class="section-subtitle" data-i18n="nav-chefs-table">Chef's Table</span>
+            <h1 class="hero-title" data-i18n="ct-title">Chef's Table Deneyimi</h1>
+            <p class="hero-desc" data-i18n="ct-subtitle">Şef Ersin Avşar ile Gastronomik Sentez</p>
+            <a href="#concept" class="btn" data-i18n="about-btn">Keşfedin</a>
+        </div>
+    </section>
+
+    <!-- Concept Details -->
+    <section id="concept" class="reveal">
+        <div class="container" style="display: flex; flex-direction: column; gap: 2rem;">
+            <div class="responsive-flex">
+                <div class="concept-text">
+                    <span class="section-subtitle" data-i18n="about-subtitle">Konsept</span>
+                    <h2 data-i18n="ct-title">Chef's Table Deneyimi</h2>
+                    <p data-i18n="ct-desc-1">Sintesi mutfağının kalbine davetlisiniz. Şefimiz Ersin Avşar'ın açık mutfakta bizzat hazırlayıp sunduğu, sınırlı sayıda misafir için tasarlanan bu özel deneyim, geleneksel tatların modern gastronomi teknikleriyle buluştuğu eşsiz bir tadım yolculuğudur.</p>
+                    <p data-i18n="ct-desc-2">Her bir tabağımız, mevsimin en taze yerel malzemeleriyle hazırlanır ve şefin hikayeleri eşliğinde servis edilir. Bu interaktif deneyim, sadece yemek yemeyi değil, gastronominin sanatsal yönünü keşfetmeyi hedefler.</p>
+                </div>
+                <div class="concept-image">
+                    <img src="./assets/optimized/ersin.webp" loading="lazy" alt="Chef Ersin Avşar">
+                </div>
+            </div>
+
+            <!-- Experience Details Grid -->
+            <div>
+                <h3 class="section-subtitle" style="margin-top: 3rem;" data-i18n="ct-details-title">Deneyim Detayları</h3>
+                <div class="details-grid" id="details-grid">
+                    <div class="detail-card">
+                        <h3 data-i18n="ct-detail-seats-title">Kapasite</h3>
+                        <p data-i18n="ct-detail-seats-desc">En fazla 8 kişilik özel masa düzeni</p>
+                    </div>
+                    <div class="detail-card">
+                        <h3 data-i18n="ct-detail-menu-title">Menü</h3>
+                        <p data-i18n="ct-detail-menu-desc">Şefin o güne özel hazırladığı 7 aşamalı tadım menüsü</p>
+                    </div>
+                    <div class="detail-card">
+                        <h3 data-i18n="ct-detail-pairing-title">Eşleşme</h3>
+                        <p data-i18n="ct-detail-pairing-desc">Opsiyonel sommelier eşliğinde şarap uyumu</p>
+                    </div>
+                    <div class="detail-card">
+                        <h3 data-i18n="ct-detail-time-title">Rezervasyon</h3>
+                        <p data-i18n="ct-detail-time-desc">En az 48 saat önceden rezervasyon gereklidir</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tasting Menu Timeline -->
+    <section id="tasting-menu" class="reveal">
+        <div class="container">
+            <div class="menu-title-area">
+                <span class="section-subtitle" data-i18n="ct-menu-sub">Mevsimsel olarak değişen eşsiz lezzetler</span>
+                <h2 data-i18n="ct-menu-heading">Örnek Tadım Menüsü</h2>
+            </div>
+
+            <div class="menu-timeline" id="menu-timeline">
+                <!-- Course 1 -->
+                <div class="timeline-item reveal">
+                    <div class="timeline-marker">1</div>
+                    <div class="timeline-content">
+                        <div class="course-title">
+                            <span data-i18n="ct-course-1-title">Soğuk Başlangıç</span>
+                            <span class="course-type" data-i18n="ct-course-1-title">Soğuk Başlangıç</span>
+                        </div>
+                        <p class="course-desc" data-i18n="ct-course-1-desc">Ege otları jeli, marine levrek, limon otu yağı ve kurutulmuş havyar.</p>
+                    </div>
+                </div>
+
+                <!-- Course 2 -->
+                <div class="timeline-item reveal">
+                    <div class="timeline-marker">2</div>
+                    <div class="timeline-content">
+                        <div class="course-title">
+                            <span data-i18n="ct-course-2-title">Sıcak Başlangıç</span>
+                            <span class="course-type" data-i18n="ct-course-2-title">Sıcak Başlangıç</span>
+                        </div>
+                        <p class="course-desc" data-i18n="ct-course-2-desc">Köz patlıcan dolgulu çıtır kabak çiçeği, naneli süzme yoğurt sos.</p>
+                    </div>
+                </div>
+
+                <!-- Course 3 -->
+                <div class="timeline-item reveal">
+                    <div class="timeline-marker">3</div>
+                    <div class="timeline-content">
+                        <div class="course-title">
+                            <span data-i18n="ct-course-3-title">Şefin Makarnası</span>
+                            <span class="course-type" data-i18n="menu-yemek">Yemek</span>
+                        </div>
+                        <p class="course-desc" data-i18n="ct-course-3-desc">Taze trüf mantarı, ev yapımı adaçaylı tereyağlı tagliolini.</p>
+                    </div>
+                </div>
+
+                <!-- Course 4 -->
+                <div class="timeline-item reveal">
+                    <div class="timeline-marker">4</div>
+                    <div class="timeline-content">
+                        <div class="course-title">
+                            <span data-i18n="ct-course-4-title">Deniz Mahsulü</span>
+                            <span class="course-type" data-i18n="ct-course-4-title">Deniz Mahsulü</span>
+                        </div>
+                        <p class="course-desc" data-i18n="ct-course-4-desc">Tava fener balığı, safranlı patates püresi, yaban mersini sos.</p>
+                    </div>
+                </div>
+
+                <!-- Course 5 -->
+                <div class="timeline-item reveal">
+                    <div class="timeline-marker">5</div>
+                    <div class="timeline-content">
+                        <div class="course-title">
+                            <span data-i18n="ct-course-5-title">Ana Yemek</span>
+                            <span class="course-type" data-i18n="ct-course-5-title">Ana Yemek</span>
+                        </div>
+                        <p class="course-desc" data-i18n="ct-course-5-desc">Ağır ateşte pişmiş dana yanağı, fırınlanmış kök sebzeler, kemik iliği sosu.</p>
+                    </div>
+                </div>
+
+                <!-- Course 6 -->
+                <div class="timeline-item reveal">
+                    <div class="timeline-marker">6</div>
+                    <div class="timeline-content">
+                        <div class="course-title">
+                            <span data-i18n="ct-course-6-title">Damak Temizleyici</span>
+                            <span class="course-type" data-i18n="ct-course-6-title">Damak Temizleyici</span>
+                        </div>
+                        <p class="course-desc" data-i18n="ct-course-6-desc">Fesleğenli ve limonlu ev yapımı sorbe.</p>
+                    </div>
+                </div>
+
+                <!-- Course 7 -->
+                <div class="timeline-item reveal">
+                    <div class="timeline-marker">7</div>
+                    <div class="timeline-content">
+                        <div class="course-title">
+                            <span data-i18n="ct-course-7-title">İmza Tatlı</span>
+                            <span class="course-type" data-i18n="ct-course-7-title">İmza Tatlı</span>
+                        </div>
+                        <p class="course-desc" data-i18n="ct-course-7-desc">Bitter çikolata ganaj, karamelize incir ve kakule esanslı dondurma.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Reservation CTA Section -->
+    <section id="cta" class="reveal">
+        <div class="container cta-content">
+            <h2 data-i18n="ct-cta-title">Bu Eşsiz Senteze Ortak Olun</h2>
+            <p data-i18n="ct-cta-desc">Şef Ersin Avşar ile Chef's Table deneyimi için yerinizi şimdiden ayırtın.</p>
+            <a href="chefs-table-rezervasyon.html" class="btn-large" data-i18n="ct-cta-btn">Rezervasyon Talebi</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div style="margin-bottom: 1.5rem;">
+            <a href="https://www.instagram.com/sintesirestaurant/" target="_blank" rel="noopener noreferrer"
+                style="color: var(--color-text-muted); transition: color 0.3s ease;"
+                onmouseover="this.style.color='var(--color-accent)'"
+                onmouseout="this.style.color='var(--color-text-muted)'" title="Instagram">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                </svg>
+            </a>
+        </div>
+        <p data-i18n="footer-copy">&copy; Sintesi Restaurant. Tüm Hakları Saklıdır.</p>
+    </footer>
+
+    <!-- Translations System Script -->
+    <script src="js/translations.js"></script>
+    <script>
+        let chefsTableData = null;
+
+        async function loadChefsTableData() {
+            try {
+                const res = await fetch('public_api.php?action=settings');
+                const json = await res.json();
+                if (json.success && json.data) {
+                    chefsTableData = json.data;
+                    renderChefsTableData();
+                }
+            } catch (err) {
+                console.error("Failed to load Chef's Table dynamic settings:", err);
+            }
+        }
+
+        function renderChefsTableData() {
+            if (!chefsTableData) return;
+            const lang = localStorage.getItem('preferredLanguage') || 'tr';
+            
+            // Render Details
+            const detailsGrid = document.getElementById('details-grid');
+            if (detailsGrid && chefsTableData.chefs_table_details) {
+                detailsGrid.innerHTML = chefsTableData.chefs_table_details.map(item => `
+                    <div class="detail-card">
+                        <h3>${lang === 'tr' ? item.title_tr : item.title_en}</h3>
+                        <p>${lang === 'tr' ? item.desc_tr : item.desc_en}</p>
+                    </div>
+                `).join('');
+            }
+
+            // Render Menu
+            const menuTimeline = document.getElementById('menu-timeline');
+            if (menuTimeline && chefsTableData.chefs_table_menu) {
+                menuTimeline.innerHTML = chefsTableData.chefs_table_menu.map(item => `
+                    <div class="timeline-item reveal">
+                        <div class="timeline-marker">${item.num}</div>
+                        <div class="timeline-content">
+                            <div class="course-title">
+                                <span>${lang === 'tr' ? item.title_tr : item.title_en}</span>
+                                <span class="course-type">${lang === 'tr' ? item.type_tr : item.type_en}</span>
+                            </div>
+                            <p class="course-desc">${lang === 'tr' ? item.desc_tr : item.desc_en}</p>
+                        </div>
+                    </div>
+                `).join('');
+                
+                // Re-observe the new reveal elements
+                if (window.revealObserver) {
+                    document.querySelectorAll('#menu-timeline .reveal').forEach(el => window.revealObserver.observe(el));
+                }
+            }
+        }
+
+        function onLanguageChange(lang) {
+            renderChefsTableData();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load dynamic data
+            loadChefsTableData();
+
+            // Mobile menu toggle
+            const mobileMenu = document.getElementById('mobile-menu');
+            const navLinks = document.getElementById('nav-links');
+            
+            if (mobileMenu) {
+                mobileMenu.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('active');
+                    navLinks.classList.toggle('active');
+                });
+            }
+
+            // Header scroll effect
+            const header = document.getElementById('header');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    header.classList.add('scrolled');
+                } else {
+                    header.classList.remove('scrolled');
+                }
+            });
+
+            // Clean mobile menu on resize
+            window.addEventListener('resize', () => {
+                if (window.innerWidth > 1100) {
+                    if (mobileMenu) mobileMenu.classList.remove('active');
+                    if (navLinks) navLinks.classList.remove('active');
+                }
+            });
+
+            // Scroll Reveal Observer
+            const revealObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                    }
+                });
+            }, { threshold: 0.1 });
+            window.revealObserver = revealObserver;
+
+            document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+        });
+    </script>
+</body>
+
+</html>
