@@ -848,6 +848,7 @@
             .then(json => {
                 if (json.success) {
                     maxKapasite = json.data.chefs_table_kapasite || 8;
+                    maxPersonForSlot = maxKapasite;
                     kapaliGunler = json.data.chefs_table_kapali_gunler || {};
                     calismaSaatleri = json.data.chefs_table_calisma_saatleri || {};
                 }
@@ -992,7 +993,7 @@
             document.getElementById('rez-saat').value = time;
 
             // Kişi sayısını müsaitliğe göre sınırla
-            maxPersonForSlot = Math.min(20, remaining);
+            maxPersonForSlot = Math.min(maxKapasite, remaining);
             if (personCount > maxPersonForSlot) {
                 personCount = maxPersonForSlot;
                 document.getElementById('person-count-display').textContent = personCount;
