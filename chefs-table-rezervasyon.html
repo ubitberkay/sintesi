@@ -823,6 +823,8 @@
         let kapaliGunler = {};
         let calismaSaatleri = {};
         let fp = null; // Flatpickr instance
+        let kapaliGunMesajiTr = "Chef's Table bugün hizmet vermemektedir.";
+        let kapaliGunMesajiEn = "Chef's Table is not serving today.";
 
         function onLanguageChange(lang) {
             if (fp) {
@@ -851,6 +853,8 @@
                     maxPersonForSlot = maxKapasite;
                     kapaliGunler = json.data.chefs_table_kapali_gunler || {};
                     calismaSaatleri = json.data.chefs_table_calisma_saatleri || {};
+                    kapaliGunMesajiTr = json.data.chefs_table_kapali_gun_mesaji_tr || "Chef's Table bugün hizmet vermemektedir.";
+                    kapaliGunMesajiEn = json.data.chefs_table_kapali_gun_mesaji_en || "Chef's Table is not serving today.";
                 }
                 initCalendar();
             });
@@ -924,7 +928,8 @@
                 const gunAyari = calismaSaatleri[dayOfWeek] || { acilis: "15:00", kapanis: "00:00", durum: "acik" };
 
                 if (gunAyari.durum === 'kapali') {
-                    container.innerHTML = `<div style="grid-column: 1 / -1; padding: 20px; text-align: center; color: var(--color-accent); font-weight: 500; background: rgba(157, 67, 44, 0.05); border-radius: 10px;">${translations[currentLang]['res-closed-day']}</div>`;
+                    const closedMsg = currentLang === 'tr' ? kapaliGunMesajiTr : kapaliGunMesajiEn;
+                    container.innerHTML = `<div style="grid-column: 1 / -1; padding: 20px; text-align: center; color: var(--color-accent); font-weight: 500; background: rgba(157, 67, 44, 0.05); border-radius: 10px;">${closedMsg}</div>`;
                     return;
                 }
 

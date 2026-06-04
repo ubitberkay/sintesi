@@ -751,7 +751,11 @@ function ayarlariGetir($pdo) {
                 'chefs_table_menu' => isset($ayarlar['chefs_table_menu']) ? json_decode($ayarlar['chefs_table_menu'], true) : $varsayilan_chefs_table_menu,
                 'chefs_table_kapasite' => isset($ayarlar['chefs_table_kapasite']) ? (int)$ayarlar['chefs_table_kapasite'] : 8,
                 'chefs_table_kapali_gunler' => isset($ayarlar['chefs_table_kapali_gunler']) ? json_decode($ayarlar['chefs_table_kapali_gunler'], true) : new stdClass(),
-                'chefs_table_calisma_saatleri' => isset($ayarlar['chefs_table_calisma_saatleri']) ? json_decode($ayarlar['chefs_table_calisma_saatleri'], true) : $varsayilan_chefs_table_saatler
+                'chefs_table_calisma_saatleri' => isset($ayarlar['chefs_table_calisma_saatleri']) ? json_decode($ayarlar['chefs_table_calisma_saatleri'], true) : $varsayilan_chefs_table_saatler,
+                'kapali_gun_mesaji_tr' => $ayarlar['kapali_gun_mesaji_tr'] ?? 'Restoranımız bugün kapalıdır.',
+                'kapali_gun_mesaji_en' => $ayarlar['kapali_gun_mesaji_en'] ?? 'Our restaurant is closed today.',
+                'chefs_table_kapali_gun_mesaji_tr' => $ayarlar['chefs_table_kapali_gun_mesaji_tr'] ?? "Chef's Table bugün hizmet vermemektedir.",
+                'chefs_table_kapali_gun_mesaji_en' => $ayarlar['chefs_table_kapali_gun_mesaji_en'] ?? 'Chef\'s Table is not serving today.'
             ]
         ]);
     } catch (Exception $e) {
@@ -863,7 +867,11 @@ function ayarlariGetir($pdo) {
                 'chefs_table_menu' => $varsayilan_chefs_table_menu,
                 'chefs_table_kapasite' => 8,
                 'chefs_table_kapali_gunler' => new stdClass(),
-                'chefs_table_calisma_saatleri' => isset($varsayilan_chefs_table_saatler) ? $varsayilan_chefs_table_saatler : []
+                'chefs_table_calisma_saatleri' => isset($varsayilan_chefs_table_saatler) ? $varsayilan_chefs_table_saatler : [],
+                'kapali_gun_mesaji_tr' => 'Restoranımız bugün kapalıdır.',
+                'kapali_gun_mesaji_en' => 'Our restaurant is closed today.',
+                'chefs_table_kapali_gun_mesaji_tr' => "Chef's Table bugün hizmet vermemektedir.",
+                'chefs_table_kapali_gun_mesaji_en' => 'Chef\'s Table is not serving today.'
             ]
         ]);
     }
@@ -946,6 +954,23 @@ function ayarlariKaydet($pdo) {
                 $stmt = $pdo->prepare("REPLACE INTO ayarlar (ayar_anahtari, ayar_degeri) VALUES ('chefs_table_calisma_saatleri', ?)");
                 $stmt->execute([json_encode($decoded_ct_saatler)]);
             }
+        }
+
+        if (isset($_POST['kapali_gun_mesaji_tr'])) {
+            $stmt = $pdo->prepare("REPLACE INTO ayarlar (ayar_anahtari, ayar_degeri) VALUES ('kapali_gun_mesaji_tr', ?)");
+            $stmt->execute([trim($_POST['kapali_gun_mesaji_tr'])]);
+        }
+        if (isset($_POST['kapali_gun_mesaji_en'])) {
+            $stmt = $pdo->prepare("REPLACE INTO ayarlar (ayar_anahtari, ayar_degeri) VALUES ('kapali_gun_mesaji_en', ?)");
+            $stmt->execute([trim($_POST['kapali_gun_mesaji_en'])]);
+        }
+        if (isset($_POST['chefs_table_kapali_gun_mesaji_tr'])) {
+            $stmt = $pdo->prepare("REPLACE INTO ayarlar (ayar_anahtari, ayar_degeri) VALUES ('chefs_table_kapali_gun_mesaji_tr', ?)");
+            $stmt->execute([trim($_POST['chefs_table_kapali_gun_mesaji_tr'])]);
+        }
+        if (isset($_POST['chefs_table_kapali_gun_mesaji_en'])) {
+            $stmt = $pdo->prepare("REPLACE INTO ayarlar (ayar_anahtari, ayar_degeri) VALUES ('chefs_table_kapali_gun_mesaji_en', ?)");
+            $stmt->execute([trim($_POST['chefs_table_kapali_gun_mesaji_en'])]);
         }
 
         // Menü PDF Yüklemeleri

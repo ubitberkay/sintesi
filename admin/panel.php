@@ -1468,6 +1468,15 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                             <h3 style="font-family: 'Cormorant Garamond'; color: var(--accent); font-size: 1.4rem; margin-bottom: 1rem;">⚙️ Sistem Ayarları</h3>
                             <div class="filter-group" style="margin-bottom: 1.5rem;"><label>Saatlik Kişi Kapasitesi</label><input type="number" name="kapasite" id="kapasite_main" min="1" max="100"></div>
                             
+                            <div class="filter-group" style="margin-bottom: 1rem;">
+                                <label>Restoran Kapalı Gün Mesajı (TR)</label>
+                                <input type="text" name="kapali_gun_mesaji_tr" id="kapali_gun_mesaji_tr" style="background: rgba(255, 255, 255, 0.05); border: none; color: #fff; padding: 10px; border-radius: 4px; width: 100%;">
+                            </div>
+                            <div class="filter-group" style="margin-bottom: 1.5rem;">
+                                <label>Restoran Kapalı Gün Mesajı (EN)</label>
+                                <input type="text" name="kapali_gun_mesaji_en" id="kapali_gun_mesaji_en" style="background: rgba(255, 255, 255, 0.05); border: none; color: #fff; padding: 10px; border-radius: 4px; width: 100%;">
+                            </div>
+                            
                             <h3 style="font-family: 'Cormorant Garamond'; color: var(--accent); font-size: 1.4rem; margin-bottom: 1rem;">🔒 Kapalı Günler</h3>
                             <div id="kapali-gunler-liste-main" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px; min-height: 40px; padding: 10px; background: rgba(255,255,255,0.02); border-radius: 8px;"></div>
                             <div style="display: flex; flex-direction: column; gap: 10px; background: var(--surface-2); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
@@ -1509,6 +1518,15 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                             <div class="filter-group" style="margin-bottom: 1.5rem;">
                                 <label>Saatlik Kişi Kapasitesi</label>
                                 <input type="number" name="chefs_table_kapasite" id="chefs_table_kapasite" min="1" max="100">
+                            </div>
+                            
+                            <div class="filter-group" style="margin-bottom: 1rem;">
+                                <label>Chef's Table Kapalı Gün Mesajı (TR)</label>
+                                <input type="text" name="chefs_table_kapali_gun_mesaji_tr" id="chefs_table_kapali_gun_mesaji_tr" style="background: rgba(255, 255, 255, 0.05); border: none; color: #fff; padding: 10px; border-radius: 4px; width: 100%;">
+                            </div>
+                            <div class="filter-group" style="margin-bottom: 1.5rem;">
+                                <label>Chef's Table Kapalı Gün Mesajı (EN)</label>
+                                <input type="text" name="chefs_table_kapali_gun_mesaji_en" id="chefs_table_kapali_gun_mesaji_en" style="background: rgba(255, 255, 255, 0.05); border: none; color: #fff; padding: 10px; border-radius: 4px; width: 100%;">
                             </div>
                             
                             <h4 style="font-family: 'Cormorant Garamond'; color: var(--accent); font-size: 1.3rem; margin-bottom: 1rem;">🔒 Chef's Table Kapalı Günler</h4>
@@ -3070,6 +3088,8 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                 const json = await res.json();
                 if (json.success) {
                     document.getElementById('kapasite_main').value = json.data.kapasite;
+                    document.getElementById('kapali_gun_mesaji_tr').value = json.data.kapali_gun_mesaji_tr || '';
+                    document.getElementById('kapali_gun_mesaji_en').value = json.data.kapali_gun_mesaji_en || '';
                     kapaliGunler = json.data.kapali_gunler || {};
                     if (Array.isArray(kapaliGunler)) kapaliGunler = {}; 
                     listeleKapaliGunlerMain();
@@ -3359,6 +3379,8 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                     
                     // Kapasite
                     document.getElementById('chefs_table_kapasite').value = json.data.chefs_table_kapasite || 8;
+                    document.getElementById('chefs_table_kapali_gun_mesaji_tr').value = json.data.chefs_table_kapali_gun_mesaji_tr || '';
+                    document.getElementById('chefs_table_kapali_gun_mesaji_en').value = json.data.chefs_table_kapali_gun_mesaji_en || '';
                     // Kapalı Günler
                     chefsTableKapaliGunler = json.data.chefs_table_kapali_gunler || {};
                     if (Array.isArray(chefsTableKapaliGunler)) chefsTableKapaliGunler = {};
@@ -3490,6 +3512,8 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                 formData.append('chefs_table_menu', JSON.stringify(menu));
                 
                 formData.append('chefs_table_kapasite', document.getElementById('chefs_table_kapasite').value);
+                formData.append('chefs_table_kapali_gun_mesaji_tr', document.getElementById('chefs_table_kapali_gun_mesaji_tr').value);
+                formData.append('chefs_table_kapali_gun_mesaji_en', document.getElementById('chefs_table_kapali_gun_mesaji_en').value);
                 formData.append('chefs_table_kapali_gunler', JSON.stringify(chefsTableKapaliGunler));
                 formData.append('chefs_table_calisma_saatleri', JSON.stringify(ctSaatler));
                 

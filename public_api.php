@@ -255,7 +255,11 @@ try {
             'chefs_table_menu' => $chefs_table_menu,
             'chefs_table_kapasite' => $chefs_table_kapasite,
             'chefs_table_kapali_gunler' => $chefs_table_kapali_gunler,
-            'chefs_table_calisma_saatleri' => $chefs_table_calisma_saatleri
+            'chefs_table_calisma_saatleri' => $chefs_table_calisma_saatleri,
+            'kapali_gun_mesaji_tr' => $ayarlar['kapali_gun_mesaji_tr'] ?? 'Restoranımız bugün kapalıdır.',
+            'kapali_gun_mesaji_en' => $ayarlar['kapali_gun_mesaji_en'] ?? 'Our restaurant is closed today.',
+            'chefs_table_kapali_gun_mesaji_tr' => $ayarlar['chefs_table_kapali_gun_mesaji_tr'] ?? "Chef's Table bugün hizmet vermemektedir.",
+            'chefs_table_kapali_gun_mesaji_en' => $ayarlar['chefs_table_kapali_gun_mesaji_en'] ?? 'Chef\'s Table is not serving today.'
         ]
     ]);
     
