@@ -52,6 +52,7 @@ const translations = {
         "menu-title": "Menülerimiz",
         "menu-yemek": "Yemek",
         "menu-yemek-desc": "Ana Menü",
+        "menu-icecek": "İçecekler",
         "menu-alkol": "Alkol",
         "menu-alkol-desc": "İçecek Listesi",
 
@@ -116,6 +117,7 @@ const translations = {
         // Page Titles (Browser Tab)
         "title-index": "Sintesi",
         "title-menu": "Sintesi - Menülerimiz",
+        "title-icecekler": "Sintesi - İçecek Menüsü",
         "title-catering": "Sintesi - Catering ve Events Hizmetleri",
         "title-rezervasyon": "Sintesi - Online Rezervasyon",
         "title-hakkimizda": "Sintesi - Hakkımızda",
@@ -210,6 +212,7 @@ const translations = {
         "menu-title": "Our Menus",
         "menu-yemek": "Food",
         "menu-yemek-desc": "Main Menu",
+        "menu-icecek": "Beverages",
         "menu-alkol": "Alcohol",
         "menu-alkol-desc": "Beverage List",
 
@@ -275,6 +278,7 @@ const translations = {
         // Page Titles (Browser Tab)
         "title-index": "Sintesi",
         "title-menu": "Sintesi - Our Menus",
+        "title-icecekler": "Sintesi - Beverages Menu",
         "title-catering": "Sintesi - Catering & Events Services",
         "title-rezervasyon": "Sintesi - Online Reservation",
         "title-hakkimizda": "Sintesi - About Us",

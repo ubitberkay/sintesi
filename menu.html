@@ -438,7 +438,6 @@
                     </svg>
                 </div>
                 <h3 data-i18n="menu-yemek">Yemek</h3>
-                <p data-i18n="menu-yemek-desc">Ana Menü</p>
             </a>
             <a href="alkol.html" id="menu-alkol" class="menu-card">
                 <div class="icon">
@@ -451,7 +450,19 @@
                     </svg>
                 </div>
                 <h3 data-i18n="menu-alkol">Alkol</h3>
-                <p data-i18n="menu-alkol-desc">İçecek Listesi</p>
+            </a>
+            <a href="icecekler.html" id="menu-icecek" class="menu-card">
+                <div class="icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17 8h1a4 4 0 1 1 0 8h-1"></path>
+                        <path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"></path>
+                        <line x1="6" y1="2" x2="6" y2="4"></line>
+                        <line x1="10" y1="2" x2="10" y2="4"></line>
+                        <line x1="14" y1="2" x2="14" y2="4"></line>
+                    </svg>
+                </div>
+                <h3 data-i18n="menu-icecek">İçecekler</h3>
             </a>
         </div>
     </main>
@@ -475,39 +486,6 @@
 
     <script src="js/translations.js"></script>
     <script>
-        async function loadMenuLinks() {
-            try {
-                const res = await fetch('public_api.php?action=settings');
-                const json = await res.json();
-                if (json.success) {
-                    const data = json.data;
-                    const lang = localStorage.getItem('preferredLanguage') || 'tr';
-                    
-                    const links = {
-                        'yemek': lang === 'tr' ? data.menu_yemek : (data.menu_yemek_en || data.menu_yemek),
-                        'alkol': lang === 'tr' ? data.menu_alkol : (data.menu_alkol_en || data.menu_alkol)
-                    };
-
-                    const menuYemek = document.getElementById('menu-yemek');
-                    const menuAlkol = document.getElementById('menu-alkol');
-
-                    if (links.yemek) { menuYemek.classList.remove('disabled'); }
-                    else menuYemek.classList.add('disabled');
-
-                    if (links.alkol) { menuAlkol.classList.remove('disabled'); }
-                    else menuAlkol.classList.add('disabled');
-                }
-            } catch (err) {
-                console.error('Menü linkleri yüklenemedi:', err);
-            }
-        }
-        
-        function onLanguageChange(lang) {
-            loadMenuLinks();
-        }
-        
-        loadMenuLinks();
-
         // Mobil Menü Toggle
         const mobileMenu = document.getElementById('mobile-menu');
         const navLinks = document.getElementById('nav-links');

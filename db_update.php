@@ -45,6 +45,16 @@ try {
     } catch (Exception $e) {
         echo "<p>❌ Hatırlatma sütunu eklenirken hata oluştu: " . $e->getMessage() . "</p>";
     }
+
+    // 3. Kahveler, Çaylar, Meşrubatlar kategorilerini 'drinks' tipine taşı
+    try {
+        $stmt = $pdo->prepare("UPDATE menu_categories SET type = 'drinks' WHERE name_tr IN ('Kahveler', 'Çaylar', 'Meşrubatlar')");
+        $stmt->execute();
+        $affected = $stmt->rowCount();
+        echo "<p>✅ Menü kategorileri güncellendi. ($affected kategori 'drinks' tipine taşındı.)</p>";
+    } catch (Exception $e) {
+        echo "<p>❌ Menü kategorileri güncellenirken hata oluştu: " . $e->getMessage() . "</p>";
+    }
     
     echo "<h3>Güncelleme Tamamlandı!</h3>";
     echo "<p><a href='/admin'>Admin Paneline Git</a></p>";

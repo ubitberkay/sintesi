@@ -1439,6 +1439,7 @@ if (!isset($_SESSION['admin_giris']) || $_SESSION['admin_giris'] !== true) {
                     <div class="filter-group">
                         <select id="digital-menu-type" onchange="loadDigitalMenu()">
                             <option value="food">🍴 Yemek Menüsü</option>
+                            <option value="drinks">🥤 İçecekler Menüsü</option>
                             <option value="alcohol">🍷 Alkol Menüsü</option>
                         </select>
                     </div>
