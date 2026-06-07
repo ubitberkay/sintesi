@@ -797,7 +797,7 @@
                         data-i18n="contact-res-link">Online
                         Rezervasyon
                         Formu</a>
-                    <p>+90 (216) XXX XX XX<br>info@sintesi.com.tr</p>
+                    <p>+90 532 699 32 82<br>info@sintesi.com.tr</p>
 
                 </div>
 
@@ -915,7 +915,117 @@
 
             // Dinamik Galeri Yükle (İlk 6 Resim)
             loadGallery();
+
+            // Çalışma Saatlerini Yükle
+            loadWorkingHours();
         });
+
+        async function loadWorkingHours() {
+            try {
+                const res = await fetch('public_api.php');
+                const json = await res.json();
+                if (json.success) {
+                    const calismaSaatleri = json.data.calisma_saatleri || {};
+                    const ctCalismaSaatleri = json.data.chefs_table_calisma_saatleri || {};
+                    
+                    const normalTr = formatWorkingHoursText(calismaSaatleri, 'tr');
+                    const normalEn = formatWorkingHoursText(calismaSaatleri, 'en');
+                    const ctTr = formatWorkingHoursText(ctCalismaSaatleri, 'tr');
+                    const ctEn = formatWorkingHoursText(ctCalismaSaatleri, 'en');
+                    
+                    let formattedTr = `<strong>Restoran:</strong><br>${normalTr}`;
+                    let formattedEn = `<strong>Restaurant:</strong><br>${normalEn}`;
+                    
+                    const hasOpenCT = Object.values(ctCalismaSaatleri).some(s => s.durum === 'acik');
+                    if (hasOpenCT) {
+                        formattedTr += `<br><br><strong>Chef's Table:</strong><br>${ctTr}`;
+                        formattedEn += `<br><br><strong>Chef's Table:</strong><br>${ctEn}`;
+                    }
+                    
+                    if (typeof translations !== 'undefined') {
+                        translations.tr["contact-hours-detail"] = formattedTr;
+                        translations.en["contact-hours-detail"] = formattedEn;
+                        
+                        const currentLang = localStorage.getItem('preferredLanguage') || 'tr';
+                        setLanguage(currentLang);
+                    } else {
+                        const currentLang = localStorage.getItem('preferredLanguage') || 'tr';
+                        const el = document.querySelector('[data-i18n="contact-hours-detail"]');
+                        if (el) {
+                            el.innerHTML = currentLang === 'tr' ? formattedTr : formattedEn;
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error('Çalışma saatleri yüklenirken hata:', err);
+            }
+        }
+
+        function formatWorkingHoursText(calismaSaatleri, lang) {
+            const daysOrder = ["1", "2", "3", "4", "5", "6", "0"];
+            const dayNamesList = {
+                tr: { "1": "Pazartesi", "2": "Salı", "3": "Çarşamba", "4": "Perşembe", "5": "Cuma", "6": "Cumartesi", "0": "Pazar" },
+                en: { "1": "Monday", "2": "Tuesday", "3": "Wednesday", "4": "Thursday", "5": "Friday", "6": "Saturday", "0": "Sunday" }
+            };
+            const dayShortNamesList = {
+                tr: { "1": "Pzt", "2": "Sal", "3": "Çar", "4": "Per", "5": "Cum", "6": "Cmt", "0": "Paz" },
+                en: { "1": "Mon", "2": "Tue", "3": "Wed", "4": "Thu", "5": "Fri", "6": "Sat", "0": "Sun" }
+            };
+            
+            const dayTimes = {};
+            const uniqueTimes = [];
+            
+            daysOrder.forEach(day => {
+                const s = calismaSaatleri[day] || { acilis: "15:00", kapanis: "00:00", durum: "acik" };
+                let timeStr = "";
+                if (s.durum === "kapali") {
+                    timeStr = lang === "tr" ? "Kapalı" : "Closed";
+                } else {
+                    timeStr = `${s.acilis} - ${s.kapanis}`;
+                }
+                dayTimes[day] = timeStr;
+                if (!uniqueTimes.includes(timeStr)) {
+                    uniqueTimes.push(timeStr);
+                }
+            });
+            
+            if (uniqueTimes.length === 1) {
+                const singleTime = uniqueTimes[0];
+                if (singleTime === "Kapalı" || singleTime === "Closed") {
+                    return lang === "tr" ? "Her Gün: Kapalı" : "Every Day: Closed";
+                }
+                return (lang === "tr" ? "Her Gün: " : "Every Day: ") + singleTime;
+            }
+            
+            const groups = [];
+            let currentGroup = { time: dayTimes["1"], days: ["1"] };
+            
+            for (let i = 1; i < daysOrder.length; i++) {
+                const day = daysOrder[i];
+                const time = dayTimes[day];
+                if (time === currentGroup.time) {
+                    currentGroup.days.push(day);
+                } else {
+                    groups.push(currentGroup);
+                    currentGroup = { time: time, days: [day] };
+                }
+            }
+            groups.push(currentGroup);
+            
+            const groupStrings = groups.map(g => {
+                let daysStr = "";
+                if (g.days.length === 1) {
+                    daysStr = dayNamesList[lang][g.days[0]];
+                } else if (g.days.length === 2) {
+                    daysStr = `${dayShortNamesList[lang][g.days[0]]} - ${dayShortNamesList[lang][g.days[1]]}`;
+                } else {
+                    daysStr = `${dayShortNamesList[lang][g.days[0]]} - ${dayShortNamesList[lang][g.days[g.days.length - 1]]}`;
+                }
+                return `${daysStr}: ${g.time}`;
+            });
+            
+            return groupStrings.join("<br>");
+        }
 
         async function loadGallery() {
             const grid = document.querySelector('.gallery-grid');

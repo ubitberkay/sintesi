@@ -158,7 +158,7 @@ function gonderHatirlatmaMaili($rez) {
                             </table>
                         </div>
                         
-                        <p style='font-size: 14px; color: #aaa; line-height: 1.6;'>If you are running late, please inform us at <strong>+90 (216) XXX XX XX</strong>. Reservations may be automatically cancelled 15 minutes after the expected time.</p>
+                        <p style='font-size: 14px; color: #aaa; line-height: 1.6;'>If you are running late, please inform us at <strong>+90 532 699 32 82</strong>. Reservations may be automatically cancelled 15 minutes after the expected time.</p>
                         <p style='margin-top: 40px; font-size: 14px; color: #aaa; text-align: center;'>See you soon,<br><strong>Sintesi Team</strong></p>
                     </div>
                     <div style='background: rgba(0,0,0,0.4); padding: 30px; text-align: center; border-top: 1px solid rgba(255,255,255,0.05);'>
@@ -195,7 +195,7 @@ function gonderHatirlatmaMaili($rez) {
                             </table>
                         </div>
                         
-                        <p style='font-size: 14px; color: #aaa; line-height: 1.6;'>Geç kalma durumunuzda lütfen bize <strong>+90 (216) XXX XX XX</strong> numaralı telefondan bilgi veriniz. Rezervasyonlar beklenen saatten 15 dakika sonra otomatik olarak iptal edilebilmektedir.</p>
+                        <p style='font-size: 14px; color: #aaa; line-height: 1.6;'>Geç kalma durumunuzda lütfen bize <strong>+90 532 699 32 82</strong> numaralı telefondan bilgi veriniz. Rezervasyonlar beklenen saatten 15 dakika sonra otomatik olarak iptal edilebilmektedir.</p>
                         <p style='margin-top: 40px; font-size: 14px; color: #aaa; text-align: center;'>Görüşmek üzere,<br><strong>Sintesi Ekibi</strong></p>
                     </div>
                     <div style='background: rgba(0,0,0,0.4); padding: 30px; text-align: center; border-top: 1px solid rgba(255,255,255,0.05);'>

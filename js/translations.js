@@ -332,7 +332,11 @@ function setLanguage(lang) {
                 // Special handling for select options if needed, but usually data-i18n is on option
                 el.textContent = translations[lang][key];
             } else {
-                el.textContent = translations[lang][key];
+                if (key === 'contact-hours-detail' || key === 'contact-address-detail') {
+                    el.innerHTML = translations[lang][key];
+                } else {
+                    el.textContent = translations[lang][key];
+                }
             }
         }
     });

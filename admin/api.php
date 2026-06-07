@@ -346,7 +346,7 @@ function gonderOnayMaili($rez) {
                     </div>
                     <div style='background: rgba(0,0,0,0.4); padding: 30px; text-align: center; border-top: 1px solid rgba(255,255,255,0.05);'>
                         <p style='margin: 0; color: #888; font-size: 13px;'>Metropol Istanbul Mall, B2 Floor, Atasehir/Istanbul</p>
-                        <p style='margin: 10px 0 0 0; color: #888; font-size: 13px;'>+90 (216) XXX XX XX</p>
+                        <p style='margin: 10px 0 0 0; color: #888; font-size: 13px;'>+90 532 699 32 82</p>
                     </div>
                 </div>
             ";
@@ -396,7 +396,7 @@ function gonderOnayMaili($rez) {
                     </div>
                     <div style='background: rgba(0,0,0,0.4); padding: 30px; text-align: center; border-top: 1px solid rgba(255,255,255,0.05);'>
                         <p style='margin: 0; color: #888; font-size: 13px;'>Metropol İstanbul AVM, B2 Katı, Ataşehir/İstanbul</p>
-                        <p style='margin: 10px 0 0 0; color: #888; font-size: 13px;'>+90 (216) XXX XX XX</p>
+                        <p style='margin: 10px 0 0 0; color: #888; font-size: 13px;'>+90 532 699 32 82</p>
                     </div>
                 </div>
             ";
