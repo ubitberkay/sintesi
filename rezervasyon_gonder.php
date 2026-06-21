@@ -30,12 +30,12 @@ $dil        = isset($_POST['dil']) ? htmlspecialchars(strip_tags(trim($_POST['di
 $rezervasyon_tipi = isset($_POST['rezervasyon_tipi']) ? htmlspecialchars(strip_tags(trim($_POST['rezervasyon_tipi']))) : 'normal';
 
 // Doğrulama
-if (empty($ad_soyad) || empty($telefon) || empty($tarih) || empty($saat)) {
+if (empty($ad_soyad) || empty($email) || empty($telefon) || empty($tarih) || empty($saat)) {
     echo json_encode(['success' => false, 'message' => 'Lütfen zorunlu alanları doldurun.']);
     exit;
 }
 
-if (!empty($email) && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     echo json_encode(['success' => false, 'message' => 'Geçerli bir e-posta adresi giriniz.']);
     exit;
 }

@@ -18,9 +18,10 @@ const translations = {
         // About Section (Index)
         "about-subtitle": "Hikayemiz",
         "about-title": "Tutkuyla Harmanlanmış Lezzetler",
-        "about-p1": "Sintesi, kelime anlamı olarak \"sentez\" anlamına gelir. Bizim için mutfak, farklı kültürlerin, yerel malzemelerin ve yenilikçi tekniklerin kusursuz bir sentezidir.",
-        "about-p2": "Her bir tabağımız, en taze malzemelerin özenle seçilmesiyle başlar ve şeflerimizin sanatıyla masanıza ulaşır. Amacımız, sadece yemek yemek değil, aynı zamanda duygulara hitap eden bir gastronomi yolculuğu sunmaktır.",
-        "about-p3": "Yıllar süren araştırmalarımız ve geleneksel yöntemlere olan saygımız, modern pişirme teknikleriyle birleştiğinde Sintesi'nin karakteristik menüsü ortaya çıkıyor.",
+        "about-p1": "Sintesi, farklı kültürlerin, geleneklerin ve lezzetlerin aynı sofrada doğal bir uyum içinde buluştuğu bir mutfak anlayışıdır.",
+        "about-p2": "Şef Ersin Avşar’ın yorumuyla; Anadolu, Ege ve Akdeniz’in en iyi ürünleri, İtalyan ve Fransız mutfak teknikleriyle yeniden şekillenir. İstanbul’un yüzyıllar boyunca farklı kültürlerden beslenen gastronomi mirasından ilham alan mutfağımızda, yerel ve mevsimsel ürünler her zaman merkezde yer alır.",
+        "about-p3": "Açık mutfağımızda hazırlanan her tabak; malzemeye duyulan saygının, tekniğin, yaratıcılığın ve paylaşma kültürünün bir yansımasıdır. Geçmişten gelen lezzet hafızasını çağdaş bir bakış açısıyla yorumlarken, samimiyeti ve misafirperverliği soframızın vazgeçilmez bir parçası olarak görüyoruz.",
+        "about-p4": "Sintesi’de amacımız yalnızca iyi yemek sunmak değil; misafirlerimizi kendilerini özel hissedecekleri sıcak, özenli ve unutulmaz bir deneyimle ağırlamaktır.",
         "about-btn": "Mekanımızı Keşfedin",
 
         // Gallery Section (Index)
@@ -91,7 +92,7 @@ const translations = {
         "form-name-ph": "Adınız Soyadınız",
         "form-phone-label": "TELEFON",
         "form-phone-ph": "05XX XXX XX XX",
-        "form-email-label": "E-POSTA (OPSİYONEL)",
+        "form-email-label": "E-POSTA",
         "form-email-ph": "orn@mail.com",
         "form-note-label": "ÖZEL NOT (OPSİYONEL)",
         "form-note-ph": "Alerji, kutlama veya masa tercihi...",
@@ -106,9 +107,9 @@ const translations = {
         "about-page-title": "Sintesi Hakkında",
         "about-page-desc": "Modern gastronominin yerel değerlerle buluştuğu nokta.",
         "about-mission-title": "Misyonumuz",
-        "about-mission-desc": "Yerel üreticileri destekleyerek en taze malzemeleri misafirlerimize sunmak ve gastronomi dünyasında sürdürülebilir, yenilikçi bir değer yaratmak.",
+        "about-mission-desc": "Yerel ve mevsimsel ürünleri en doğru zamanda kullanarak; teknik, yaratıcılık ve sadeliği bir araya getiren tabaklar hazırlamak. Akdeniz’in paylaşım kültüründen ilham alan yaklaşımımızla, misafirlerimize yalnızca bir öğün değil; lezzetin, samimiyetin ve misafirperverliğin merkezde olduğu bütünsel bir gastronomi deneyimi sunmak.",
         "about-vision-title": "Vizyonumuz",
-        "about-vision-desc": "Dünya mutfakları ile yerel mirasımızı harmanlayarak, Sintesi'yi hem lezzet hem de atmosfer açısından uluslararası bir destinasyon haline getirmek.",
+        "about-vision-desc": "Anadolu, Ege ve Akdeniz’in ürün zenginliğini, İtalyan ve Fransız mutfaklarının teknik birikimiyle yorumlayarak İstanbul’un gastronomi sahnesinde kalıcı bir iz bırakmak. Yerel değerlere duyduğumuz saygı, sürdürülebilir yaklaşımımız ve Şef Ersin Avşar’ın özgün mutfak anlayışıyla; uluslararası standartlarda, ilham veren ve kendi kimliğini güçlü şekilde ortaya koyan bir restoran olmak.",
 
         // Galeri Page
         "gallery-page-title": "Galerimiz",
@@ -179,9 +180,10 @@ const translations = {
         // About Section (Index)
         "about-subtitle": "Our Story",
         "about-title": "Flavors Blended with Passion",
-        "about-p1": "Sintesi means \"synthesis\". For us, the kitchen is a perfect synthesis of different cultures, local ingredients, and innovative techniques.",
-        "about-p2": "Each of our plates begins with the careful selection of the freshest ingredients and reaches your table through the art of our chefs. Our aim is not just to eat, but to offer a gastronomic journey that appeals to the emotions.",
-        "about-p3": "When our years of research and respect for traditional methods combine with modern cooking techniques, the characteristic menu of Sintesi emerges.",
+        "about-p1": "Sintesi is a culinary philosophy where different cultures, traditions, and flavors meet in natural harmony around the same table.",
+        "about-p2": "Interpreted by Chef Ersin Avşar, the finest ingredients of Anatolia, the Aegean, and the Mediterranean are reshaped through Italian and French culinary techniques. Inspired by the gastronomic heritage of Istanbul, which has been nourished by diverse cultures for centuries, local and seasonal products are always at the heart of our kitchen.",
+        "about-p3": "Every plate prepared in our open kitchen is a reflection of respect for ingredients, technique, creativity, and the culture of sharing. While interpreting the culinary memory of the past from a contemporary perspective, we embrace sincerity and hospitality as indispensable parts of our table.",
+        "about-p4": "At Sintesi, our goal is not only to offer fine food, but to host our guests in a warm, attentive, and unforgettable experience where they feel truly special.",
         "about-btn": "Discover Our Place",
 
         // Gallery Section (Index)
@@ -251,7 +253,7 @@ const translations = {
         "form-name-ph": "Your Name Surname",
         "form-phone-label": "PHONE",
         "form-phone-ph": "05XX XXX XX XX",
-        "form-email-label": "EMAIL (OPTIONAL)",
+        "form-email-label": "EMAIL",
         "form-email-ph": "example@mail.com",
         "form-note-label": "SPECIAL NOTE (OPTIONAL)",
         "form-note-ph": "Allergies, celebrations or table preference...",
@@ -266,9 +268,9 @@ const translations = {
         "about-page-title": "About Sintesi",
         "about-page-desc": "The point where modern gastronomy meets local values.",
         "about-mission-title": "Our Mission",
-        "about-mission-desc": "Supporting local producers to provide the freshest ingredients and creating sustainable, innovative value in gastronomy.",
+        "about-mission-desc": "To prepare dishes that bring together technique, creativity, and simplicity by using local and seasonal products at their peak. With our approach inspired by the sharing culture of the Mediterranean, to offer our guests not just a meal, but a holistic gastronomic experience centered around flavor, sincerity, and hospitality.",
         "about-vision-title": "Our Vision",
-        "about-vision-desc": "Blending global cuisines with our local heritage to make Sintesi an international destination for both flavor and atmosphere.",
+        "about-vision-desc": "To leave a lasting mark on Istanbul’s culinary scene by interpreting the rich variety of products from Anatolia, the Aegean, and the Mediterranean with the technical expertise of Italian and French cuisines. To be an inspiring restaurant that stands out with its strong identity at international standards, through our respect for local values, our sustainable approach, and Chef Ersin Avşar’s unique culinary philosophy.",
 
         // Galeri Page
         "gallery-page-title": "Our Gallery",
