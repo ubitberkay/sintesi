@@ -13,6 +13,37 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Montserrat:wght@300;400;500&display=swap"
         rel="stylesheet">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Restaurant",
+      "name": "Sintesi Restaurant",
+      "image": "https://sintesi.com.tr/sintesi.webp",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Atatürk Mahallesi Ertuğrul Gazi Sokak Metropol İstanbul Alışveriş Merkezi B2 Katı",
+        "addressLocality": "Ataşehir",
+        "addressRegion": "İstanbul",
+        "addressCountry": "TR"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 40.994778,
+        "longitude": 29.121453
+      },
+      "telephone": "+905326993282",
+      "servesCuisine": "Modern Mutfak, Anadolu, Akdeniz, İtalyan, FransızS",
+      "openingHoursSpecification": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+          "opens": "15:00",
+          "closes": "00:00"
+        }
+      ],
+      "menu": "https://sintesi.com.tr/menu"
+    }
+    </script>
     <style>
         :root {
             --color-bg: #0c0c0c;
@@ -724,8 +755,12 @@
         <div class="about-text">
             <span class="section-subtitle" data-i18n="about-subtitle">Hikayemiz</span>
             <h2 data-i18n="about-title">Tutkuyla Harmanlanmış Lezzetler</h2>
-            <p data-i18n="about-p1">Sintesi, farklı kültürlerin, geleneklerin ve lezzetlerin aynı sofrada doğal bir uyum içinde buluştuğu bir mutfak anlayışıdır.</p>
-            <p data-i18n="about-p2">Şef Ersin Avşar’ın yorumuyla; Anadolu, Ege ve Akdeniz’in en iyi ürünleri, İtalyan ve Fransız mutfak teknikleriyle yeniden şekillenir. İstanbul’un yüzyıllar boyunca farklı kültürlerden beslenen gastronomi mirasından ilham alan mutfağımızda, yerel ve mevsimsel ürünler her zaman merkezde yer alır.</p>
+            <p data-i18n="about-p1">Sintesi, farklı kültürlerin, geleneklerin ve lezzetlerin aynı sofrada doğal bir uyum
+                içinde buluştuğu bir mutfak anlayışıdır.</p>
+            <p data-i18n="about-p2">Şef Ersin Avşar’ın yorumuyla; Anadolu, Ege ve Akdeniz’in en iyi ürünleri, İtalyan ve
+                Fransız mutfak teknikleriyle yeniden şekillenir. İstanbul’un yüzyıllar boyunca farklı kültürlerden
+                beslenen gastronomi mirasından ilham alan mutfağımızda, yerel ve mevsimsel ürünler her zaman merkezde
+                yer alır.</p>
             <a href="hakkimizda.html" class="btn" style="margin-top: 1rem;" data-i18n="about-btn">Mekanımızı
                 Keşfedin</a>
         </div>
@@ -816,7 +851,7 @@
                 </div>
                 <div class="form-group">
                     <input type="tel" name="telefon" id="telefon" placeholder="Telefon Numaranız"
-                        oninput="this.value = this.value.replace(/[^0-9]/g, '');" maxlength="15" data-i18n="form-phone">
+                        data-i18n="form-phone">
                 </div>
                 <div class="form-group">
                     <textarea name="mesaj" id="mesaj" placeholder="Mesajınız veya Özel İstekleriniz..." required
@@ -913,6 +948,9 @@
 
             // Çalışma Saatlerini Yükle
             loadWorkingHours();
+
+            // Telefon Numarası Maskeleme
+            setupPhoneMask('telefon');
         });
 
         async function loadWorkingHours() {
@@ -922,25 +960,25 @@
                 if (json.success) {
                     const calismaSaatleri = json.data.calisma_saatleri || {};
                     const ctCalismaSaatleri = json.data.chefs_table_calisma_saatleri || {};
-                    
+
                     const normalTr = formatWorkingHoursText(calismaSaatleri, 'tr');
                     const normalEn = formatWorkingHoursText(calismaSaatleri, 'en');
                     const ctTr = formatWorkingHoursText(ctCalismaSaatleri, 'tr');
                     const ctEn = formatWorkingHoursText(ctCalismaSaatleri, 'en');
-                    
+
                     let formattedTr = `<strong>Restoran:</strong><br>${normalTr}`;
                     let formattedEn = `<strong>Restaurant:</strong><br>${normalEn}`;
-                    
+
                     const hasOpenCT = Object.values(ctCalismaSaatleri).some(s => s.durum === 'acik');
                     if (hasOpenCT) {
                         formattedTr += `<br><br><strong>Chef's Table:</strong><br>${ctTr}`;
                         formattedEn += `<br><br><strong>Chef's Table:</strong><br>${ctEn}`;
                     }
-                    
+
                     if (typeof translations !== 'undefined') {
                         translations.tr["contact-hours-detail"] = formattedTr;
                         translations.en["contact-hours-detail"] = formattedEn;
-                        
+
                         const currentLang = localStorage.getItem('preferredLanguage') || 'tr';
                         setLanguage(currentLang);
                     } else {
@@ -966,10 +1004,10 @@
                 tr: { "1": "Pzt", "2": "Sal", "3": "Çar", "4": "Per", "5": "Cum", "6": "Cmt", "0": "Paz" },
                 en: { "1": "Mon", "2": "Tue", "3": "Wed", "4": "Thu", "5": "Fri", "6": "Sat", "0": "Sun" }
             };
-            
+
             const dayTimes = {};
             const uniqueTimes = [];
-            
+
             daysOrder.forEach(day => {
                 const s = calismaSaatleri[day] || { acilis: "15:00", kapanis: "00:00", durum: "acik" };
                 let timeStr = "";
@@ -983,7 +1021,7 @@
                     uniqueTimes.push(timeStr);
                 }
             });
-            
+
             if (uniqueTimes.length === 1) {
                 const singleTime = uniqueTimes[0];
                 if (singleTime === "Kapalı" || singleTime === "Closed") {
@@ -991,10 +1029,10 @@
                 }
                 return (lang === "tr" ? "Her Gün: " : "Every Day: ") + singleTime;
             }
-            
+
             const groups = [];
             let currentGroup = { time: dayTimes["1"], days: ["1"] };
-            
+
             for (let i = 1; i < daysOrder.length; i++) {
                 const day = daysOrder[i];
                 const time = dayTimes[day];
@@ -1006,7 +1044,7 @@
                 }
             }
             groups.push(currentGroup);
-            
+
             const groupStrings = groups.map(g => {
                 let daysStr = "";
                 if (g.days.length === 1) {
@@ -1018,7 +1056,7 @@
                 }
                 return `${daysStr}: ${g.time}`;
             });
-            
+
             return groupStrings.join("<br>");
         }
 
@@ -1195,6 +1233,38 @@
         }, { threshold: 0.1 });
 
         document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+        // Telefon Maskeleme Yardımcı Fonksiyonu
+        function setupPhoneMask(id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.addEventListener('input', function (e) {
+                let val = e.target.value;
+                let isInternational = val.startsWith('+');
+                let digits = val.replace(/\D/g, '');
+
+                if (isInternational) {
+                    e.target.value = '+' + digits.substring(0, 15);
+                    return;
+                }
+
+                if (digits.startsWith('90')) {
+                    digits = digits.substring(2);
+                }
+                if (digits.startsWith('5')) {
+                    digits = '0' + digits;
+                }
+                digits = digits.substring(0, 11);
+
+                let parts = [];
+                if (digits.length > 0) parts.push(digits.substring(0, 4));
+                if (digits.length > 4) parts.push(digits.substring(4, 7));
+                if (digits.length > 7) parts.push(digits.substring(7, 9));
+                if (digits.length > 9) parts.push(digits.substring(9, 11));
+
+                e.target.value = parts.join(' ');
+            });
+        }
     </script>
 </body>
 

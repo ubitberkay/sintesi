@@ -1,0 +1,14 @@
+# SQLite database files
+data/
+*.db
+*.db-journal
+*.db-wal
+
+# Setup/installation scripts (should not be in production Git repository)
+kurulum.php
+
+# PHP environment files / logs
+.user.ini
+admin/session/
+cron_log.txt
+*.log

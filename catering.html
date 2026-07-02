@@ -571,7 +571,7 @@
                     </div>
                     <div class="form-group">
                         <label>TELEFON</label>
-                        <input type="tel" name="telefon" required placeholder="05XX XXX XX XX">
+                        <input type="tel" name="telefon" id="cat-telefon" required placeholder="05XX XXX XX XX">
                     </div>
                     <div class="form-group full-width">
                         <label>E-POSTA</label>
@@ -729,6 +729,40 @@
                 cateringSubmit.textContent = 'Talebi Gönder';
             }
         });
+
+        // Telefon Maskeleme Yardımcı Fonksiyonu
+        function setupPhoneMask(id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.addEventListener('input', function (e) {
+                let val = e.target.value;
+                let isInternational = val.startsWith('+');
+                let digits = val.replace(/\D/g, '');
+                
+                if (isInternational) {
+                    e.target.value = '+' + digits.substring(0, 15);
+                    return;
+                }
+                
+                if (digits.startsWith('90')) {
+                    digits = digits.substring(2);
+                }
+                if (digits.startsWith('5')) {
+                    digits = '0' + digits;
+                }
+                digits = digits.substring(0, 11);
+                
+                let parts = [];
+                if (digits.length > 0) parts.push(digits.substring(0, 4));
+                if (digits.length > 4) parts.push(digits.substring(4, 7));
+                if (digits.length > 7) parts.push(digits.substring(7, 9));
+                if (digits.length > 9) parts.push(digits.substring(9, 11));
+                
+                e.target.value = parts.join(' ');
+            });
+        }
+
+        setupPhoneMask('cat-telefon');
     </script>
 </body>
 
