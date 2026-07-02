@@ -16,8 +16,8 @@ $telefon = isset($_POST['telefon']) ? htmlspecialchars(strip_tags(trim($_POST['t
 $mesaj = isset($_POST['mesaj']) ? htmlspecialchars(strip_tags(trim($_POST['mesaj']))) : '';
 
 // Boş alan kontrolü
-if(empty($ad) || empty($eposta) || empty($mesaj)) {
-    echo json_encode(['success' => false, 'message' => 'Lütfen zorunlu alanları doldurun (Ad, E-posta, Mesaj).']);
+if(empty($ad) || empty($eposta) || empty($telefon) || empty($mesaj)) {
+    echo json_encode(['success' => false, 'message' => 'Lütfen tüm zorunlu alanları doldurun (Ad, E-posta, Telefon, Mesaj).']);
     exit;
 }
 

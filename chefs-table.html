@@ -168,10 +168,56 @@
             width: 100%;
         }
 
+        /* Laptop/Middle Screen Optimization */
+        @media (min-width: 1251px) and (max-width: 1450px) {
+            header {
+                padding: 1.5rem 3%;
+            }
+            header.scrolled {
+                padding: 1rem 3%;
+            }
+            .logo {
+                font-size: 1.5rem;
+                gap: 8px;
+            }
+            nav ul {
+                gap: 1.2rem;
+                flex-wrap: nowrap !important;
+            }
+            nav ul li a {
+                font-size: 0.8rem;
+                letter-spacing: 1px;
+                white-space: nowrap !important;
+            }
+            .lang-switcher.desktop-only {
+                padding-left: 1rem;
+            }
+        }
+
+        .lang-btn.active {
+            color: var(--color-accent);
+        }
+
+        nav {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+        }
+
+        .desktop-only {
+            display: flex !important;
+        }
+
+        .mobile-only {
+            display: none !important;
+        }
+
         .lang-switcher {
             display: flex;
             gap: 10px;
-            margin-left: 2rem;
+        }
+
+        .lang-switcher.desktop-only {
             border-left: 1px solid rgba(255, 255, 255, 0.1);
             padding-left: 1.5rem;
         }
@@ -555,7 +601,23 @@
             }
         }
 
-        @media (max-width: 1100px) {
+        @media (max-width: 1250px) {
+            nav {
+                flex: none;
+                display: block;
+            }
+            .desktop-only {
+                display: none !important;
+            }
+            .mobile-only {
+                display: flex !important;
+            }
+            .lang-switcher.mobile-only {
+                margin-left: 0;
+                margin-top: 2rem;
+                border-left: none;
+                padding-left: 0;
+            }
             nav ul {
                 position: fixed;
                 top: 0;
@@ -588,13 +650,6 @@
 
             .menu-toggle.active span:nth-child(3) {
                 transform: translateY(-7px) rotate(-45deg);
-            }
-
-            .lang-switcher {
-                margin-left: 0;
-                margin-top: 2rem;
-                border-left: none;
-                padding-left: 0;
             }
         }
 
@@ -652,13 +707,18 @@
                 <li><a href="catering.html" class="nav-link" data-i18n="nav-catering">Caterıng ve Events</a></li>
                 <li><a href="chefs-table.html" class="nav-link active" data-i18n="nav-chefs-table">Chef's Table</a></li>
                 <li><a href="index.html#iletisim" class="nav-link" data-i18n="nav-contact">İletişim</a></li>
-                <li class="lang-switcher">
+                <li class="lang-switcher mobile-only">
                     <span class="lang-btn" onclick="setLanguage('tr')" data-lang="tr">TR</span>
                     <span style="color: rgba(255,255,255,0.2)">|</span>
                     <span class="lang-btn" onclick="setLanguage('en')" data-lang="en">EN</span>
                 </li>
             </ul>
         </nav>
+        <div class="lang-switcher desktop-only">
+            <span class="lang-btn" onclick="setLanguage('tr')" data-lang="tr">TR</span>
+            <span style="color: rgba(255,255,255,0.2)">|</span>
+            <span class="lang-btn" onclick="setLanguage('en')" data-lang="en">EN</span>
+        </div>
         <div class="menu-toggle" id="mobile-menu">
             <span></span>
             <span></span>

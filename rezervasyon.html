@@ -458,42 +458,77 @@
         }
 
         .btn-continue {
-            padding: 15px 40px;
-            background: #333;
-            /* Varsayılan pasif */
-            color: #888;
-            border: none;
-            border-radius: 10px;
-            font-size: 1rem;
+            padding: 14px 36px;
+            background: #242424;
+            color: #666;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            font-size: 0.85rem;
             font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-family: var(--font-body);
+            cursor: not-allowed;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .btn-continue.active {
-            background: var(--color-accent);
-            color: #fff;
+            background: transparent;
+            color: var(--color-accent);
+            border: 1px solid var(--color-accent);
+            cursor: pointer;
         }
 
         .btn-continue.active:hover {
-            background: var(--color-accent-hover);
+            background: var(--color-accent);
+            color: var(--color-bg);
             transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(157, 67, 44, 0.3);
         }
 
         .btn-back {
             background: none;
             border: none;
             color: var(--color-text-muted);
+            font-family: var(--font-body);
             cursor: pointer;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+        }
+
+        .btn-back:hover {
+            color: var(--color-accent);
+        }
+
+        /* Genel Font Uyumluluğu Resetleme */
+        button, input, select, textarea, .flatpickr-calendar, .flatpickr-day, .flatpickr-months, .flatpickr-weekday {
+            font-family: var(--font-body) !important;
+        }
+
+        h1, h2, h3, h4, h5, h6, .step-title {
+            font-family: var(--font-heading) !important;
+            letter-spacing: 2px;
         }
 
         /* Header linkleri için geri dönüş */
-        .home-link {
-            position: absolute;
+        .header-nav-container {
+            position: fixed;
             top: 20px;
             left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .home-link {
+            position: absolute;
+            top: 0;
+            left: 0;
             z-index: 10;
             color: #fff;
             text-decoration: none;
@@ -514,12 +549,24 @@
                 padding: 20px 15px;
             }
 
+            .header-nav-container {
+                position: relative !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                display: flex !important;
+                justify-content: space-between !important;
+                width: 100% !important;
+                margin-bottom: 20px !important;
+                pointer-events: auto !important;
+            }
+
             .home-link {
                 position: relative !important;
                 top: 0 !important;
                 left: 0 !important;
                 display: inline-flex !important;
-                margin-bottom: 20px !important;
+                margin-bottom: 0 !important;
                 background: rgba(255, 255, 255, 0.05);
                 border: 1px solid rgba(255, 255, 255, 0.1);
             }
@@ -650,8 +697,8 @@
         /* Header linkleri için geri dönüş */
         .lang-switcher-fixed {
             position: absolute;
-            top: 20px;
-            right: 20px;
+            top: 0;
+            right: 0;
             z-index: 100;
             display: flex;
             gap: 10px;
@@ -683,15 +730,48 @@
                 top: 0 !important;
                 right: 0 !important;
                 display: inline-flex !important;
-                margin-bottom: 20px !important;
-                margin-left: 10px;
+                margin-bottom: 0 !important;
+                margin-left: 0 !important;
             }
+        }
+
+        /* Özel Form Doğrulama Stilleri */
+        .form-group {
+            position: relative;
+        }
+
+        .form-group input.invalid,
+        .form-group textarea.invalid,
+        .form-group select.invalid {
+            border-color: #E03E3E !important;
+            animation: shakeError 0.4s ease;
+        }
+
+        .form-group .error-msg {
+            display: block;
+            color: #E03E3E;
+            font-size: 0.75rem;
+            margin-top: 5px;
+            text-align: left;
+            letter-spacing: 0.5px;
+            animation: fadeInError 0.3s ease;
+        }
+
+        @keyframes shakeError {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+
+        @keyframes fadeInError {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 
 <body>
-    <div style="position: fixed; top: 20px; left: 20px; right: 20px; display: flex; justify-content: space-between; z-index: 1000; pointer-events: none;">
+    <div class="header-nav-container">
         <a href="index.html" class="home-link" style="pointer-events: auto;" data-i18n="nav-home">← Anasayfa</a>
         <div class="lang-switcher-fixed" style="pointer-events: auto;">
             <span class="lang-btn" onclick="setLanguage('tr')" data-lang="tr">TR</span>
@@ -1048,8 +1128,15 @@
         }
 
         // Form Gönderimi
-        document.getElementById('bookingForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
+        const bookingForm = document.getElementById('bookingForm');
+        if (bookingForm) {
+            bookingForm.setAttribute('novalidate', '');
+            bookingForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                if (!validateFormFields(bookingForm)) {
+                    return;
+                }
             const btn = document.getElementById('submit-btn');
             btn.disabled = true;
             btn.textContent = 'İşleniyor...';
@@ -1081,6 +1168,7 @@
                 btn.textContent = 'Rezervasyonu Tamamla';
             }
         });
+        }
 
         // Scroll Reveal Observer
         const revealObserver = new IntersectionObserver((entries) => {
@@ -1126,6 +1214,98 @@
         }
 
         setupPhoneMask('rez-telefon');
+
+        // Form Doğrulama Yardımcı Fonksiyonu
+        function validateFormFields(form) {
+            const inputs = form.querySelectorAll('input[required], textarea[required], select[required]');
+            let isFormValid = true;
+            const currentLang = localStorage.getItem('preferredLanguage') || 'tr';
+            
+            const errors = {
+                tr: {
+                    required: 'Bu alan zorunludur.',
+                    email: 'Lütfen geçerli bir e-posta adresi giriniz.',
+                    tel: 'Lütfen geçerli bir telefon numarası giriniz.'
+                },
+                en: {
+                    required: 'This field is required.',
+                    email: 'Please enter a valid email address.',
+                    tel: 'Please enter a valid phone number.'
+                }
+            };
+            
+            inputs.forEach(input => {
+                const parent = input.closest('.form-group');
+                if (!parent) return;
+                
+                // Önceki hatayı temizle
+                const prevError = parent.querySelector('.error-msg');
+                if (prevError) prevError.remove();
+                input.classList.remove('invalid');
+                
+                let isValid = true;
+                let errorText = '';
+                
+                // Zorunlu alan kontrolü
+                if (input.value.trim() === '') {
+                    isValid = false;
+                    errorText = errors[currentLang].required;
+                } 
+                // E-posta kontrolü
+                else if (input.type === 'email') {
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(input.value.trim())) {
+                        isValid = false;
+                        errorText = errors[currentLang].email;
+                    }
+                }
+                // Telefon kontrolü
+                else if (input.type === 'tel') {
+                    const rawLength = input.value.replace(/\D/g, '').length;
+                    let isTelValid = true;
+                    if (input.value.startsWith('+')) {
+                        if (rawLength < 10) isTelValid = false;
+                    } else {
+                        if (rawLength !== 11) isTelValid = false;
+                    }
+                    
+                    if (!isTelValid) {
+                        isValid = false;
+                        errorText = errors[currentLang].tel;
+                    }
+                }
+                
+                if (!isValid) {
+                    isFormValid = false;
+                    input.classList.add('invalid');
+                    
+                    const span = document.createElement('span');
+                    span.className = 'error-msg';
+                    span.textContent = errorText;
+                    parent.appendChild(span);
+                    
+                    // Giriş yapıldıkça hatayı temizle
+                    const clearError = () => {
+                        input.classList.remove('invalid');
+                        span.remove();
+                        input.removeEventListener('input', clearError);
+                        input.removeEventListener('change', clearError);
+                    };
+                    input.addEventListener('input', clearError);
+                    input.addEventListener('change', clearError);
+                }
+            });
+            
+            if (!isFormValid) {
+                const firstError = form.querySelector('.invalid');
+                if (firstError) {
+                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    firstError.focus();
+                }
+            }
+            
+            return isFormValid;
+        }
     </script>
     <script src="js/translations.js"></script>
 </body>

@@ -145,6 +145,10 @@ Sitenin ilk açılış hızı, özellikle mobil cihazlarda kullanıcıyı tutmak
 * **Öneri:** Kullanıcı yazarken otomatik olarak `(0532) 123 45 67` gibi formatlayan bir maskeleme kütüphanesi (örn: Cleave.js veya basit bir regEx input mask) eklenmesi formu daha profesyonel gösterir.
 * **Durum:** **[Uygulandı]** Tüm telefon girdisi olan form sayfalarına (`index.html`, `rezervasyon.html`, `chefs-table-rezervasyon.html`, `catering.html`) özel JavaScript telefon maskeleme fonksiyonu (`setupPhoneMask`) entegre edildi. Telefon numaraları otomatik olarak `05XX XXX XX XX` biçiminde formatlanır, `5` ile başlayan girdilerin başına otomatik `0` eklenir ve `+` ile başlayan uluslararası numaralar da desteklenir.
 
+### D. Site Konseptine Uygun Özel Form Doğrulama Arayüzü
+* **Öneri:** Form gönderimlerinde standart tarayıcı hata pencereleri (tooltips) yerine sitenin genel tasarım dili ve renk paletiyle uyumlu, dinamik ve şık kırmızı hata mesajları tasarlanmalıdır.
+* **Durum:** **[Uygulandı]** Tüm aktif formlara (`index.html`, `rezervasyon.html`, `chefs-table-rezervasyon.html`, `catering.html`) site tasarımıyla bütünleşik yeni hata mesajı tasarımı uygulandı. Hatalı girdilerde alanı vurgulayan kırmızı kenarlıklar, sallanma (shake) animasyonu ve dil duyarlı (Türkçe/İngilizce) açıklamalar dinamik olarak gösterilmektedir.
+
 ---
 
 ## ⚙️ 6. Yönetim Paneli (Admin Panel) Önerileri
