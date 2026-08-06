@@ -923,7 +923,17 @@
                 fp.set("locale", lang === "tr" ? "tr" : "default");
             }
             if (selectedDate) {
-                loadTimeSlots(selectedDate);
+                const isClosed = checkClosedDate(null, selectedDate);
+                if (isClosed) {
+                    const container = document.getElementById('time-slots-container');
+                    const closedText = lang === 'tr' ? 'Seçilen tarih rezervasyonlara kapalıdır.' : 'The selected date is closed for reservations.';
+                    container.innerHTML = `<p style="color:var(--color-accent); font-weight:600;">${closedText}</p>`;
+                    selectedTime = null;
+                    document.getElementById('rez-saat').value = '';
+                    updateButtonState();
+                } else {
+                    loadTimeSlots(selectedDate);
+                }
             }
         }
 
@@ -985,11 +995,12 @@
             msgBox.style.display = 'none';
             msgBox.className = '';
 
-            let note = null;
-            if (kapaliGunler[dateStr]) note = kapaliGunler[dateStr];
-
-            if (note) {
-                showMsg(typeof note === 'string' ? note : 'Bu tarih rezervasyona kapalıdır.', 'error');
+            if (kapaliGunler.hasOwnProperty(dateStr)) {
+                const note = kapaliGunler[dateStr];
+                const currentLang = localStorage.getItem('preferredLanguage') || 'tr';
+                const defaultMsg = currentLang === 'tr' ? kapaliGunMesajiTr : kapaliGunMesajiEn;
+                const showText = (typeof note === 'string' && note.trim() !== '') ? note : defaultMsg;
+                showMsg(showText, 'error');
                 return true;
             }
             return false;
